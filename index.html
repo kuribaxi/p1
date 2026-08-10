@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Var kan jag se den? — TMDB</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,900&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b1220;
+    --bg-alt:#0f1830;
+    --panel:#121b2e;
+    --panel-line:rgba(212,175,55,0.16);
+    --gold:#c9a227;
+    --gold-bright:#e8c766;
+    --cream:#f3ecdd;
+    --cream-dim:#a9a290;
+    --teal:#35c6b4;
+    --amber:#e0a458;
+    --error:#e2574c;
+    --radius:14px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:
+      radial-gradient(700px 400px at 15% -10%, rgba(201,162,39,0.10), transparent),
+      radial-gradient(900px 500px at 90% 10%, rgba(53,198,180,0.06), transparent),
+      var(--bg);
+    color:var(--cream);
+    font-family:'Manrope', sans-serif;
+    min-height:100vh;
+    padding:0 0 80px;
+  }
+  .mono{font-family:'JetBrains Mono', monospace;}
+
+  /* Marquee header */
+  .marquee{
+    padding:38px 20px 26px;
+    text-align:center;
+    position:relative;
+    border-bottom:1px solid var(--panel-line);
+    background:linear-gradient(180deg, rgba(201,162,39,0.06), transparent);
+  }
+  .bulbs{
+    display:flex; justify-content:center; gap:7px; margin-bottom:18px;
+  }
+  .bulb{
+    width:6px; height:6px; border-radius:50%;
+    background:var(--gold-bright);
+    box-shadow:0 0 6px 1px rgba(232,199,102,0.6);
+    animation:flicker 3.2s ease-in-out infinite;
+  }
+  .bulb:nth-child(3n){animation-delay:.4s}
+  .bulb:nth-child(5n){animation-delay:.9s}
+  .bulb:nth-child(7n){animation-delay:1.4s}
+  @media (prefers-reduced-motion: reduce){ .bulb{animation:none} }
+  @keyframes flicker{
+    0%,100%{opacity:1}
+    50%{opacity:.35}
+  }
+  .marquee h1{
+    font-family:'Fraunces', serif;
+    font-weight:900;
+    font-size:clamp(28px, 5vw, 46px);
+    letter-spacing:-0.01em;
+    color:var(--cream);
+  }
+  .marquee h1 span{color:var(--gold-bright);}
+  .marquee p{
+    margin-top:10px;
+    font-size:13.5px;
+    color:var(--cream-dim);
+    max-width:520px;
+    margin-left:auto; margin-right:auto;
+    line-height:1.5;
+  }
+
+  .wrap{max-width:880px; margin:0 auto; padding:0 20px;}
+
+  /* Config panel */
+  .config{
+    margin-top:26px;
+    background:var(--panel);
+    border:1px solid var(--panel-line);
+    border-radius:var(--radius);
+    padding:18px 20px;
+  }
+  .config-row{
+    display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end;
+  }
+  .field{display:flex; flex-direction:column; gap:6px; flex:1; min-width:180px;}
+  .field label{
+    font-size:11px; text-transform:uppercase; letter-spacing:0.06em;
+    color:var(--gold-bright); font-weight:600;
+  }
+  input[type=text], input[type=password], select{
+    background:rgba(255,255,255,0.04);
+    border:1px solid var(--panel-line);
+    color:var(--cream);
+    border-radius:8px;
+    padding:10px 12px;
+    font-size:13.5px;
+    font-family:'Manrope', sans-serif;
+    outline:none;
+    transition:border-color .15s;
+  }
+  input:focus, select:focus{border-color:var(--gold);}
+  input::placeholder{color:var(--cream-dim);}
+  select{cursor:pointer;}
+  .hint{
+    font-size:11.5px; color:var(--cream-dim); margin-top:10px; line-height:1.5;
+  }
+  .hint a{color:var(--gold-bright); text-decoration:none; border-bottom:1px dotted var(--gold);}
+  .hint a:hover{color:var(--gold);}
+
+  /* Search */
+  .search{
+    margin-top:16px;
+    display:flex; gap:10px; flex-wrap:wrap;
+  }
+  .search input{flex:1; min-width:220px; font-size:14.5px; padding:12px 14px;}
+  .type-toggle{
+    display:flex; border:1px solid var(--panel-line); border-radius:8px; overflow:hidden;
+  }
+  .type-toggle button{
+    background:transparent; border:none; color:var(--cream-dim);
+    font-size:12px; font-weight:600; padding:0 14px;
+    cursor:pointer; font-family:'JetBrains Mono', monospace;
+    letter-spacing:0.03em;
+  }
+  .type-toggle button.active{background:var(--gold); color:#1a1305;}
+  .go-btn{
+    background:var(--gold); color:#1a1305; border:none;
+    font-weight:700; font-size:13.5px; padding:0 22px; border-radius:8px;
+    cursor:pointer; transition:background .15s, transform .1s;
+  }
+  .go-btn:hover{background:var(--gold-bright);}
+  .go-btn:active{transform:scale(0.98);}
+  .go-btn:disabled{opacity:0.5; cursor:default;}
+
+  .status{
+    margin-top:14px; font-size:13px; padding:10px 14px; border-radius:8px;
+    display:none;
+  }
+  .status.show{display:block;}
+  .status.error{background:rgba(226,87,76,0.1); border:1px solid rgba(226,87,76,0.3); color:#f0938a;}
+  .status.info{background:rgba(53,198,180,0.08); border:1px solid rgba(53,198,180,0.25); color:var(--teal);}
+
+  /* Multi-result picker */
+  .results-list{margin-top:18px; display:flex; flex-direction:column; gap:8px;}
+  .result-row{
+    display:flex; gap:12px; align-items:center;
+    background:var(--panel); border:1px solid var(--panel-line);
+    border-radius:10px; padding:8px 12px; cursor:pointer;
+    transition:border-color .15s, background .15s;
+  }
+  .result-row:hover{border-color:var(--gold); background:rgba(201,162,39,0.06);}
+  .result-row img{width:36px; height:54px; object-fit:cover; border-radius:4px; background:#1a2436; flex-shrink:0;}
+  .result-row .rmeta{min-width:0;}
+  .result-row .rtitle{font-size:13.5px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .result-row .ryear{font-size:11px; color:var(--cream-dim); font-family:'JetBrains Mono', monospace;}
+  .result-row .rtype{
+    margin-left:auto; font-size:10px; font-family:'JetBrains Mono', monospace;
+    color:var(--gold-bright); border:1px solid var(--panel-line); padding:3px 7px; border-radius:20px;
+    flex-shrink:0;
+  }
+
+  /* Ticket stub card */
+  .ticket{
+    margin-top:22px;
+    display:none;
+    background:var(--panel);
+    border:1px solid var(--panel-line);
+    border-radius:var(--radius);
+    overflow:hidden;
+    box-shadow:0 20px 60px -20px rgba(0,0,0,0.6);
+  }
+  .ticket.show{display:block;}
+  .ticket-main{
+    display:flex; gap:0;
+  }
+  .sprockets{
+    width:22px; flex-shrink:0;
+    background:repeating-linear-gradient(180deg, var(--bg-alt) 0 14px, var(--panel) 14px 22px);
+    position:relative;
+  }
+  .sprockets::before{
+    content:'';
+    position:absolute; inset:0;
+    background-image:radial-gradient(circle at 11px 11px, var(--bg) 4px, transparent 4.5px);
+    background-size:100% 22px;
+  }
+  .ticket-body{flex:1; padding:22px 24px; display:flex; gap:18px;}
+  .poster{
+    width:100px; flex-shrink:0; border-radius:8px; overflow:hidden;
+    background:#1a2436; aspect-ratio:2/3;
+  }
+  .poster img{width:100%; height:100%; object-fit:cover; display:block;}
+  .ticket-info{min-width:0;}
+  .ticket-info h2{
+    font-family:'Fraunces', serif; font-weight:700; font-size:21px;
+    line-height:1.15; color:var(--cream);
+  }
+  .ticket-info .sub{
+    margin-top:4px; font-size:11.5px; color:var(--gold-bright);
+    font-family:'JetBrains Mono', monospace; letter-spacing:0.02em;
+  }
+  .ticket-info .overview{
+    margin-top:10px; font-size:12.5px; line-height:1.55; color:var(--cream-dim);
+  }
+  .genres{margin-top:10px; display:flex; gap:6px; flex-wrap:wrap;}
+  .genre-tag{
+    font-size:10px; padding:3px 9px; border-radius:20px;
+    border:1px solid var(--panel-line); color:var(--cream-dim);
+  }
+
+  /* Perforation */
+  .perf{
+    position:relative;
+    border-top:1px dashed var(--panel-line);
+    margin:0 24px;
+  }
+  .perf::before, .perf::after{
+    content:''; position:absolute; top:-8px; width:16px; height:16px;
+    background:var(--bg); border-radius:50%;
+  }
+  .perf::before{left:-32px;}
+  .perf::after{right:-32px;}
+
+  /* Providers */
+  .providers{padding:20px 24px 24px;}
+  .providers h3{
+    font-size:11px; text-transform:uppercase; letter-spacing:0.08em;
+    color:var(--cream-dim); margin-bottom:14px; font-weight:700;
+  }
+  .prov-group{margin-bottom:16px;}
+  .prov-group:last-child{margin-bottom:0;}
+  .prov-group .glabel{
+    font-size:11px; font-family:'JetBrains Mono', monospace;
+    margin-bottom:8px; display:inline-block; padding:2px 10px; border-radius:20px;
+  }
+  .glabel.stream{color:#0a1a17; background:var(--teal);}
+  .glabel.rent{color:#241505; background:var(--amber);}
+  .glabel.buy{color:#241505; background:var(--amber); opacity:0.75;}
+  .prov-icons{display:flex; gap:8px; flex-wrap:wrap;}
+  .prov-icon{
+    width:38px; height:38px; border-radius:9px; overflow:hidden;
+    border:1px solid var(--panel-line); background:#1a2436;
+  }
+  .prov-icon img{width:100%; height:100%; object-fit:cover; display:block;}
+  .no-providers{
+    font-size:13px; color:var(--cream-dim); line-height:1.6;
+  }
+  .no-providers a{color:var(--gold-bright);}
+  .tmdb-link{
+    display:inline-block; margin-top:14px; font-size:11.5px;
+    color:var(--gold-bright); text-decoration:none; border-bottom:1px dotted var(--gold);
+  }
+  .tmdb-link:hover{color:var(--gold);}
+
+  .justwatch-note{
+    margin-top:16px; font-size:10px; color:var(--cream-dim); opacity:0.7; line-height:1.5;
+  }
+
+  footer{
+    max-width:880px; margin:40px auto 0; padding:0 20px;
+    text-align:center; font-size:11px; color:var(--cream-dim); opacity:0.6;
+  }
+  footer a{color:var(--cream-dim);}
+</style>
+</head>
+<body>
+
+  <div class="marquee">
+    <div class="bulbs" id="bulbs"></div>
+    <h1>Var kan jag <span>se</span> den?</h1>
+    <p>Sök på titel, TMDB-id eller IMDb-id. Vi visar bara var filmen eller serien går att se lagligt — streaming, hyra eller köp — i ditt land.</p>
+  </div>
+
+  <div class="wrap">
+
+    <div class="config">
+      <div class="config-row">
+        <div class="field">
+          <label for="apikey">TMDB API-nyckel (v3)</label>
+          <input type="password" id="apikey" placeholder="klistra in din nyckel här">
+        </div>
+        <div class="field" style="flex:0 0 140px;">
+          <label for="region">Region</label>
+          <select id="region"></select>
+        </div>
+      </div>
+      <p class="hint">
+        Gratis nyckel på 2 minuter: skapa konto på
+        <a href="https://www.themoviedb.org/signup" target="_blank" rel="noopener">themoviedb.org</a>,
+        gå till <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener">Settings → API</a>
+        och kopiera "API Key (v3 auth)". Nyckeln sparas inte — den finns bara i den här fliken tills du laddar om sidan.
+      </p>
+    </div>
+
+    <div class="search">
+      <div class="type-toggle" id="typeToggle">
+        <button data-mode="title" class="active">TITEL</button>
+        <button data-mode="tmdb">TMDB-ID</button>
+        <button data-mode="imdb">IMDB-ID</button>
+      </div>
+      <input type="text" id="query" placeholder="t.ex. Dune, 693134, eller tt15239678">
+      <button class="go-btn" id="goBtn">Sök</button>
+    </div>
+
+    <div class="status" id="status"></div>
+    <div class="results-list" id="resultsList"></div>
+
+    <div class="ticket" id="ticket">
+      <div class="ticket-main">
+        <div class="sprockets"></div>
+        <div class="ticket-body">
+          <div class="poster"><img id="posterImg" alt=""></div>
+          <div class="ticket-info">
+            <h2 id="titleText"></h2>
+            <div class="sub" id="subText"></div>
+            <div class="genres" id="genreTags"></div>
+            <p class="overview" id="overviewText"></p>
+          </div>
+        </div>
+      </div>
+      <div class="perf"></div>
+      <div class="providers" id="providersBox"></div>
+    </div>
+
+  </div>
+
+  <footer>
+    Drivs av TMDB API. Den här produkten använder TMDB API men är varken godkänd eller certifierad av TMDB.<br>
+    Streamingdata via JustWatch.
+  </footer>
+
+<script>
+(function(){
+  const bulbsEl = document.getElementById('bulbs');
+  for(let i=0;i<26;i++){const b=document.createElement('div');b.className='bulb';bulbsEl.appendChild(b);}
+
+  const regions = [
+    ['SE','Sverige'],['US','USA'],['GB','Storbritannien'],['DE','Tyskland'],
+    ['NO','Norge'],['DK','Danmark'],['FI','Finland'],['FR','Frankrike'],
+    ['ES','Spanien'],['IT','Italien'],['NL','Nederländerna'],['CA','Kanada'],
+    ['AU','Australien'],['BR','Brasilien'],['PL','Polen'],['IE','Irland']
+  ];
+  const regionSel = document.getElementById('region');
+  regions.forEach(([code,name])=>{
+    const o=document.createElement('option'); o.value=code; o.textContent=`${name} (${code})`;
+    regionSel.appendChild(o);
+  });
+  const guess = (navigator.language||'sv-SE').split('-')[1];
+  regionSel.value = regions.some(r=>r[0]===guess) ? guess : 'SE';
+
+  let mode = 'title';
+  document.getElementById('typeToggle').addEventListener('click', (e)=>{
+    const btn = e.target.closest('button'); if(!btn) return;
+    document.querySelectorAll('.type-toggle button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    mode = btn.dataset.mode;
+    const q = document.getElementById('query');
+    q.placeholder = mode==='title' ? 't.ex. Dune' : mode==='tmdb' ? 't.ex. 693134' : 't.ex. tt15239678';
+  });
+
+  const statusEl = document.getElementById('status');
+  function setStatus(msg, type){
+    statusEl.textContent = msg;
+    statusEl.className = 'status show ' + (type||'info');
+  }
+  function clearStatus(){ statusEl.className = 'status'; }
+
+  const resultsList = document.getElementById('resultsList');
+  const ticket = document.getElementById('ticket');
+
+  const IMG = 'https://image.tmdb.org/t/p/w200';
+  const LOGO = 'https://image.tmdb.org/t/p/w92';
+
+  function apiKey(){ return document.getElementById('apikey').value.trim(); }
+
+  async function tmdb(path){
+    const key = apiKey();
+    if(!key){ throw new Error('NEEDKEY'); }
+    const sep = path.includes('?') ? '&' : '?';
+    const res = await fetch(`https://api.themoviedb.org/3${path}${sep}api_key=${encodeURIComponent(key)}&language=sv-SE`);
+    if(!res.ok){
+      if(res.status===401) throw new Error('BADKEY');
+      throw new Error('HTTP_'+res.status);
+    }
+    return res.json();
+  }
+
+  document.getElementById('goBtn').addEventListener('click', runSearch);
+  document.getElementById('query').addEventListener('keydown', (e)=>{ if(e.key==='Enter') runSearch(); });
+
+  async function runSearch(){
+    clearStatus();
+    resultsList.innerHTML = '';
+    ticket.classList.remove('show');
+    const q = document.getElementById('query').value.trim();
+    if(!q){ setStatus('Skriv in en titel eller ett id först.', 'error'); return; }
+    if(!apiKey()){ setStatus('Lägg in din TMDB API-nyckel ovan först.', 'error'); return; }
+
+    const btn = document.getElementById('goBtn');
+    btn.disabled = true; btn.textContent = 'Söker…';
+
+    try{
+      if(mode==='title'){
+        const data = await tmdb(`/search/multi?query=${encodeURIComponent(q)}`);
+        const items = (data.results||[]).filter(r=>r.media_type==='movie'||r.media_type==='tv');
+        if(items.length===0){ setStatus('Inga träffar. Kolla stavningen eller prova på engelska.', 'error'); }
+        else if(items.length===1){ await loadDetail(items[0].id, items[0].media_type); }
+        else { renderResultList(items.slice(0,8)); }
+      } else if(mode==='tmdb'){
+        // try movie first, then tv
+        try{ await loadDetail(q, 'movie'); }
+        catch(e){ await loadDetail(q, 'tv'); }
+      } else {
+        const data = await tmdb(`/find/${encodeURIComponent(q)}?external_source=imdb_id`);
+        if(data.movie_results && data.movie_results.length){ await loadDetail(data.movie_results[0].id, 'movie'); }
+        else if(data.tv_results && data.tv_results.length){ await loadDetail(data.tv_results[0].id, 'tv'); }
+        else { setStatus('Hittade inget TMDB-objekt för det IMDb-id:t.', 'error'); }
+      }
+    } catch(err){
+      handleError(err);
+    } finally {
+      btn.disabled = false; btn.textContent = 'Sök';
+    }
+  }
+
+  function renderResultList(items){
+    resultsList.innerHTML = '';
+    items.forEach(item=>{
+      const title = item.title || item.name;
+      const date = item.release_date || item.first_air_date || '';
+      const year = date ? date.slice(0,4) : '—';
+      const row = document.createElement('div');
+      row.className = 'result-row';
+      row.innerHTML = `
+        <img src="${item.poster_path ? IMG+item.poster_path : ''}" alt="">
+        <div class="rmeta">
+          <div class="rtitle">${escapeHtml(title)}</div>
+          <div class="ryear">${year}</div>
+        </div>
+        <div class="rtype">${item.media_type==='tv' ? 'SERIE' : 'FILM'}</div>
+      `;
+      row.addEventListener('click', ()=>{
+        loadDetail(item.id, item.media_type).catch(handleError);
+      });
+      resultsList.appendChild(row);
+    });
+  }
+
+  async function loadDetail(id, type){
+    clearStatus();
+    const detail = await tmdb(`/${type}/${id}`);
+    let providers = {};
+    try{
+      const pr = await tmdb(`/${type}/${id}/watch/providers`);
+      providers = (pr.results && pr.results[regionSel.value]) || {};
+    } catch(e){ /* providers optional */ }
+
+    resultsList.innerHTML = '';
+    renderTicket(detail, type, providers);
+  }
+
+  function renderTicket(d, type, providers){
+    const title = d.title || d.name;
+    const date = d.release_date || d.first_air_date || '';
+    const year = date ? date.slice(0,4) : '—';
+    const runtime = d.runtime ? `${d.runtime} min` : (d.episode_run_time && d.episode_run_time[0] ? `${d.episode_run_time[0]} min/avsnitt` : '');
+
+    document.getElementById('posterImg').src = d.poster_path ? IMG+d.poster_path : '';
+    document.getElementById('titleText').textContent = title;
+    document.getElementById('subText').textContent =
+      [type==='tv' ? 'SERIE' : 'FILM', year, runtime].filter(Boolean).join('  ·  ');
+    document.getElementById('overviewText').textContent = d.overview || 'Ingen beskrivning tillgänglig.';
+
+    const genreBox = document.getElementById('genreTags');
+    genreBox.innerHTML = '';
+    (d.genres||[]).forEach(g=>{
+      const tag = document.createElement('span');
+      tag.className = 'genre-tag'; tag.textContent = g.name;
+      genreBox.appendChild(tag);
+    });
+
+    const box = document.getElementById('providersBox');
+    box.innerHTML = '';
+
+    const groups = [
+      ['flatrate','stream','STREAMAR HOS'],
+      ['rent','rent','GÅR ATT HYRA HOS'],
+      ['buy','buy','GÅR ATT KÖPA HOS']
+    ];
+    let any = false;
+    groups.forEach(([key,cls,label])=>{
+      const list = providers[key];
+      if(list && list.length){
+        any = true;
+        const g = document.createElement('div');
+        g.className = 'prov-group';
+        g.innerHTML = `<span class="glabel ${cls}">${label}</span><div class="prov-icons">
+          ${list.map(p=>`<div class="prov-icon" title="${escapeHtml(p.provider_name)}"><img src="${LOGO+p.logo_path}" alt="${escapeHtml(p.provider_name)}"></div>`).join('')}
+        </div>`;
+        box.appendChild(g);
+      }
+    });
+
+    const h3 = document.createElement('h3');
+    h3.textContent = 'Var man kan se den — ' + regionSel.options[regionSel.selectedIndex].text;
+    box.prepend(h3);
+
+    if(!any){
+      const p = document.createElement('p');
+      p.className = 'no-providers';
+      p.textContent = 'Hittade ingen laglig streaming-, hyr- eller köpkälla för den här regionen just nu.';
+      box.appendChild(p);
+    }
+
+    if(providers.link){
+      const a = document.createElement('a');
+      a.href = providers.link; a.target = '_blank'; a.rel = 'noopener';
+      a.className = 'tmdb-link';
+      a.textContent = 'Se alla alternativ på TMDB →';
+      box.appendChild(a);
+    }
+
+    const note = document.createElement('div');
+    note.className = 'justwatch-note';
+    note.textContent = 'Streaming-, hyr- och köpdata tillhandahålls av JustWatch via TMDB.';
+    box.appendChild(note);
+
+    ticket.classList.add('show');
+    ticket.scrollIntoView({behavior:'smooth', block:'nearest'});
+  }
+
+  function handleError(err){
+    if(err.message==='NEEDKEY') setStatus('Lägg in din TMDB API-nyckel ovan först.', 'error');
+    else if(err.message==='BADKEY') setStatus('TMDB avvisade nyckeln. Dubbelkolla att du kopierat "API Key (v3 auth)" korrekt.', 'error');
+    else setStatus('Kunde inte hämta data just nu (' + err.message + '). Prova igen om en stund.', 'error');
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+})();
+</script>
+
+</body>
+</html>
