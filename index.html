@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Var kan jag se den? — TMDB</title>
+<title>Var kan jag se den? — vidsrc.to</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,900&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -76,7 +76,7 @@
     line-height:1.5;
   }
 
-  .wrap{max-width:880px; margin:0 auto; padding:0 20px;}
+  .wrap{max-width:980px; margin:0 auto; padding:0 20px;}
 
   /* Config panel */
   .config{
@@ -228,27 +228,51 @@
   .perf::before{left:-32px;}
   .perf::after{right:-32px;}
 
-  /* Providers */
-  .providers{padding:20px 24px 24px;}
-  .providers h3{
+  /* Player section */
+  .player-box{padding:20px 24px 24px;}
+  .player-box h3{
     font-size:11px; text-transform:uppercase; letter-spacing:0.08em;
     color:var(--cream-dim); margin-bottom:14px; font-weight:700;
   }
-  .prov-group{margin-bottom:16px;}
-  .prov-group:last-child{margin-bottom:0;}
-  .prov-group .glabel{
-    font-size:11px; font-family:'JetBrains Mono', monospace;
-    margin-bottom:8px; display:inline-block; padding:2px 10px; border-radius:20px;
+  .player-frame{
+    position:relative;
+    width:100%;
+    aspect-ratio:16/9;
+    background:#000;
+    border-radius:10px;
+    overflow:hidden;
+    border:1px solid var(--panel-line);
   }
-  .glabel.stream{color:#0a1a17; background:var(--teal);}
-  .glabel.rent{color:#241505; background:var(--amber);}
-  .glabel.buy{color:#241505; background:var(--amber); opacity:0.75;}
-  .prov-icons{display:flex; gap:8px; flex-wrap:wrap;}
-  .prov-icon{
-    width:38px; height:38px; border-radius:9px; overflow:hidden;
-    border:1px solid var(--panel-line); background:#1a2436;
+  .player-frame iframe{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    border:none;
   }
-  .prov-icon img{width:100%; height:100%; object-fit:cover; display:block;}
+  .player-meta{
+    margin-top:12px;
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    align-items:center;
+  }
+  .player-meta a{
+    color:var(--gold-bright);
+    text-decoration:none;
+    border-bottom:1px dotted var(--gold);
+    font-size:12px;
+  }
+  .player-meta a:hover{color:var(--gold);}
+  .player-meta .tag{
+    font-size:10px;
+    font-family:'JetBrains Mono', monospace;
+    color:var(--cream-dim);
+    border:1px solid var(--panel-line);
+    padding:3px 10px;
+    border-radius:20px;
+  }
+
   .no-providers{
     font-size:13px; color:var(--cream-dim); line-height:1.6;
   }
@@ -259,23 +283,20 @@
   }
   .tmdb-link:hover{color:var(--gold);}
 
-  .justwatch-note{
-    margin-top:16px; font-size:10px; color:var(--cream-dim); opacity:0.7; line-height:1.5;
-  }
-
   footer{
-    max-width:880px; margin:40px auto 0; padding:0 20px;
+    max-width:980px; margin:40px auto 0; padding:0 20px;
     text-align:center; font-size:11px; color:var(--cream-dim); opacity:0.6;
   }
   footer a{color:var(--cream-dim);}
 </style>
+<base target="_blank">
 </head>
 <body>
 
   <div class="marquee">
     <div class="bulbs" id="bulbs"></div>
     <h1>Var kan jag <span>se</span> den?</h1>
-    <p>Sök på titel, TMDB-id eller IMDb-id. Vi visar bara var filmen eller serien går att se lagligt — streaming, hyra eller köp — i ditt land.</p>
+    <p>Sök på titel, TMDB-id eller IMDb-id. När vi hittar filmen eller serien öppnas den direkt i spelaren nedan.</p>
   </div>
 
   <div class="wrap">
@@ -326,14 +347,20 @@
         </div>
       </div>
       <div class="perf"></div>
-      <div class="providers" id="providersBox"></div>
+      <div class="player-box" id="playerBox">
+        <h3 id="playerHeading">Spelare</h3>
+        <div class="player-frame" id="playerFrame">
+          <iframe id="vidsrcFrame" allowfullscreen></iframe>
+        </div>
+        <div class="player-meta" id="playerMeta"></div>
+      </div>
     </div>
 
   </div>
 
   <footer>
     Drivs av TMDB API. Den här produkten använder TMDB API men är varken godkänd eller certifierad av TMDB.<br>
-    Streamingdata via JustWatch.
+    Spelaren tillhandahålls av vidsrc.to.
   </footer>
 
 <script>
@@ -376,7 +403,6 @@
   const ticket = document.getElementById('ticket');
 
   const IMG = 'https://image.tmdb.org/t/p/w200';
-  const LOGO = 'https://image.tmdb.org/t/p/w92';
 
   function apiKey(){ return document.getElementById('apikey').value.trim(); }
 
@@ -457,17 +483,11 @@
   async function loadDetail(id, type){
     clearStatus();
     const detail = await tmdb(`/${type}/${id}`);
-    let providers = {};
-    try{
-      const pr = await tmdb(`/${type}/${id}/watch/providers`);
-      providers = (pr.results && pr.results[regionSel.value]) || {};
-    } catch(e){ /* providers optional */ }
-
     resultsList.innerHTML = '';
-    renderTicket(detail, type, providers);
+    renderTicket(detail, type, id);
   }
 
-  function renderTicket(d, type, providers){
+  function renderTicket(d, type, id){
     const title = d.title || d.name;
     const date = d.release_date || d.first_air_date || '';
     const year = date ? date.slice(0,4) : '—';
@@ -476,7 +496,7 @@
     document.getElementById('posterImg').src = d.poster_path ? IMG+d.poster_path : '';
     document.getElementById('titleText').textContent = title;
     document.getElementById('subText').textContent =
-      [type==='tv' ? 'SERIE' : 'FILM', year, runtime].filter(Boolean).join('  ·  ');
+      [type==='tv' ? 'SERIE' : 'FILM', year, runtime, `TMDB #${d.id}`].filter(Boolean).join('  ·  ');
     document.getElementById('overviewText').textContent = d.overview || 'Ingen beskrivning tillgänglig.';
 
     const genreBox = document.getElementById('genreTags');
@@ -487,51 +507,27 @@
       genreBox.appendChild(tag);
     });
 
-    const box = document.getElementById('providersBox');
-    box.innerHTML = '';
+    // Build vidsrc.to URL
+    const vidsrcUrl = `https://vidsrc.to/embed/${type}/${id}`;
+    const frame = document.getElementById('vidsrcFrame');
+    frame.src = vidsrcUrl;
 
-    const groups = [
-      ['flatrate','stream','STREAMAR HOS'],
-      ['rent','rent','GÅR ATT HYRA HOS'],
-      ['buy','buy','GÅR ATT KÖPA HOS']
-    ];
-    let any = false;
-    groups.forEach(([key,cls,label])=>{
-      const list = providers[key];
-      if(list && list.length){
-        any = true;
-        const g = document.createElement('div');
-        g.className = 'prov-group';
-        g.innerHTML = `<span class="glabel ${cls}">${label}</span><div class="prov-icons">
-          ${list.map(p=>`<div class="prov-icon" title="${escapeHtml(p.provider_name)}"><img src="${LOGO+p.logo_path}" alt="${escapeHtml(p.provider_name)}"></div>`).join('')}
-        </div>`;
-        box.appendChild(g);
-      }
-    });
+    document.getElementById('playerHeading').textContent = 'Spelare — ' + (type==='tv' ? 'Serie' : 'Film');
 
-    const h3 = document.createElement('h3');
-    h3.textContent = 'Var man kan se den — ' + regionSel.options[regionSel.selectedIndex].text;
-    box.prepend(h3);
+    const meta = document.getElementById('playerMeta');
+    meta.innerHTML = '';
 
-    if(!any){
-      const p = document.createElement('p');
-      p.className = 'no-providers';
-      p.textContent = 'Hittade ingen laglig streaming-, hyr- eller köpkälla för den här regionen just nu.';
-      box.appendChild(p);
-    }
+    const tag = document.createElement('span');
+    tag.className = 'tag';
+    tag.textContent = type==='tv' ? 'vidsrc.to / tv / ' + id : 'vidsrc.to / movie / ' + id;
+    meta.appendChild(tag);
 
-    if(providers.link){
-      const a = document.createElement('a');
-      a.href = providers.link; a.target = '_blank'; a.rel = 'noopener';
-      a.className = 'tmdb-link';
-      a.textContent = 'Se alla alternativ på TMDB →';
-      box.appendChild(a);
-    }
-
-    const note = document.createElement('div');
-    note.className = 'justwatch-note';
-    note.textContent = 'Streaming-, hyr- och köpdata tillhandahålls av JustWatch via TMDB.';
-    box.appendChild(note);
+    const a = document.createElement('a');
+    a.href = vidsrcUrl;
+    a.target = '_blank';
+    a.rel = 'noopener';
+    a.textContent = 'Öppna i eget fönster →';
+    meta.appendChild(a);
 
     ticket.classList.add('show');
     ticket.scrollIntoView({behavior:'smooth', block:'nearest'});
