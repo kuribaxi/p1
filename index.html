@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Var kan jag se den? — vidsrc</title>
+<title>Var kan jag se den? — streamimdb</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,900&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -415,16 +415,16 @@
   const guess = (navigator.language||'sv-SE').split('-')[1];
   regionSel.value = regions.some(r=>r[0]===guess) ? guess : 'SE';
 
-  // Available sources — ordered by likelihood of working without verification
+  // Available sources
   const SOURCES = [
-    {key:'vidsrc_sbs', name:'vidsrc.sbs', base:'https://vidsrc.sbs/embed'},
-    {key:'vidsrc_to',  name:'vidsrc.to',  base:'https://vidsrc.to/embed'},
-    {key:'vidsrc_me',  name:'vidsrc.me',  base:'https://vidsrc.me/embed'},
-    {key:'vidsrc_xyz', name:'vidsrc.xyz', base:'https://vidsrc.xyz/embed'},
+    {key:'streamimdb', name:'streamimdb.ru', base:'https://streamimdb.ru/movie', needsImdb:true},
+    {key:'vidsrc_to',  name:'vidsrc.to',  base:'https://vidsrc.to/embed', needsImdb:false},
+    {key:'vidsrc_me',  name:'vidsrc.me',  base:'https://vidsrc.me/embed', needsImdb:false},
   ];
   let activeSource = SOURCES[0].key;
   let currentType = 'movie';
   let currentId = null;
+  let currentImdbId = null;
 
   let mode = 'title';
   document.getElementById('typeToggle').addEventListener('click', (e)=>{
@@ -526,13 +526,27 @@
   async function loadDetail(id, type){
     clearStatus();
     const detail = await tmdb(`/${type}/${id}`);
+
+    // Fetch IMDb ID if needed (for streamimdb.ru)
+    let imdbId = detail.imdb_id || null;
+    if(!imdbId && type === 'tv'){
+      try{
+        const ext = await tmdb(`/tv/${id}/external_ids`);
+        imdbId = ext.imdb_id || null;
+      } catch(e){ /* ignore */ }
+    }
+
     resultsList.innerHTML = '';
-    renderTicket(detail, type, id);
+    renderTicket(detail, type, id, imdbId);
   }
 
-  function buildUrl(source, type, id){
-    // vidsrc.sbs uses: /embed/movie/{id} or /embed/tv/{id}
-    // vidsrc.to uses:   /embed/movie/{id} or /embed/tv/{id}
+  function buildUrl(source, type, id, imdbId){
+    if(source.needsImdb){
+      // streamimdb.ru uses IMDb ID
+      const useId = imdbId || id;
+      return `${source.base}/${useId}`;
+    }
+    // vidsrc uses TMDB ID
     return `${source.base}/${type}/${id}`;
   }
 
@@ -546,17 +560,18 @@
       btn.addEventListener('click', ()=>{
         activeSource = src.key;
         renderSourcePicker();
-        if(currentId) loadPlayer(currentType, currentId);
+        if(currentId) loadPlayer(currentType, currentId, currentImdbId);
       });
       picker.appendChild(btn);
     });
   }
 
-  function loadPlayer(type, id){
+  function loadPlayer(type, id, imdbId){
     currentType = type;
     currentId = id;
+    currentImdbId = imdbId;
     const src = SOURCES.find(s=>s.key===activeSource);
-    const url = buildUrl(src, type, id);
+    const url = buildUrl(src, type, id, imdbId);
     const frame = document.getElementById('vidsrcFrame');
     frame.src = url;
 
@@ -565,7 +580,7 @@
 
     const tag = document.createElement('span');
     tag.className = 'tag active';
-    tag.textContent = src.name + ' / ' + type + ' / ' + id;
+    tag.textContent = src.name + ' / ' + type + ' / ' + (src.needsImdb && imdbId ? imdbId : id);
     meta.appendChild(tag);
 
     const a = document.createElement('a');
@@ -575,17 +590,19 @@
     a.textContent = 'Öppna i eget fönster →';
     meta.appendChild(a);
 
-    // Show notice about verification
     const notice = document.getElementById('playerNotice');
-    notice.style.display = 'block';
-    notice.innerHTML = `
-      <strong>OBS:</strong> Vissa källor (särskilt vidsrc.to) visar ibland en QR-kod eller robotkontroll.
-      Detta är en säkerhetsåtgärd från källan själv och kan <strong>inte tas bort</strong> från den här sidan.
-      Tips: Prova en annan källa ovan, eller öppna spelaren i ett eget fönster.
-    `;
+    if(src.needsImdb && !imdbId){
+      notice.style.display = 'block';
+      notice.innerHTML = `
+        <strong>OBS:</strong> Inget IMDb-ID hittades för detta objekt.
+        <code>streamimdb.ru</code> kräver IMDb-ID. Prova en annan källa ovan.
+      `;
+    } else {
+      notice.style.display = 'none';
+    }
   }
 
-  function renderTicket(d, type, id){
+  function renderTicket(d, type, id, imdbId){
     const title = d.title || d.name;
     const date = d.release_date || d.first_air_date || '';
     const year = date ? date.slice(0,4) : '—';
@@ -606,7 +623,7 @@
     });
 
     renderSourcePicker();
-    loadPlayer(type, id);
+    loadPlayer(type, id, imdbId);
 
     document.getElementById('playerHeading').textContent = 'Spelare — ' + (type==='tv' ? 'Serie' : 'Film');
 
