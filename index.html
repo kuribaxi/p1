@@ -284,7 +284,7 @@
       <div class="config-row">
         <div class="field">
           <label for="apikey">TMDB API-nyckel (v3)</label>
-          <input type="password" id="apikey" placeholder="klistra in din nyckel här">
+          <input type="password" id="apikey" placeholder="klistra in din nyckel här" value="31efe739e595ccb0a3337a0dc8b4e76f">
         </div>
         <div class="field" style="flex:0 0 140px;">
           <label for="region">Region</label>
@@ -295,7 +295,7 @@
         Gratis nyckel på 2 minuter: skapa konto på
         <a href="https://www.themoviedb.org/signup" target="_blank" rel="noopener">themoviedb.org</a>,
         gå till <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener">Settings → API</a>
-        och kopiera "API Key (v3 auth)". Nyckeln sparas inte — den finns bara i den här fliken tills du laddar om sidan.
+        och kopiera "API Key (v3 auth)". Nyckeln är redan ifylld här — byt ut den om du vill använda en egen.
       </p>
     </div>
 
@@ -444,6 +444,7 @@
           <div class="rtitle">${escapeHtml(title)}</div>
           <div class="ryear">${year}</div>
         </div>
+        <div class="ryear rid mono">TMDB #${item.id}</div>
         <div class="rtype">${item.media_type==='tv' ? 'SERIE' : 'FILM'}</div>
       `;
       row.addEventListener('click', ()=>{
