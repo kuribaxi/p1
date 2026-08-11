@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Var kan jag se den? — vidsrc.to</title>
+<title>Var kan jag se den? — vidsrc</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,900&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -34,7 +34,6 @@
   }
   .mono{font-family:'JetBrains Mono', monospace;}
 
-  /* Marquee header */
   .marquee{
     padding:38px 20px 26px;
     text-align:center;
@@ -78,7 +77,6 @@
 
   .wrap{max-width:980px; margin:0 auto; padding:0 20px;}
 
-  /* Config panel */
   .config{
     margin-top:26px;
     background:var(--panel);
@@ -114,7 +112,6 @@
   .hint a{color:var(--gold-bright); text-decoration:none; border-bottom:1px dotted var(--gold);}
   .hint a:hover{color:var(--gold);}
 
-  /* Search */
   .search{
     margin-top:16px;
     display:flex; gap:10px; flex-wrap:wrap;
@@ -146,8 +143,8 @@
   .status.show{display:block;}
   .status.error{background:rgba(226,87,76,0.1); border:1px solid rgba(226,87,76,0.3); color:#f0938a;}
   .status.info{background:rgba(53,198,180,0.08); border:1px solid rgba(53,198,180,0.25); color:var(--teal);}
+  .status.warn{background:rgba(224,164,88,0.10); border:1px solid rgba(224,164,88,0.30); color:var(--amber);}
 
-  /* Multi-result picker */
   .results-list{margin-top:18px; display:flex; flex-direction:column; gap:8px;}
   .result-row{
     display:flex; gap:12px; align-items:center;
@@ -166,7 +163,6 @@
     flex-shrink:0;
   }
 
-  /* Ticket stub card */
   .ticket{
     margin-top:22px;
     display:none;
@@ -215,7 +211,6 @@
     border:1px solid var(--panel-line); color:var(--cream-dim);
   }
 
-  /* Perforation */
   .perf{
     position:relative;
     border-top:1px dashed var(--panel-line);
@@ -228,7 +223,6 @@
   .perf::before{left:-32px;}
   .perf::after{right:-32px;}
 
-  /* Player section */
   .player-box{padding:20px 24px 24px;}
   .player-box h3{
     font-size:11px; text-transform:uppercase; letter-spacing:0.08em;
@@ -257,13 +251,18 @@
     flex-wrap:wrap;
     align-items:center;
   }
-  .player-meta a{
+  .player-meta a, .player-meta button{
     color:var(--gold-bright);
     text-decoration:none;
     border-bottom:1px dotted var(--gold);
     font-size:12px;
+    background:none;
+    border:none;
+    cursor:pointer;
+    font-family:'Manrope', sans-serif;
+    padding:0;
   }
-  .player-meta a:hover{color:var(--gold);}
+  .player-meta a:hover, .player-meta button:hover{color:var(--gold);}
   .player-meta .tag{
     font-size:10px;
     font-family:'JetBrains Mono', monospace;
@@ -272,16 +271,48 @@
     padding:3px 10px;
     border-radius:20px;
   }
+  .player-meta .tag.active{
+    color:#0a1a17;
+    background:var(--teal);
+    border-color:var(--teal);
+  }
 
-  .no-providers{
-    font-size:13px; color:var(--cream-dim); line-height:1.6;
+  .source-picker{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-bottom:12px;
   }
-  .no-providers a{color:var(--gold-bright);}
-  .tmdb-link{
-    display:inline-block; margin-top:14px; font-size:11.5px;
-    color:var(--gold-bright); text-decoration:none; border-bottom:1px dotted var(--gold);
+  .source-btn{
+    font-size:11px;
+    font-family:'JetBrains Mono', monospace;
+    padding:5px 12px;
+    border-radius:20px;
+    border:1px solid var(--panel-line);
+    background:transparent;
+    color:var(--cream-dim);
+    cursor:pointer;
+    transition:all .15s;
   }
-  .tmdb-link:hover{color:var(--gold);}
+  .source-btn:hover{border-color:var(--gold); color:var(--gold-bright);}
+  .source-btn.active{
+    background:var(--gold);
+    color:#1a1305;
+    border-color:var(--gold);
+    font-weight:600;
+  }
+
+  .notice{
+    margin-top:12px;
+    font-size:11.5px;
+    color:var(--cream-dim);
+    line-height:1.5;
+    padding:10px 14px;
+    background:rgba(224,164,88,0.06);
+    border:1px solid rgba(224,164,88,0.15);
+    border-radius:8px;
+  }
+  .notice strong{color:var(--amber);}
 
   footer{
     max-width:980px; margin:40px auto 0; padding:0 20px;
@@ -296,7 +327,7 @@
   <div class="marquee">
     <div class="bulbs" id="bulbs"></div>
     <h1>Var kan jag <span>se</span> den?</h1>
-    <p>Sök på titel, TMDB-id eller IMDb-id. När vi hittar filmen eller serien öppnas den direkt i spelaren nedan.</p>
+    <p>Sök på titel, TMDB-id eller IMDb-id. Välj källa nedan — spelaren laddas direkt under biljetten.</p>
   </div>
 
   <div class="wrap">
@@ -348,11 +379,13 @@
       </div>
       <div class="perf"></div>
       <div class="player-box" id="playerBox">
-        <h3 id="playerHeading">Spelare</h3>
+        <h3>Spelare</h3>
+        <div class="source-picker" id="sourcePicker"></div>
         <div class="player-frame" id="playerFrame">
-          <iframe id="vidsrcFrame" allowfullscreen></iframe>
+          <iframe id="vidsrcFrame" allowfullscreen referrerpolicy="origin"></iframe>
         </div>
         <div class="player-meta" id="playerMeta"></div>
+        <div class="notice" id="playerNotice" style="display:none;"></div>
       </div>
     </div>
 
@@ -360,7 +393,7 @@
 
   <footer>
     Drivs av TMDB API. Den här produkten använder TMDB API men är varken godkänd eller certifierad av TMDB.<br>
-    Spelaren tillhandahålls av vidsrc.to.
+    Spelaren tillhandahålls av externa källor.
   </footer>
 
 <script>
@@ -381,6 +414,17 @@
   });
   const guess = (navigator.language||'sv-SE').split('-')[1];
   regionSel.value = regions.some(r=>r[0]===guess) ? guess : 'SE';
+
+  // Available sources — ordered by likelihood of working without verification
+  const SOURCES = [
+    {key:'vidsrc_sbs', name:'vidsrc.sbs', base:'https://vidsrc.sbs/embed'},
+    {key:'vidsrc_to',  name:'vidsrc.to',  base:'https://vidsrc.to/embed'},
+    {key:'vidsrc_me',  name:'vidsrc.me',  base:'https://vidsrc.me/embed'},
+    {key:'vidsrc_xyz', name:'vidsrc.xyz', base:'https://vidsrc.xyz/embed'},
+  ];
+  let activeSource = SOURCES[0].key;
+  let currentType = 'movie';
+  let currentId = null;
 
   let mode = 'title';
   document.getElementById('typeToggle').addEventListener('click', (e)=>{
@@ -440,7 +484,6 @@
         else if(items.length===1){ await loadDetail(items[0].id, items[0].media_type); }
         else { renderResultList(items.slice(0,8)); }
       } else if(mode==='tmdb'){
-        // try movie first, then tv
         try{ await loadDetail(q, 'movie'); }
         catch(e){ await loadDetail(q, 'tv'); }
       } else {
@@ -487,6 +530,61 @@
     renderTicket(detail, type, id);
   }
 
+  function buildUrl(source, type, id){
+    // vidsrc.sbs uses: /embed/movie/{id} or /embed/tv/{id}
+    // vidsrc.to uses:   /embed/movie/{id} or /embed/tv/{id}
+    return `${source.base}/${type}/${id}`;
+  }
+
+  function renderSourcePicker(){
+    const picker = document.getElementById('sourcePicker');
+    picker.innerHTML = '';
+    SOURCES.forEach(src=>{
+      const btn = document.createElement('button');
+      btn.className = 'source-btn' + (src.key===activeSource ? ' active' : '');
+      btn.textContent = src.name;
+      btn.addEventListener('click', ()=>{
+        activeSource = src.key;
+        renderSourcePicker();
+        if(currentId) loadPlayer(currentType, currentId);
+      });
+      picker.appendChild(btn);
+    });
+  }
+
+  function loadPlayer(type, id){
+    currentType = type;
+    currentId = id;
+    const src = SOURCES.find(s=>s.key===activeSource);
+    const url = buildUrl(src, type, id);
+    const frame = document.getElementById('vidsrcFrame');
+    frame.src = url;
+
+    const meta = document.getElementById('playerMeta');
+    meta.innerHTML = '';
+
+    const tag = document.createElement('span');
+    tag.className = 'tag active';
+    tag.textContent = src.name + ' / ' + type + ' / ' + id;
+    meta.appendChild(tag);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.target = '_blank';
+    a.rel = 'noopener';
+    a.textContent = 'Öppna i eget fönster →';
+    meta.appendChild(a);
+
+    // Show notice about verification
+    const notice = document.getElementById('playerNotice');
+    notice.style.display = 'block';
+    notice.innerHTML = `
+      <strong>OBS:</strong> Vissa källor (särskilt vidsrc.to) visar ibland en QR-kod eller robotkontroll.
+      Detta är en säkerhetsåtgärd från källan själv och kan <strong>inte tas bort</strong> från den här sidan.
+      Tips: Prova en annan källa ovan, eller öppna spelaren i ett eget fönster.
+    `;
+  }
+
   function renderTicket(d, type, id){
     const title = d.title || d.name;
     const date = d.release_date || d.first_air_date || '';
@@ -507,27 +605,10 @@
       genreBox.appendChild(tag);
     });
 
-    // Build vidsrc.to URL
-    const vidsrcUrl = `https://vidsrc.to/embed/${type}/${id}`;
-    const frame = document.getElementById('vidsrcFrame');
-    frame.src = vidsrcUrl;
+    renderSourcePicker();
+    loadPlayer(type, id);
 
     document.getElementById('playerHeading').textContent = 'Spelare — ' + (type==='tv' ? 'Serie' : 'Film');
-
-    const meta = document.getElementById('playerMeta');
-    meta.innerHTML = '';
-
-    const tag = document.createElement('span');
-    tag.className = 'tag';
-    tag.textContent = type==='tv' ? 'vidsrc.to / tv / ' + id : 'vidsrc.to / movie / ' + id;
-    meta.appendChild(tag);
-
-    const a = document.createElement('a');
-    a.href = vidsrcUrl;
-    a.target = '_blank';
-    a.rel = 'noopener';
-    a.textContent = 'Öppna i eget fönster →';
-    meta.appendChild(a);
 
     ticket.classList.add('show');
     ticket.scrollIntoView({behavior:'smooth', block:'nearest'});
