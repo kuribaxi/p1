@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Var kan jag se den? — streamimdb</title>
+<title>Var kan jag se den? — vidsrc mirrors</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,900&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -244,56 +244,6 @@
     height:100%;
     border:none;
   }
-  .browser-frame{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    flex-direction:column;
-    gap:16px;
-    background:var(--bg-alt);
-    aspect-ratio:16/9;
-    border-radius:10px;
-    border:1px solid var(--panel-line);
-    text-align:center;
-    padding:24px;
-  }
-  .browser-frame .browser-icon{
-    width:56px; height:56px;
-    border-radius:14px;
-    background:rgba(201,162,39,0.10);
-    border:1px solid var(--panel-line);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:24px;
-  }
-  .browser-frame p{
-    font-size:13px;
-    color:var(--cream-dim);
-    max-width:380px;
-    line-height:1.5;
-  }
-  .browser-frame p strong{
-    color:var(--cream);
-  }
-  .open-browser-btn{
-    display:inline-flex;
-    align-items:center;
-    gap:8px;
-    background:var(--gold);
-    color:#1a1305;
-    border:none;
-    font-weight:700;
-    font-size:14px;
-    padding:12px 28px;
-    border-radius:10px;
-    cursor:pointer;
-    transition:background .15s, transform .1s;
-    text-decoration:none;
-  }
-  .open-browser-btn:hover{background:var(--gold-bright);}
-  .open-browser-btn:active{transform:scale(0.98);}
-
   .player-meta{
     margin-top:12px;
     display:flex;
@@ -434,11 +384,6 @@
         <div class="player-frame" id="playerFrame">
           <iframe id="vidsrcFrame" allowfullscreen referrerpolicy="origin"></iframe>
         </div>
-        <div class="browser-frame" id="browserFrame" style="display:none;">
-          <div class="browser-icon">🌐</div>
-          <p>Den här källan kan inte visas inbäddad.<br><strong>Öppna den i din webbläsare istället.</strong></p>
-          <a class="open-browser-btn" id="openBrowserBtn" href="#" target="_blank" rel="noopener">Öppna i webbläsaren →</a>
-        </div>
         <div class="player-meta" id="playerMeta"></div>
         <div class="notice" id="playerNotice" style="display:none;"></div>
       </div>
@@ -470,17 +415,21 @@
   const guess = (navigator.language||'sv-SE').split('-')[1];
   regionSel.value = regions.some(r=>r[0]===guess) ? guess : 'SE';
 
-  // Available sources
-  // openInBrowser = true -> shows a button instead of iframe (blocks embedding)
+  // vidsrc mirrors — all use same embed format: /embed/{movie|tv}/{tmdb_id}
   const SOURCES = [
-    {key:'streamimdb', name:'streamimdb.ru', base:'https://streamimdb.ru/movie', needsImdb:true, openInBrowser:true},
-    {key:'vidsrc_to',  name:'vidsrc.to',  base:'https://vidsrc.to/embed', needsImdb:false, openInBrowser:false},
-    {key:'vidsrc_me',  name:'vidsrc.me',  base:'https://vidsrc.me/embed', needsImdb:false, openInBrowser:false},
+    {key:'vidsrc2',        name:'vidsrc2.ru',        base:'https://vidsrc2.ru/embed'},
+    {key:'vidsrc_ir',      name:'vidsrc.ir',         base:'https://vidsrc.ir/embed'},
+    {key:'vidsrcme_ru',    name:'vidsrcme.ru',       base:'https://vidsrcme.ru/embed'},
+    {key:'vidsrcme_su',    name:'vidsrcme.su',       base:'https://vidsrcme.su/embed'},
+    {key:'vidsrc_me_ru',   name:'vidsrc-me.ru',      base:'https://vidsrc-me.ru/embed'},
+    {key:'vidsrc_me_su',   name:'vidsrc-me.su',      base:'https://vidsrc-me.su/embed'},
+    {key:'vidsrc_embed_ru',name:'vidsrc-embed.ru',   base:'https://vidsrc-embed.ru/embed'},
+    {key:'vidsrc_embed_su',name:'vidsrc-embed.su',   base:'https://vidsrc-embed.su/embed'},
+    {key:'vsrc_su',        name:'vsrc.su',           base:'https://vsrc.su/embed'},
   ];
   let activeSource = SOURCES[0].key;
   let currentType = 'movie';
   let currentId = null;
-  let currentImdbId = null;
 
   let mode = 'title';
   document.getElementById('typeToggle').addEventListener('click', (e)=>{
@@ -582,25 +531,11 @@
   async function loadDetail(id, type){
     clearStatus();
     const detail = await tmdb(`/${type}/${id}`);
-
-    // Fetch IMDb ID if needed (for streamimdb.ru)
-    let imdbId = detail.imdb_id || null;
-    if(!imdbId && type === 'tv'){
-      try{
-        const ext = await tmdb(`/tv/${id}/external_ids`);
-        imdbId = ext.imdb_id || null;
-      } catch(e){ /* ignore */ }
-    }
-
     resultsList.innerHTML = '';
-    renderTicket(detail, type, id, imdbId);
+    renderTicket(detail, type, id);
   }
 
-  function buildUrl(source, type, id, imdbId){
-    if(source.needsImdb){
-      const useId = imdbId || id;
-      return `${source.base}/${useId}`;
-    }
+  function buildUrl(source, type, id){
     return `${source.base}/${type}/${id}`;
   }
 
@@ -614,43 +549,26 @@
       btn.addEventListener('click', ()=>{
         activeSource = src.key;
         renderSourcePicker();
-        if(currentId) loadPlayer(currentType, currentId, currentImdbId);
+        if(currentId) loadPlayer(currentType, currentId);
       });
       picker.appendChild(btn);
     });
   }
 
-  function loadPlayer(type, id, imdbId){
+  function loadPlayer(type, id){
     currentType = type;
     currentId = id;
-    currentImdbId = imdbId;
     const src = SOURCES.find(s=>s.key===activeSource);
-    const url = buildUrl(src, type, id, imdbId);
-
-    const iframe = document.getElementById('vidsrcFrame');
-    const playerFrame = document.getElementById('playerFrame');
-    const browserFrame = document.getElementById('browserFrame');
-    const openBtn = document.getElementById('openBrowserBtn');
-
-    if(src.openInBrowser){
-      // Hide iframe, show browser button
-      playerFrame.style.display = 'none';
-      browserFrame.style.display = 'flex';
-      openBtn.href = url;
-      iframe.src = '';
-    } else {
-      // Show iframe, hide browser button
-      playerFrame.style.display = 'block';
-      browserFrame.style.display = 'none';
-      iframe.src = url;
-    }
+    const url = buildUrl(src, type, id);
+    const frame = document.getElementById('vidsrcFrame');
+    frame.src = url;
 
     const meta = document.getElementById('playerMeta');
     meta.innerHTML = '';
 
     const tag = document.createElement('span');
     tag.className = 'tag active';
-    tag.textContent = src.name + ' / ' + type + ' / ' + (src.needsImdb && imdbId ? imdbId : id);
+    tag.textContent = src.name + ' / ' + type + ' / ' + id;
     meta.appendChild(tag);
 
     const a = document.createElement('a');
@@ -660,19 +578,10 @@
     a.textContent = 'Öppna i eget fönster →';
     meta.appendChild(a);
 
-    const notice = document.getElementById('playerNotice');
-    if(src.needsImdb && !imdbId){
-      notice.style.display = 'block';
-      notice.innerHTML = `
-        <strong>OBS:</strong> Inget IMDb-ID hittades för detta objekt.
-        <code>streamimdb.ru</code> kräver IMDb-ID. Prova en annan källa ovan.
-      `;
-    } else {
-      notice.style.display = 'none';
-    }
+    document.getElementById('playerNotice').style.display = 'none';
   }
 
-  function renderTicket(d, type, id, imdbId){
+  function renderTicket(d, type, id){
     const title = d.title || d.name;
     const date = d.release_date || d.first_air_date || '';
     const year = date ? date.slice(0,4) : '—';
@@ -693,7 +602,7 @@
     });
 
     renderSourcePicker();
-    loadPlayer(type, id, imdbId);
+    loadPlayer(type, id);
 
     document.getElementById('playerHeading').textContent = 'Spelare — ' + (type==='tv' ? 'Serie' : 'Film');
 
