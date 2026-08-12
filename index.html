@@ -425,11 +425,12 @@
     {key:'vidsrc_embed_ru',name:'vidsrc-embed.ru',   base:'https://vidsrc-embed.ru/embed'},
     {key:'vidsrc_embed_su',name:'vidsrc-embed.su',   base:'https://vidsrc-embed.su/embed'},
     {key:'vsrc_su',        name:'vsrc.su',           base:'https://vsrc.su/embed'},
-    {key:'vidapi',         name:'vidapi.ru',           base:'https://vidapi.ru/embed'},
+    {key:'vidapi',         name:'vidapi.ru',           base:'https://vaplayer.ru/embed', needsImdb:true, tvFormat:'tmdb_season_episode'},
   ];
   let activeSource = SOURCES[0].key;
   let currentType = 'movie';
   let currentId = null;
+  let currentImdbId = null;
 
   let mode = 'title';
   document.getElementById('typeToggle').addEventListener('click', (e)=>{
@@ -531,11 +532,33 @@
   async function loadDetail(id, type){
     clearStatus();
     const detail = await tmdb(`/${type}/${id}`);
+
+    // Fetch IMDb ID for sources that need it (vidapi.ru)
+    let imdbId = detail.imdb_id || null;
+    if(!imdbId && type === 'tv'){
+      try{
+        const ext = await tmdb(`/tv/${id}/external_ids`);
+        imdbId = ext.imdb_id || null;
+      } catch(e){ /* ignore */ }
+    }
+
     resultsList.innerHTML = '';
-    renderTicket(detail, type, id);
+    renderTicket(detail, type, id, imdbId);
   }
 
-  function buildUrl(source, type, id){
+  function buildUrl(source, type, id, imdbId){
+    // vidapi.ru / vaplayer.ru special format
+    if(source.key === 'vidapi'){
+      if(type === 'movie'){
+        // Movies use IMDb ID: /embed/movie/tt1234567
+        const useId = imdbId || id;
+        return `${source.base}/movie/${useId}`;
+      } else {
+        // TV uses TMDB ID with season/episode: /embed/tv/{id}/1/1
+        return `${source.base}/tv/${id}/1/1`;
+      }
+    }
+    // Standard vidsrc format
     return `${source.base}/${type}/${id}`;
   }
 
@@ -549,17 +572,18 @@
       btn.addEventListener('click', ()=>{
         activeSource = src.key;
         renderSourcePicker();
-        if(currentId) loadPlayer(currentType, currentId);
+        if(currentId) loadPlayer(currentType, currentId, currentImdbId);
       });
       picker.appendChild(btn);
     });
   }
 
-  function loadPlayer(type, id){
+  function loadPlayer(type, id, imdbId){
     currentType = type;
     currentId = id;
+    currentImdbId = imdbId;
     const src = SOURCES.find(s=>s.key===activeSource);
-    const url = buildUrl(src, type, id);
+    const url = buildUrl(src, type, id, imdbId);
     const frame = document.getElementById('vidsrcFrame');
     frame.src = url;
 
@@ -568,7 +592,8 @@
 
     const tag = document.createElement('span');
     tag.className = 'tag active';
-    tag.textContent = src.name + ' / ' + type + ' / ' + id;
+    const displayId = (src.key === 'vidapi' && type === 'movie' && imdbId) ? imdbId : id;
+    tag.textContent = src.name + ' / ' + type + ' / ' + displayId;
     meta.appendChild(tag);
 
     const a = document.createElement('a');
@@ -581,7 +606,7 @@
     document.getElementById('playerNotice').style.display = 'none';
   }
 
-  function renderTicket(d, type, id){
+  function renderTicket(d, type, id, imdbId){
     const title = d.title || d.name;
     const date = d.release_date || d.first_air_date || '';
     const year = date ? date.slice(0,4) : '—';
@@ -602,7 +627,7 @@
     });
 
     renderSourcePicker();
-    loadPlayer(type, id);
+    loadPlayer(type, id, imdbId);
 
     document.getElementById('playerHeading').textContent = 'Spelare — ' + (type==='tv' ? 'Serie' : 'Film');
 
