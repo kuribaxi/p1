@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Var kan jag se den? — vidsrc mirrors</title>
+<title>Var kan jag se den? — Kuribaxi Player</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,900&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -30,19 +30,19 @@
     color:var(--cream);
     font-family:'Manrope', sans-serif;
     min-height:100vh;
-    padding:0 0 80px;
+    padding:0 0 40px;
   }
   .mono{font-family:'JetBrains Mono', monospace;}
 
   .marquee{
-    padding:38px 20px 26px;
+    padding:32px 20px 22px;
     text-align:center;
     position:relative;
     border-bottom:1px solid var(--panel-line);
     background:linear-gradient(180deg, rgba(201,162,39,0.06), transparent);
   }
   .bulbs{
-    display:flex; justify-content:center; gap:7px; margin-bottom:18px;
+    display:flex; justify-content:center; gap:7px; margin-bottom:14px;
   }
   .bulb{
     width:6px; height:6px; border-radius:50%;
@@ -61,14 +61,14 @@
   .marquee h1{
     font-family:'Fraunces', serif;
     font-weight:900;
-    font-size:clamp(28px, 5vw, 46px);
+    font-size:clamp(26px, 5vw, 42px);
     letter-spacing:-0.01em;
     color:var(--cream);
   }
   .marquee h1 span{color:var(--gold-bright);}
   .marquee p{
-    margin-top:10px;
-    font-size:13.5px;
+    margin-top:8px;
+    font-size:13px;
     color:var(--cream-dim);
     max-width:520px;
     margin-left:auto; margin-right:auto;
@@ -78,11 +78,11 @@
   .wrap{max-width:980px; margin:0 auto; padding:0 20px;}
 
   .config{
-    margin-top:26px;
+    margin-top:22px;
     background:var(--panel);
     border:1px solid var(--panel-line);
     border-radius:var(--radius);
-    padding:18px 20px;
+    padding:16px 20px;
   }
   .config-row{
     display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end;
@@ -106,14 +106,9 @@
   input:focus, select:focus{border-color:var(--gold);}
   input::placeholder{color:var(--cream-dim);}
   select{cursor:pointer;}
-  .hint{
-    font-size:11.5px; color:var(--cream-dim); margin-top:10px; line-height:1.5;
-  }
-  .hint a{color:var(--gold-bright); text-decoration:none; border-bottom:1px dotted var(--gold);}
-  .hint a:hover{color:var(--gold);}
 
   .search{
-    margin-top:16px;
+    margin-top:14px;
     display:flex; gap:10px; flex-wrap:wrap;
   }
   .search input{flex:1; min-width:220px; font-size:14.5px; padding:12px 14px;}
@@ -137,7 +132,7 @@
   .go-btn:disabled{opacity:0.5; cursor:default;}
 
   .status{
-    margin-top:14px; font-size:13px; padding:10px 14px; border-radius:8px;
+    margin-top:12px; font-size:13px; padding:10px 14px; border-radius:8px;
     display:none;
   }
   .status.show{display:block;}
@@ -145,7 +140,7 @@
   .status.info{background:rgba(53,198,180,0.08); border:1px solid rgba(53,198,180,0.25); color:var(--teal);}
   .status.warn{background:rgba(224,164,88,0.10); border:1px solid rgba(224,164,88,0.30); color:var(--amber);}
 
-  .results-list{margin-top:18px; display:flex; flex-direction:column; gap:8px;}
+  .results-list{margin-top:14px; display:flex; flex-direction:column; gap:8px;}
   .result-row{
     display:flex; gap:12px; align-items:center;
     background:var(--panel); border:1px solid var(--panel-line);
@@ -164,7 +159,7 @@
   }
 
   .ticket{
-    margin-top:22px;
+    margin-top:18px;
     display:none;
     background:var(--panel);
     border:1px solid var(--panel-line);
@@ -187,25 +182,25 @@
     background-image:radial-gradient(circle at 11px 11px, var(--bg) 4px, transparent 4.5px);
     background-size:100% 22px;
   }
-  .ticket-body{flex:1; padding:22px 24px; display:flex; gap:18px;}
+  .ticket-body{flex:1; padding:18px 20px; display:flex; gap:16px;}
   .poster{
-    width:100px; flex-shrink:0; border-radius:8px; overflow:hidden;
+    width:90px; flex-shrink:0; border-radius:8px; overflow:hidden;
     background:#1a2436; aspect-ratio:2/3;
   }
   .poster img{width:100%; height:100%; object-fit:cover; display:block;}
   .ticket-info{min-width:0;}
   .ticket-info h2{
-    font-family:'Fraunces', serif; font-weight:700; font-size:21px;
+    font-family:'Fraunces', serif; font-weight:700; font-size:20px;
     line-height:1.15; color:var(--cream);
   }
   .ticket-info .sub{
-    margin-top:4px; font-size:11.5px; color:var(--gold-bright);
+    margin-top:4px; font-size:11px; color:var(--gold-bright);
     font-family:'JetBrains Mono', monospace; letter-spacing:0.02em;
   }
   .ticket-info .overview{
-    margin-top:10px; font-size:12.5px; line-height:1.55; color:var(--cream-dim);
+    margin-top:8px; font-size:12px; line-height:1.5; color:var(--cream-dim);
   }
-  .genres{margin-top:10px; display:flex; gap:6px; flex-wrap:wrap;}
+  .genres{margin-top:8px; display:flex; gap:6px; flex-wrap:wrap;}
   .genre-tag{
     font-size:10px; padding:3px 9px; border-radius:20px;
     border:1px solid var(--panel-line); color:var(--cream-dim);
@@ -214,19 +209,19 @@
   .perf{
     position:relative;
     border-top:1px dashed var(--panel-line);
-    margin:0 24px;
+    margin:0 20px;
   }
   .perf::before, .perf::after{
     content:''; position:absolute; top:-8px; width:16px; height:16px;
     background:var(--bg); border-radius:50%;
   }
-  .perf::before{left:-32px;}
-  .perf::after{right:-32px;}
+  .perf::before{left:-28px;}
+  .perf::after{right:-28px;}
 
-  .player-box{padding:20px 24px 24px;}
+  .player-box{padding:18px 20px 20px;}
   .player-box h3{
     font-size:11px; text-transform:uppercase; letter-spacing:0.08em;
-    color:var(--cream-dim); margin-bottom:14px; font-weight:700;
+    color:var(--cream-dim); margin-bottom:12px; font-weight:700;
   }
   .player-frame{
     position:relative;
@@ -243,88 +238,6 @@
     width:100%;
     height:100%;
     border:none;
-  }
-  .browser-frame{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    flex-direction:column;
-    gap:16px;
-    background:var(--bg-alt);
-    aspect-ratio:16/9;
-    border-radius:10px;
-    border:1px solid var(--panel-line);
-    text-align:center;
-    padding:24px;
-  }
-  .browser-frame .browser-icon{
-    width:56px; height:56px;
-    border-radius:14px;
-    background:rgba(201,162,39,0.10);
-    border:1px solid var(--panel-line);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:24px;
-  }
-  .browser-frame p{
-    font-size:13px;
-    color:var(--cream-dim);
-    max-width:380px;
-    line-height:1.5;
-  }
-  .browser-frame p strong{
-    color:var(--cream);
-  }
-  .open-browser-btn{
-    display:inline-flex;
-    align-items:center;
-    gap:8px;
-    background:var(--gold);
-    color:#1a1305;
-    border:none;
-    font-weight:700;
-    font-size:14px;
-    padding:12px 28px;
-    border-radius:10px;
-    cursor:pointer;
-    transition:background .15s, transform .1s;
-    text-decoration:none;
-  }
-  .open-browser-btn:hover{background:var(--gold-bright);}
-  .open-browser-btn:active{transform:scale(0.98);}
-
-  .player-meta{
-    margin-top:12px;
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-    align-items:center;
-  }
-  .player-meta a, .player-meta button{
-    color:var(--gold-bright);
-    text-decoration:none;
-    border-bottom:1px dotted var(--gold);
-    font-size:12px;
-    background:none;
-    border:none;
-    cursor:pointer;
-    font-family:'Manrope', sans-serif;
-    padding:0;
-  }
-  .player-meta a:hover, .player-meta button:hover{color:var(--gold);}
-  .player-meta .tag{
-    font-size:10px;
-    font-family:'JetBrains Mono', monospace;
-    color:var(--cream-dim);
-    border:1px solid var(--panel-line);
-    padding:3px 10px;
-    border-radius:20px;
-  }
-  .player-meta .tag.active{
-    color:#0a1a17;
-    background:var(--teal);
-    border-color:var(--teal);
   }
 
   .source-picker{
@@ -352,8 +265,36 @@
     font-weight:600;
   }
 
+  .player-meta{
+    margin-top:10px;
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    align-items:center;
+  }
+  .player-meta a{
+    color:var(--gold-bright);
+    text-decoration:none;
+    border-bottom:1px dotted var(--gold);
+    font-size:12px;
+  }
+  .player-meta a:hover{color:var(--gold);}
+  .player-meta .tag{
+    font-size:10px;
+    font-family:'JetBrains Mono', monospace;
+    color:var(--cream-dim);
+    border:1px solid var(--panel-line);
+    padding:3px 10px;
+    border-radius:20px;
+  }
+  .player-meta .tag.active{
+    color:#0a1a17;
+    background:var(--teal);
+    border-color:var(--teal);
+  }
+
   .notice{
-    margin-top:12px;
+    margin-top:10px;
     font-size:11.5px;
     color:var(--cream-dim);
     line-height:1.5;
@@ -363,12 +304,49 @@
     border-radius:8px;
   }
   .notice strong{color:var(--amber);}
+  .notice code{
+    background:rgba(255,255,255,0.06);
+    padding:2px 6px;
+    border-radius:4px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+  }
+  .notice a{color:var(--gold-bright); text-decoration:none; border-bottom:1px dotted var(--gold);}
+  .notice a:hover{color:var(--gold);}
+
+  .verify-box{
+    margin-top:12px;
+    padding:14px 16px;
+    background:rgba(53,198,180,0.06);
+    border:1px solid rgba(53,198,180,0.2);
+    border-radius:10px;
+  }
+  .verify-box h4{
+    font-size:12px;
+    color:var(--teal);
+    margin-bottom:8px;
+    font-weight:700;
+  }
+  .verify-box ol{
+    margin-left:18px;
+    font-size:12px;
+    color:var(--cream-dim);
+    line-height:1.7;
+  }
+  .verify-box li{margin-bottom:4px;}
+  .verify-box code{
+    background:rgba(255,255,255,0.06);
+    padding:2px 6px;
+    border-radius:4px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    color:var(--gold-bright);
+  }
 
   footer{
-    max-width:980px; margin:40px auto 0; padding:0 20px;
+    max-width:980px; margin:32px auto 0; padding:0 20px;
     text-align:center; font-size:11px; color:var(--cream-dim); opacity:0.6;
   }
-  footer a{color:var(--cream-dim);}
 </style>
 <base target="_blank">
 </head>
@@ -377,7 +355,7 @@
   <div class="marquee">
     <div class="bulbs" id="bulbs"></div>
     <h1>Var kan jag <span>se</span> den?</h1>
-    <p>Sök på titel, TMDB-id eller IMDb-id. Välj källa nedan — spelaren laddas direkt under biljetten.</p>
+    <p>Sök på titel, TMDB-id eller IMDb-id. Spelaren laddas direkt under biljetten.</p>
   </div>
 
   <div class="wrap">
@@ -388,17 +366,7 @@
           <label for="apikey">TMDB API-nyckel (v3)</label>
           <input type="password" id="apikey" placeholder="klistra in din nyckel här" value="31efe739e595ccb0a3337a0dc8b4e76f">
         </div>
-        <div class="field" style="flex:0 0 140px;">
-          <label for="region">Region</label>
-          <select id="region"></select>
-        </div>
       </div>
-      <p class="hint">
-        Gratis nyckel på 2 minuter: skapa konto på
-        <a href="https://www.themoviedb.org/signup" target="_blank" rel="noopener">themoviedb.org</a>,
-        gå till <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener">Settings → API</a>
-        och kopiera "API Key (v3 auth)". Nyckeln är redan ifylld här — byt ut den om du vill använda en egen.
-      </p>
     </div>
 
     <div class="search">
@@ -434,12 +402,18 @@
         <div class="player-frame" id="playerFrame">
           <iframe id="vidsrcFrame" allowfullscreen referrerpolicy="origin"></iframe>
         </div>
-        <div class="browser-frame" id="browserFrame" style="display:none;">
-          <div class="browser-icon">🌐</div>
-          <p>Den här källan kan inte visas inbäddad.<br><strong>Öppna den i din webbläsare istället.</strong></p>
-          <a class="open-browser-btn" id="openBrowserBtn" href="#" target="_blank" rel="noopener">Öppna i webbläsaren →</a>
-        </div>
         <div class="player-meta" id="playerMeta"></div>
+
+        <div class="verify-box" id="verifyBox" style="display:none;">
+          <h4>🔒 VidAPI kräver domänverifiering</h4>
+          <ol>
+            <li>Logga in på <a href="https://vidapi.ru" target="_blank" rel="noopener">vidapi.ru</a> → Domains</li>
+            <li>Lägg till: <code>kuribaxi.github.io</code></li>
+            <li>Verifiera domänen (följ instruktionerna på VidAPI)</li>
+            <li>Ladda om den här sidan när den är verifierad</li>
+          </ol>
+        </div>
+
         <div class="notice" id="playerNotice" style="display:none;"></div>
       </div>
     </div>
@@ -447,8 +421,7 @@
   </div>
 
   <footer>
-    Drivs av TMDB API. Den här produkten använder TMDB API men är varken godkänd eller certifierad av TMDB.<br>
-    Spelaren tillhandahålls av externa källor.
+    Drivs av TMDB API. Spelare via VidAPI & vidsrc mirrors.
   </footer>
 
 <script>
@@ -456,22 +429,17 @@
   const bulbsEl = document.getElementById('bulbs');
   for(let i=0;i<26;i++){const b=document.createElement('div');b.className='bulb';bulbsEl.appendChild(b);}
 
-  const regions = [
-    ['SE','Sverige'],['US','USA'],['GB','Storbritannien'],['DE','Tyskland'],
-    ['NO','Norge'],['DK','Danmark'],['FI','Finland'],['FR','Frankrike'],
-    ['ES','Spanien'],['IT','Italien'],['NL','Nederländerna'],['CA','Kanada'],
-    ['AU','Australien'],['BR','Brasilien'],['PL','Polen'],['IE','Irland']
-  ];
-  const regionSel = document.getElementById('region');
-  regions.forEach(([code,name])=>{
-    const o=document.createElement('option'); o.value=code; o.textContent=`${name} (${code})`;
-    regionSel.appendChild(o);
-  });
-  const guess = (navigator.language||'sv-SE').split('-')[1];
-  regionSel.value = regions.some(r=>r[0]===guess) ? guess : 'SE';
-
-  // vidsrc mirrors — all use same embed format: /embed/{movie|tv}/{tmdb_id}
+  // === SOURCES ===
+  // VidAPI = primary, needs domain verification (kuribaxi.github.io)
+  // vidsrc mirrors = backup, works without verification
   const SOURCES = [
+    {
+      key:'vidapi',
+      name:'VidAPI (Rekommenderad)',
+      base:'https://vaplayer.ru/embed',
+      needsImdb:true,
+      isVidApi:true
+    },
     {key:'vidsrc2',        name:'vidsrc2.ru',        base:'https://vidsrc2.ru/embed'},
     {key:'vidsrc_ir',      name:'vidsrc.ir',         base:'https://vidsrc.ir/embed'},
     {key:'vidsrcme_ru',    name:'vidsrcme.ru',       base:'https://vidsrcme.ru/embed'},
@@ -480,7 +448,6 @@
     {key:'vidsrc_embed_ru',name:'vidsrc-embed.ru',   base:'https://vidsrc-embed.ru/embed'},
     {key:'vidsrc_embed_su',name:'vidsrc-embed.su',   base:'https://vidsrc-embed.su/embed'},
     {key:'vsrc_su',        name:'vsrc.su',           base:'https://vsrc.su/embed'},
-    {key:'vidapi',         name:'vidapi.ru',           base:'https://vaplayer.ru/embed', needsImdb:true},
   ];
   let activeSource = SOURCES[0].key;
   let currentType = 'movie';
@@ -588,7 +555,7 @@
     clearStatus();
     const detail = await tmdb(`/${type}/${id}`);
 
-    // Fetch IMDb ID for sources that need it (vidapi.ru)
+    // Fetch IMDb ID for VidAPI
     let imdbId = detail.imdb_id || null;
     if(!imdbId && type === 'tv'){
       try{
@@ -602,14 +569,12 @@
   }
 
   function buildUrl(source, type, id, imdbId){
-    // vidapi.ru / vaplayer.ru special format
-    if(source.key === 'vidapi'){
+    if(source.isVidApi){
+      // VidAPI format
       if(type === 'movie'){
-        // Movies use IMDb ID: /embed/movie/tt1234567
         const useId = imdbId || id;
         return `${source.base}/movie/${useId}`;
       } else {
-        // TV uses TMDB ID with season/episode: /embed/tv/{id}/1/1
         return `${source.base}/tv/${id}/1/1`;
       }
     }
@@ -639,29 +604,15 @@
     currentImdbId = imdbId;
     const src = SOURCES.find(s=>s.key===activeSource);
     const url = buildUrl(src, type, id, imdbId);
-
-    const iframe = document.getElementById('vidsrcFrame');
-    const playerFrame = document.getElementById('playerFrame');
-    const browserFrame = document.getElementById('browserFrame');
-    const openBtn = document.getElementById('openBrowserBtn');
-
-    if(src.openInBrowser){
-      playerFrame.style.display = 'none';
-      browserFrame.style.display = 'flex';
-      openBtn.href = url;
-      iframe.src = '';
-    } else {
-      playerFrame.style.display = 'block';
-      browserFrame.style.display = 'none';
-      iframe.src = url;
-    }
+    const frame = document.getElementById('vidsrcFrame');
+    frame.src = url;
 
     const meta = document.getElementById('playerMeta');
     meta.innerHTML = '';
 
     const tag = document.createElement('span');
     tag.className = 'tag active';
-    const displayId = (src.key === 'vidapi' && type === 'movie' && imdbId) ? imdbId : id;
+    const displayId = (src.isVidApi && type === 'movie' && imdbId) ? imdbId : id;
     tag.textContent = src.name + ' / ' + type + ' / ' + displayId;
     meta.appendChild(tag);
 
@@ -671,6 +622,14 @@
     a.rel = 'noopener';
     a.textContent = 'Öppna i eget fönster →';
     meta.appendChild(a);
+
+    // Show verification notice for VidAPI
+    const verifyBox = document.getElementById('verifyBox');
+    if(src.isVidApi){
+      verifyBox.style.display = 'block';
+    } else {
+      verifyBox.style.display = 'none';
+    }
 
     document.getElementById('playerNotice').style.display = 'none';
   }
