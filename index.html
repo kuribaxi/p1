@@ -244,6 +244,56 @@
     height:100%;
     border:none;
   }
+  .browser-frame{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    gap:16px;
+    background:var(--bg-alt);
+    aspect-ratio:16/9;
+    border-radius:10px;
+    border:1px solid var(--panel-line);
+    text-align:center;
+    padding:24px;
+  }
+  .browser-frame .browser-icon{
+    width:56px; height:56px;
+    border-radius:14px;
+    background:rgba(201,162,39,0.10);
+    border:1px solid var(--panel-line);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:24px;
+  }
+  .browser-frame p{
+    font-size:13px;
+    color:var(--cream-dim);
+    max-width:380px;
+    line-height:1.5;
+  }
+  .browser-frame p strong{
+    color:var(--cream);
+  }
+  .open-browser-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    background:var(--gold);
+    color:#1a1305;
+    border:none;
+    font-weight:700;
+    font-size:14px;
+    padding:12px 28px;
+    border-radius:10px;
+    cursor:pointer;
+    transition:background .15s, transform .1s;
+    text-decoration:none;
+  }
+  .open-browser-btn:hover{background:var(--gold-bright);}
+  .open-browser-btn:active{transform:scale(0.98);}
+
   .player-meta{
     margin-top:12px;
     display:flex;
@@ -384,6 +434,11 @@
         <div class="player-frame" id="playerFrame">
           <iframe id="vidsrcFrame" allowfullscreen referrerpolicy="origin"></iframe>
         </div>
+        <div class="browser-frame" id="browserFrame" style="display:none;">
+          <div class="browser-icon">🌐</div>
+          <p>Den här källan kan inte visas inbäddad.<br><strong>Öppna den i din webbläsare istället.</strong></p>
+          <a class="open-browser-btn" id="openBrowserBtn" href="#" target="_blank" rel="noopener">Öppna i webbläsaren →</a>
+        </div>
         <div class="player-meta" id="playerMeta"></div>
         <div class="notice" id="playerNotice" style="display:none;"></div>
       </div>
@@ -425,7 +480,7 @@
     {key:'vidsrc_embed_ru',name:'vidsrc-embed.ru',   base:'https://vidsrc-embed.ru/embed'},
     {key:'vidsrc_embed_su',name:'vidsrc-embed.su',   base:'https://vidsrc-embed.su/embed'},
     {key:'vsrc_su',        name:'vsrc.su',           base:'https://vsrc.su/embed'},
-    {key:'vidapi',         name:'vidapi.ru',           base:'https://vaplayer.ru/embed', needsImdb:true, tvFormat:'tmdb_season_episode'},
+    {key:'vidapi',         name:'vidapi.ru',           base:'https://vaplayer.ru/embed', needsImdb:true, tvFormat:'tmdb_season_episode', openInBrowser:true},
   ];
   let activeSource = SOURCES[0].key;
   let currentType = 'movie';
@@ -584,8 +639,22 @@
     currentImdbId = imdbId;
     const src = SOURCES.find(s=>s.key===activeSource);
     const url = buildUrl(src, type, id, imdbId);
-    const frame = document.getElementById('vidsrcFrame');
-    frame.src = url;
+
+    const iframe = document.getElementById('vidsrcFrame');
+    const playerFrame = document.getElementById('playerFrame');
+    const browserFrame = document.getElementById('browserFrame');
+    const openBtn = document.getElementById('openBrowserBtn');
+
+    if(src.openInBrowser){
+      playerFrame.style.display = 'none';
+      browserFrame.style.display = 'flex';
+      openBtn.href = url;
+      iframe.src = '';
+    } else {
+      playerFrame.style.display = 'block';
+      browserFrame.style.display = 'none';
+      iframe.src = url;
+    }
 
     const meta = document.getElementById('playerMeta');
     meta.innerHTML = '';
