@@ -454,7 +454,7 @@
         </div>
         <div class="browser-frame" id="browserFrame" style="display:none;">
           <div class="browser-icon">🌐</div>
-          <p>Den här källan öppnas i webbläsaren.<br><strong>Klicka knappen nedan för att spela upp.</strong></p>
+          <p id="browserFrameText">Den här källan öppnas i webbläsaren.<br><strong>Klicka knappen nedan för att spela upp.</strong></p>
           <a class="open-browser-btn" id="openBrowserBtn" href="#" target="_blank" rel="noopener">Spela upp i ny flik →</a>
         </div>
         <div class="player-meta" id="playerMeta"></div>
@@ -619,13 +619,19 @@
   }
 
   function buildUrl(source, type, id, imdbId){
+    let url;
     if(source.isVidApi){
       if(type === 'movie'){
         const useId = imdbId || id;
-        return `${source.base}/movie/${useId}`;
+        url = `${source.base}/movie/${useId}`;
       } else {
-        return `${source.base}/tv/${id}/1/1`;
+        url = `${source.base}/tv/${id}/1/1`;
       }
+      if(source.useBrowserLol){
+        // Öppna via browser.lol virtuell browser
+        return 'https://browser.lol/en/viewer?url=' + encodeURIComponent(url);
+      }
+      return url;
     }
     return `${source.base}/${type}/${id}`;
   }
