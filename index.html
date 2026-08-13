@@ -980,7 +980,7 @@
       }
       const srtMatch = text.match(/\d+\s*\n\d{2}:\d{2}:\d{2},\d{3}\s*-->\s*\d{2}:\d{2}:\d{2},\d{3}/);
       if(!srtMatch){
-        alert('Kunde inte lasa undertextfilen. Formatet stods inte an (kan vara ZIP/GZIP). Ladda ner filen manuellt och anvand en extern spelare som VLC.');
+        alert('Undertexten levereras som ZIP-fil och kan inte visas direkt i spelaren.\n\n1. Klicka "Ladda ner" pa resultatet\n2. Packa upp ZIP-filen\n3. Anvand filen i VLC eller liknande spelare.');
         return;
       }
       subtitleTracks = parseSRT(text);
