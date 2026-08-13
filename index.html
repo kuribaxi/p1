@@ -485,8 +485,6 @@
   for(let i=0;i<26;i++){const b=document.createElement('div');b.className='bulb';bulbsEl.appendChild(b);}
 
   // === SOURCES ===
-  // vidsrc mirrors first (works without verification)
-  // VidAPI last (requires domain verification)
   const SOURCES = [
     {key:'vidsrc2',        name:'vidsrc2.ru',        base:'https://vidsrc2.ru/embed'},
     {key:'vidsrc_ir',      name:'vidsrc.ir',         base:'https://vidsrc.ir/embed'},
@@ -496,8 +494,9 @@
     {key:'vidsrc_embed_ru',name:'vidsrc-embed.ru',   base:'https://vidsrc-embed.ru/embed'},
     {key:'vidsrc_embed_su',name:'vidsrc-embed.su',   base:'https://vidsrc-embed.su/embed'},
     {key:'vsrc_su',        name:'vsrc.su',           base:'https://vsrc.su/embed'},
-    // VidAPI — last, 2 variants: iframe and browser
-    {key:'vidapi_browser', name:'VidAPI',  base:'https://vaplayer.ru/embed', needsImdb:true, isVidApi:true, openInBrowser:true},
+    // VidAPI — last, 2 variants
+    {key:'vidapi_direct',  name:'VidAPI (PC)',       base:'https://vaplayer.ru/embed', needsImdb:true, isVidApi:true, openInBrowser:true},
+    {key:'vidapi_browserlol', name:'VidAPI (browser.lol)', base:'https://vaplayer.ru/embed', needsImdb:true, isVidApi:true, openInBrowser:true, useBrowserLol:true},
   ];
   let activeSource = SOURCES[0].key;
   let currentType = 'movie';
@@ -628,7 +627,6 @@
         url = `${source.base}/tv/${id}/1/1`;
       }
       if(source.useBrowserLol){
-        // Öppna via browser.lol virtuell browser
         return 'https://browser.lol/en/viewer?url=' + encodeURIComponent(url);
       }
       return url;
@@ -663,15 +661,21 @@
     const playerFrame = document.getElementById('playerFrame');
     const browserFrame = document.getElementById('browserFrame');
     const openBtn = document.getElementById('openBrowserBtn');
+    const browserFrameText = document.getElementById('browserFrameText');
 
     if(src.openInBrowser){
-      // Show browser button, hide iframe
       playerFrame.style.display = 'none';
       browserFrame.style.display = 'flex';
       openBtn.href = url;
       iframe.src = '';
+      if(src.useBrowserLol){
+        browserFrameText.innerHTML = 'Den här källan öppnas i <strong>browser.lol</strong> (virtuell browser).<br>Klicka knappen för att starta en ren Chrome-session som kan spela upp videon.';
+        openBtn.textContent = 'Öppna i browser.lol →';
+      } else {
+        browserFrameText.innerHTML = 'Den här källan öppnas i webbläsaren.<br><strong>Klicka knappen nedan för att spela upp.</strong>';
+        openBtn.textContent = 'Spela upp i ny flik →';
+      }
     } else {
-      // Show iframe, hide browser button
       playerFrame.style.display = 'block';
       browserFrame.style.display = 'none';
       iframe.src = url;
