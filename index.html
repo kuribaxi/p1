@@ -677,7 +677,8 @@
     {key:'vidsrc_embed_ru',name:'vidsrc-embed.ru',   base:'https://vidsrc-embed.ru/embed'},
     {key:'vidsrc_embed_su',name:'vidsrc-embed.su',   base:'https://vidsrc-embed.su/embed'},
     {key:'vsrc_su',        name:'vsrc.su',           base:'https://vsrc.su/embed'},
-    {key:'vidapi_direct',  name:'VidAPI (PC)',       base:'https://vaplayer.ru/embed', needsImdb:true, isVidApi:true, openInBrowser:true},
+    {key:'vidapi_embed',  name:'VidAPI (Player)',   base:'https://vaplayer.ru/embed', needsImdb:true, isVidApi:true, openInBrowser:false},
+    {key:'vidapi_tab',    name:'VidAPI (Ny flik)',  base:'https://vaplayer.ru/embed', needsImdb:true, isVidApi:true, openInBrowser:true},
   ];
   let activeSource = SOURCES[0].key;
   let currentType = 'movie';
