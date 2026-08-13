@@ -362,7 +362,102 @@
     font-size:11px;
   }
 
-  .verify-box{
+    .subtitle-box{
+    margin-top:14px;
+    padding:14px 16px;
+    background:rgba(53,198,180,0.05);
+    border:1px solid rgba(53,198,180,0.15);
+    border-radius:10px;
+  }
+  .subtitle-box h4{
+    font-size:12px;
+    color:var(--teal);
+    margin-bottom:10px;
+    font-weight:700;
+  }
+  .sub-lang-row{
+    display:flex;
+    gap:8px;
+    margin-bottom:10px;
+  }
+  .sub-lang-row select{
+    flex:1;
+    background:rgba(255,255,255,0.04);
+    border:1px solid var(--panel-line);
+    color:var(--cream);
+    border-radius:8px;
+    padding:8px 10px;
+    font-size:13px;
+    font-family:'Manrope', sans-serif;
+    cursor:pointer;
+  }
+  .sub-search-btn{
+    background:var(--teal);
+    color:#0a1a17;
+    border:none;
+    font-weight:700;
+    font-size:12px;
+    padding:0 16px;
+    border-radius:8px;
+    cursor:pointer;
+    transition:opacity .15s;
+  }
+  .sub-search-btn:hover{opacity:.85;}
+  .sub-search-btn:disabled{opacity:.4; cursor:default;}
+  .sub-results{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    max-height:200px;
+    overflow-y:auto;
+  }
+  .sub-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:8px 10px;
+    background:rgba(255,255,255,0.03);
+    border:1px solid var(--panel-line);
+    border-radius:8px;
+    font-size:12px;
+  }
+  .sub-row .sub-name{
+    flex:1;
+    color:var(--cream);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .sub-row .sub-lang-tag{
+    font-size:10px;
+    font-family:'JetBrains Mono', monospace;
+    color:var(--teal);
+    border:1px solid rgba(53,198,180,0.3);
+    padding:2px 8px;
+    border-radius:20px;
+    flex-shrink:0;
+  }
+  .sub-row .sub-dl{
+    color:var(--gold-bright);
+    text-decoration:none;
+    font-size:11px;
+    font-weight:600;
+    border-bottom:1px dotted var(--gold);
+    flex-shrink:0;
+  }
+  .sub-row .sub-dl:hover{color:var(--gold);}
+  .sub-loading{
+    font-size:12px;
+    color:var(--cream-dim);
+    padding:8px 0;
+  }
+  .sub-empty{
+    font-size:12px;
+    color:var(--cream-dim);
+    padding:8px 0;
+  }
+
+.verify-box{
     margin-top:12px;
     padding:14px 16px;
     background:rgba(53,198,180,0.06);
@@ -459,7 +554,30 @@
         </div>
         <div class="player-meta" id="playerMeta"></div>
 
-        <div class="verify-box" id="verifyBox" style="display:none;">
+        
+        <div class="subtitle-box" id="subtitleBox" style="display:none;">
+          <h4>📝 Undertexter</h4>
+          <div class="sub-lang-row">
+            <select id="subLang">
+              <option value="swe">🇸🇪 Svenska</option>
+              <option value="eng">🇬🇧 Engelska</option>
+              <option value="dan">🇩🇰 Dansk</option>
+              <option value="nor">🇳🇴 Norsk</option>
+              <option value="fin">🇫🇮 Finsk</option>
+              <option value="ger">🇩🇪 Tysk</option>
+              <option value="fre">🇫🇷 Franska</option>
+              <option value="spa">🇪🇸 Spanska</option>
+              <option value="ita">🇮🇹 Italienska</option>
+              <option value="rus">🇷🇺 Ryska</option>
+              <option value="pol">🇵🇱 Polska</option>
+              <option value="dut">🇳🇱 Nederländska</option>
+            </select>
+            <button class="sub-search-btn" id="subSearchBtn">🔍 Sök</button>
+          </div>
+          <div class="sub-results" id="subResults"></div>
+          <div class="sub-loading" id="subLoading" style="display:none;">Söker undertexter…</div>
+        </div>
+<div class="verify-box" id="verifyBox" style="display:none;">
           <h4>🔒 VidAPI kräver domänverifiering</h4>
           <ol>
             <li>Logga in på <a href="https://vidapi.ru" target="_blank" rel="noopener">vidapi.ru</a> → Domains</li>
@@ -720,6 +838,11 @@
     renderSourcePicker();
     loadPlayer(type, id, imdbId);
 
+    // Visa undertext-panelen för alla källor
+    const subBox = document.getElementById('subtitleBox');
+    subBox.style.display = 'block';
+    document.getElementById('subResults').innerHTML = '';
+
     document.getElementById('playerHeading').textContent = 'Spelare — ' + (type==='tv' ? 'Serie' : 'Film');
 
     ticket.classList.add('show');
@@ -732,7 +855,74 @@
     else setStatus('Kunde inte hämta data just nu (' + err.message + '). Prova igen om en stund.', 'error');
   }
 
-  function escapeHtml(s){
+  
+  // === UNDERTEXTER (OpenSubtitles) ===
+  document.getElementById('subSearchBtn').addEventListener('click', searchSubtitles);
+
+  async function searchSubtitles(){
+    const lang = document.getElementById('subLang').value;
+    const resultsBox = document.getElementById('subResults');
+    const loading = document.getElementById('subLoading');
+    const btn = document.getElementById('subSearchBtn');
+
+    if(!currentImdbId && !currentId){
+      resultsBox.innerHTML = '<div class="sub-empty">Sök på en film/serie först.</div>';
+      return;
+    }
+
+    btn.disabled = true;
+    loading.style.display = 'block';
+    resultsBox.innerHTML = '';
+
+    try{
+      let query;
+      if(currentImdbId){
+        query = `imdbid-${currentImdbId.replace('tt','')}`;
+      } else {
+        // Fallback: sök på titel
+        const title = document.getElementById('titleText').textContent;
+        query = `query-${encodeURIComponent(title)}`;
+      }
+
+      // OpenSubtitles API v1 (gratis, ingen nyckel)
+      const res = await fetch(`https://rest.opensubtitles.org/search/${query}/sublanguageid-${lang}`, {
+        headers: {'X-User-Agent': 'KuribaxiPlayer v1.0'}
+      });
+
+      if(!res.ok) throw new Error('HTTP_'+res.status);
+      const data = await res.json();
+
+      loading.style.display = 'none';
+
+      if(!data || data.length === 0){
+        resultsBox.innerHTML = '<div class="sub-empty">Inga undertexter hittades. Prova ett annat språk.</div>';
+        return;
+      }
+
+      // Visa max 10 resultat
+      data.slice(0,10).forEach(sub=>{
+        const row = document.createElement('div');
+        row.className = 'sub-row';
+        const name = sub.SubFileName || 'Okänd fil';
+        const langName = sub.LanguageName || lang;
+        const dlUrl = sub.SubDownloadLink || sub.ZipDownloadLink || '#';
+        row.innerHTML = `
+          <span class="sub-name">${escapeHtml(name)}</span>
+          <span class="sub-lang-tag">${escapeHtml(langName)}</span>
+          <a class="sub-dl" href="${escapeHtml(dlUrl)}" target="_blank" rel="noopener">Ladda ner ↓</a>
+        `;
+        resultsBox.appendChild(row);
+      });
+
+    } catch(err){
+      loading.style.display = 'none';
+      resultsBox.innerHTML = `<div class="sub-empty">Kunde inte söka undertexter (${err.message}). Prova igen.</div>`;
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+function escapeHtml(s){
     return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   }
 })();
