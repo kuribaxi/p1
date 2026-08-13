@@ -496,7 +496,6 @@
     {key:'vsrc_su',        name:'vsrc.su',           base:'https://vsrc.su/embed'},
     // VidAPI — last, 2 variants
     {key:'vidapi_direct',  name:'VidAPI (PC)',       base:'https://vaplayer.ru/embed', needsImdb:true, isVidApi:true, openInBrowser:true},
-    {key:'vidapi_browserlol', name:'VidAPI (browser.lol)', base:'https://vaplayer.ru/embed', needsImdb:true, isVidApi:true, openInBrowser:true, useBrowserLol:true},
   ];
   let activeSource = SOURCES[0].key;
   let currentType = 'movie';
@@ -618,18 +617,13 @@
   }
 
   function buildUrl(source, type, id, imdbId){
-    let url;
     if(source.isVidApi){
       if(type === 'movie'){
         const useId = imdbId || id;
-        url = `${source.base}/movie/${useId}`;
+        return `${source.base}/movie/${useId}`;
       } else {
-        url = `${source.base}/tv/${id}/1/1`;
+        return `${source.base}/tv/${id}/1/1`;
       }
-      if(source.useBrowserLol){
-        return 'https://browser.lol/en/viewer?url=' + encodeURIComponent(url);
-      }
-      return url;
     }
     return `${source.base}/${type}/${id}`;
   }
@@ -668,13 +662,8 @@
       browserFrame.style.display = 'flex';
       openBtn.href = url;
       iframe.src = '';
-      if(src.useBrowserLol){
-        browserFrameText.innerHTML = 'Den här källan öppnas i <strong>browser.lol</strong> (virtuell browser).<br>Klicka knappen för att starta en ren Chrome-session som kan spela upp videon.';
-        openBtn.textContent = 'Öppna i browser.lol →';
-      } else {
-        browserFrameText.innerHTML = 'Den här källan öppnas i webbläsaren.<br><strong>Klicka knappen nedan för att spela upp.</strong>';
-        openBtn.textContent = 'Spela upp i ny flik →';
-      }
+      browserFrameText.innerHTML = 'Den här källan öppnas i webbläsaren.<br><strong>Klicka knappen nedan för att spela upp.</strong>';
+      openBtn.textContent = 'Spela upp i ny flik →';
     } else {
       playerFrame.style.display = 'block';
       browserFrame.style.display = 'none';
