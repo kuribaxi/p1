@@ -457,6 +457,55 @@
     padding:8px 0;
   }
 
+  .subtitle-overlay{
+    position:absolute;
+    bottom:60px;
+    left:50%;
+    transform:translateX(-50%);
+    max-width:80%;
+    text-align:center;
+    pointer-events:none;
+    z-index:100;
+    padding:8px 20px;
+    background:rgba(0,0,0,0.75);
+    border-radius:6px;
+    color:#fff;
+    font-size:16px;
+    font-family:'Manrope', sans-serif;
+    line-height:1.4;
+    text-shadow:0 1px 3px rgba(0,0,0,0.9);
+    white-space:pre-wrap;
+  }
+  .sub-sync-bar{
+    display:flex;
+    gap:6px;
+    align-items:center;
+    margin-top:8px;
+    flex-wrap:wrap;
+  }
+  .sub-sync-bar button{
+    background:rgba(255,255,255,0.08);
+    border:1px solid var(--panel-line);
+    color:var(--cream);
+    font-size:11px;
+    padding:5px 10px;
+    border-radius:6px;
+    cursor:pointer;
+    font-family:'Manrope', sans-serif;
+  }
+  .sub-sync-bar button:hover{border-color:var(--gold); color:var(--gold-bright);}
+  .sub-sync-bar .sync-val{
+    font-size:11px;
+    color:var(--cream-dim);
+    font-family:'JetBrains Mono', monospace;
+    min-width:50px;
+    text-align:center;
+  }
+  .sub-active{
+    border-color:var(--teal) !important;
+    color:var(--teal) !important;
+  }
+
 .verify-box{
     margin-top:12px;
     padding:14px 16px;
@@ -544,8 +593,9 @@
       <div class="player-box" id="playerBox">
         <h3 id="playerHeading">Spelare</h3>
         <div class="source-picker" id="sourcePicker"></div>
-        <div class="player-frame" id="playerFrame">
+        <div class="player-frame" id="playerFrame" style="position:relative;">
           <iframe id="vidsrcFrame" allowfullscreen referrerpolicy="origin"></iframe>
+          <div id="subtitleOverlay" class="subtitle-overlay" style="display:none;"></div>
         </div>
         <div class="browser-frame" id="browserFrame" style="display:none;">
           <div class="browser-icon">🌐</div>
@@ -556,11 +606,13 @@
 
         
         <div class="subtitle-box" id="subtitleBox" style="display:none;">
-          <h4>📝 Undertexter</h4>
+          <h4>📝 Undertexter — visas direkt i spelaren</h4>
           <div class="sub-lang-row">
             <select id="subLang">
               <option value="swe">🇸🇪 Svenska</option>
               <option value="eng">🇬🇧 Engelska</option>
+              <option value="per">🇮🇷 Persiska (Farsi)</option>
+              <option value="kur">🇮🇶 Kurdiska</option>
               <option value="dan">🇩🇰 Dansk</option>
               <option value="nor">🇳🇴 Norsk</option>
               <option value="fin">🇫🇮 Finsk</option>
@@ -571,11 +623,25 @@
               <option value="rus">🇷🇺 Ryska</option>
               <option value="pol">🇵🇱 Polska</option>
               <option value="dut">🇳🇱 Nederländska</option>
+              <option value="tur">🇹🇷 Turkiska</option>
+              <option value="ara">🇸🇦 Arabiska</option>
+              <option value="hin">🇮🇳 Hindi</option>
+              <option value="jpn">🇯🇵 Japanska</option>
+              <option value="kor">🇰🇷 Koreanska</option>
+              <option value="chi">🇨🇳 Kinesiska</option>
             </select>
             <button class="sub-search-btn" id="subSearchBtn">🔍 Sök</button>
           </div>
           <div class="sub-results" id="subResults"></div>
           <div class="sub-loading" id="subLoading" style="display:none;">Söker undertexter…</div>
+          <div class="sub-sync-bar" id="subSyncBar" style="display:none;">
+            <span style="font-size:11px;color:var(--cream-dim);">Synk:</span>
+            <button id="subSyncMinus">−0.5s</button>
+            <span class="sync-val" id="subSyncVal">0.0s</span>
+            <button id="subSyncPlus">+0.5s</button>
+            <button id="subPlayPause">⏸ Pausa</button>
+            <button id="subStop" style="color:var(--error);">✕ Stäng</button>
+          </div>
         </div>
 <div class="verify-box" id="verifyBox" style="display:none;">
           <h4>🔒 VidAPI kräver domänverifiering</h4>
@@ -856,8 +922,19 @@
   }
 
   
-  // === UNDERTEXTER (OpenSubtitles) ===
+  // === UNDERTEXTER — inbyggd overlay i spelaren ===
+  let subtitleTracks = [];
+  let subtitleTimer = null;
+  let subtitleOffset = 0;
+  let subtitleStartTime = null;
+  let subtitleIsPlaying = false;
+  let currentSubtitleUrl = null;
+
   document.getElementById('subSearchBtn').addEventListener('click', searchSubtitles);
+  document.getElementById('subSyncMinus').addEventListener('click', ()=>adjustSync(-500));
+  document.getElementById('subSyncPlus').addEventListener('click', ()=>adjustSync(500));
+  document.getElementById('subPlayPause').addEventListener('click', toggleSubtitlePlay);
+  document.getElementById('subStop').addEventListener('click', stopSubtitles);
 
   async function searchSubtitles(){
     const lang = document.getElementById('subLang').value;
@@ -873,18 +950,17 @@
     btn.disabled = true;
     loading.style.display = 'block';
     resultsBox.innerHTML = '';
+    stopSubtitles();
 
     try{
       let query;
       if(currentImdbId){
         query = `imdbid-${currentImdbId.replace('tt','')}`;
       } else {
-        // Fallback: sök på titel
         const title = document.getElementById('titleText').textContent;
         query = `query-${encodeURIComponent(title)}`;
       }
 
-      // OpenSubtitles API v1 (gratis, ingen nyckel)
       const res = await fetch(`https://rest.opensubtitles.org/search/${query}/sublanguageid-${lang}`, {
         headers: {'X-User-Agent': 'KuribaxiPlayer v1.0'}
       });
@@ -899,7 +975,6 @@
         return;
       }
 
-      // Visa max 10 resultat
       data.slice(0,10).forEach(sub=>{
         const row = document.createElement('div');
         row.className = 'sub-row';
@@ -909,8 +984,12 @@
         row.innerHTML = `
           <span class="sub-name">${escapeHtml(name)}</span>
           <span class="sub-lang-tag">${escapeHtml(langName)}</span>
-          <a class="sub-dl" href="${escapeHtml(dlUrl)}" target="_blank" rel="noopener">Ladda ner ↓</a>
         `;
+        const loadBtn = document.createElement('button');
+        loadBtn.textContent = '▶ Ladda';
+        loadBtn.style.cssText = 'background:var(--teal);color:#0a1a17;border:none;font-weight:700;font-size:11px;padding:4px 12px;border-radius:6px;cursor:pointer;';
+        loadBtn.addEventListener('click', ()=>loadSubtitleFile(dlUrl, name));
+        row.appendChild(loadBtn);
         resultsBox.appendChild(row);
       });
 
@@ -919,6 +998,136 @@
       resultsBox.innerHTML = `<div class="sub-empty">Kunde inte söka undertexter (${err.message}). Prova igen.</div>`;
     } finally {
       btn.disabled = false;
+    }
+  }
+
+  async function loadSubtitleFile(url, filename){
+    const overlay = document.getElementById('subtitleOverlay');
+    const syncBar = document.getElementById('subSyncBar');
+    overlay.style.display = 'none';
+    stopSubtitles();
+
+    try{
+      // OpenSubtitles länkar är ofta .zip eller .gz — vi försöker ladda direkt
+      const res = await fetch(url);
+      if(!res.ok) throw new Error('HTTP_'+res.status);
+
+      let text;
+      const contentType = res.headers.get('content-type') || '';
+
+      if(contentType.includes('zip') || filename.endsWith('.zip')){
+        // ZIP-fil — vi kan inte packa upp i browsern utan bibliotek
+        // Försök hämta som text ändå (vissa länkar redirectar till .srt)
+        const blob = await res.blob();
+        text = await blob.text();
+      } else if(contentType.includes('gzip') || filename.endsWith('.gz')){
+        // GZIP — försök dekomprimera
+        const blob = await res.blob();
+        text = await blob.text();
+      } else {
+        text = await res.text();
+      }
+
+      // Försök hitta .srt-innehåll i texten (kan vara binärt för zip)
+      const srtMatch = text.match(/\d+\s*
+\d{2}:\d{2}:\d{2},\d{3}\s*-->\s*\d{2}:\d{2}:\d{2},\d{3}/);
+      if(!srtMatch){
+        alert('Kunde inte läsa undertextfilen. Formatet stöds inte än (kan vara ZIP/GZIP). Ladda ner filen manuellt och använd en extern spelare som VLC.');
+        return;
+      }
+
+      subtitleTracks = parseSRT(text);
+      if(subtitleTracks.length === 0){
+        alert('Inga undertexter hittades i filen.');
+        return;
+      }
+
+      currentSubtitleUrl = url;
+      subtitleOffset = 0;
+      subtitleStartTime = Date.now();
+      subtitleIsPlaying = true;
+
+      overlay.style.display = 'block';
+      syncBar.style.display = 'flex';
+      updateSyncDisplay();
+      startSubtitleTimer();
+
+      // Markera vilken undertext som är aktiv
+      document.querySelectorAll('.sub-row button').forEach(b=>b.classList.remove('sub-active'));
+      event.target.classList.add('sub-active');
+
+    } catch(err){
+      alert('Kunde inte ladda undertexten: ' + err.message);
+    }
+  }
+
+  function parseSRT(data){
+    const blocks = data.trim().split(/
+\s*
+/);
+    const tracks = [];
+    for(const block of blocks){
+      const lines = block.trim().split('
+');
+      if(lines.length < 3) continue;
+      const timeMatch = lines[1].match(/(\d{2}):(\d{2}):(\d{2}),(\d{3})\s*-->\s*(\d{2}):(\d{2}):(\d{2}),(\d{3})/);
+      if(!timeMatch) continue;
+      const start = parseInt(timeMatch[1])*3600000 + parseInt(timeMatch[2])*60000 + parseInt(timeMatch[3])*1000 + parseInt(timeMatch[4]);
+      const end = parseInt(timeMatch[5])*3600000 + parseInt(timeMatch[6])*60000 + parseInt(timeMatch[7])*1000 + parseInt(timeMatch[8]);
+      const text = lines.slice(2).join('
+').trim().replace(/<\/?[^>]+>/g, '');
+      if(text) tracks.push({start, end, text});
+    }
+    return tracks;
+  }
+
+  function startSubtitleTimer(){
+    stopSubtitleTimer();
+    const overlay = document.getElementById('subtitleOverlay');
+    subtitleTimer = setInterval(()=>{
+      if(!subtitleIsPlaying) return;
+      const elapsed = Date.now() - subtitleStartTime + subtitleOffset;
+      const track = subtitleTracks.find(t => elapsed >= t.start && elapsed <= t.end);
+      if(track){
+        overlay.textContent = track.text;
+        overlay.style.display = 'block';
+      } else {
+        overlay.style.display = 'none';
+      }
+    }, 100);
+  }
+
+  function stopSubtitleTimer(){
+    if(subtitleTimer){
+      clearInterval(subtitleTimer);
+      subtitleTimer = null;
+    }
+  }
+
+  function stopSubtitles(){
+    stopSubtitleTimer();
+    subtitleTracks = [];
+    subtitleIsPlaying = false;
+    document.getElementById('subtitleOverlay').style.display = 'none';
+    document.getElementById('subSyncBar').style.display = 'none';
+    document.querySelectorAll('.sub-row button').forEach(b=>b.classList.remove('sub-active'));
+  }
+
+  function adjustSync(ms){
+    subtitleOffset += ms;
+    updateSyncDisplay();
+  }
+
+  function updateSyncDisplay(){
+    const val = (subtitleOffset / 1000).toFixed(1);
+    document.getElementById('subSyncVal').textContent = (val >= 0 ? '+' : '') + val + 's';
+  }
+
+  function toggleSubtitlePlay(){
+    subtitleIsPlaying = !subtitleIsPlaying;
+    document.getElementById('subPlayPause').textContent = subtitleIsPlaying ? '⏸ Pausa' : '▶ Spela';
+    if(subtitleIsPlaying && !subtitleTimer){
+      startSubtitleTimer();
     }
   }
 
