@@ -399,6 +399,7 @@
   }
 </style>
 <base target="_blank">
+<base target="_blank">
 </head>
 <body>
 
@@ -460,15 +461,7 @@
         </div>
         <div class="player-meta" id="playerMeta"></div>
 
-        <div class="verify-box" id="verifyBox" style="display:none;">
-          <h4>&#128274; VidAPI kraver domanverifiering</h4>
-          <ol>
-            <li>Logga in pa <a href="https://vidapi.ru" target="_blank" rel="noopener">vidapi.ru</a> &rarr; Domains</li>
-            <li>Lagg till: <code>kuribaxi.github.io</code></li>
-            <li>Verifiera domanen (folj instruktionerna pa VidAPI)</li>
-            <li>Ladda om den har sidan nar den ar verifierad</li>
-          </ol>
-        </div>
+        
 
         <div class="notice" id="playerNotice" style="display:none;"></div>
       </div>
@@ -669,9 +662,6 @@
     a.rel = 'noopener';
     a.textContent = 'Oppna i eget fonster \u2192';
     meta.appendChild(a);
-    const verifyBox = document.getElementById('verifyBox');
-    if(src.isVidApi){ verifyBox.style.display = 'block'; }
-    else { verifyBox.style.display = 'none'; }
     document.getElementById('playerNotice').style.display = 'none';
   }
 
