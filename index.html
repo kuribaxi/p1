@@ -426,6 +426,10 @@
         <button data-mode="tmdb">TMDB-ID</button>
         <button data-mode="imdb">IMDB-ID</button>
       </div>
+      <div class="type-toggle" id="mediaTypeToggle" style="display:none;">
+        <button data-type="movie" class="active">FILM</button>
+        <button data-type="tv">SERIE</button>
+      </div>
       <input type="text" id="query" placeholder="t.ex. Dune, 693134, eller tt15239678">
       <button class="go-btn" id="goBtn">Sok</button>
     </div>
@@ -496,13 +500,28 @@
   let currentImdbId = null;
 
   let mode = 'title';
+  let mediaType = 'movie';
+  const mediaTypeToggle = document.getElementById('mediaTypeToggle');
+
   document.getElementById('typeToggle').addEventListener('click', (e)=>{
     const btn = e.target.closest('button'); if(!btn) return;
-    document.querySelectorAll('.type-toggle button').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('#typeToggle button').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
     mode = btn.dataset.mode;
     const q = document.getElementById('query');
     q.placeholder = mode==='title' ? 't.ex. Dune' : mode==='tmdb' ? 't.ex. 693134' : 't.ex. tt15239678';
+    if(mode === 'title'){
+      mediaTypeToggle.style.display = 'none';
+    } else {
+      mediaTypeToggle.style.display = 'flex';
+    }
+  });
+
+  mediaTypeToggle.addEventListener('click', (e)=>{
+    const btn = e.target.closest('button'); if(!btn) return;
+    document.querySelectorAll('#mediaTypeToggle button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    mediaType = btn.dataset.type;
   });
 
   const statusEl = document.getElementById('status');
@@ -553,13 +572,12 @@
         else if(items.length===1){ await loadDetail(items[0].id, items[0].media_type); }
         else { renderResultList(items.slice(0,8)); }
       } else if(mode==='tmdb'){
-        try{ await loadDetail(q, 'movie'); }
-        catch(e){ await loadDetail(q, 'tv'); }
+        await loadDetail(q, mediaType);
       } else {
         const data = await tmdb('/find/' + encodeURIComponent(q) + '?external_source=imdb_id');
-        if(data.movie_results && data.movie_results.length){ await loadDetail(data.movie_results[0].id, 'movie'); }
-        else if(data.tv_results && data.tv_results.length){ await loadDetail(data.tv_results[0].id, 'tv'); }
-        else { setStatus('Hittade inget TMDB-objekt for det IMDb-id:t.', 'error'); }
+        const results = mediaType === 'movie' ? data.movie_results : data.tv_results;
+        if(results && results.length){ await loadDetail(results[0].id, mediaType); }
+        else { setStatus('Hittade ingen ' + (mediaType==='movie'?'film':'serie') + ' for det IMDb-id:t.', 'error'); }
       }
     } catch(err){
       handleError(err);
