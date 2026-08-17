@@ -94,8 +94,15 @@
   .ghost-btn{font-size:11px; font-family:'JetBrains Mono', monospace; background:transparent; border:1px solid var(--panel-line); color:var(--cream-dim); padding:6px 10px; border-radius:8px; cursor:pointer;}
   .ghost-btn:hover{border-color:var(--error); color:#f0938a;}
   .lib-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(140px,1fr)); gap:10px;}
-  .lib-card{background:rgba(255,255,255,0.03); border:1px solid var(--panel-line); border-radius:10px; overflow:hidden; cursor:pointer; transition:border-color .15s;}
+  .lib-card{position:relative; background:rgba(255,255,255,0.03); border:1px solid var(--panel-line); border-radius:10px; overflow:hidden; cursor:pointer; transition:border-color .15s;}
   .lib-card:hover{border-color:var(--gold);}
+  .lib-card .del-btn{
+    position:absolute; top:6px; right:6px; width:26px; height:26px; border-radius:50%;
+    background:rgba(11,18,32,0.85); border:1px solid rgba(226,87,76,0.35); color:#f0938a;
+    display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700;
+    cursor:pointer; z-index:2; backdrop-filter:blur(6px); transition:all .15s;
+  }
+  .lib-card .del-btn:hover{background:var(--error); color:#fff; border-color:var(--error); transform:scale(1.1);}
   .lib-card img{width:100%; aspect-ratio:2/3; object-fit:cover; display:block; background:#1a2436;}
   .lib-card-body{padding:8px 9px;}
   .lib-card-title{font-size:12.5px; font-weight:600; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
@@ -346,6 +353,7 @@
       const prog = !isMovies ? `<span class="lib-card-progress">S${it.season}:E${it.episode}</span>` : '';
       const date = new Date(it.lastWatched).toLocaleDateString('sv-SE');
       return `<div class="lib-card" data-id="${it.id}" data-type="${it.type}">
+        <button class="del-btn" data-del-id="${it.id}" data-del-type="${it.type}" title="Ta bort">×</button>
         <img src="${img}" alt="" loading="lazy">
         <div class="lib-card-body">
           <div class="lib-card-title">${escapeHtml(it.title||'')}</div>
@@ -354,6 +362,16 @@
         </div>
       </div>`;
     }).join('') + `</div>`;
+    libContent.querySelectorAll('.del-btn').forEach(btn=>{
+      btn.addEventListener('click', (e)=>{
+        e.stopPropagation();
+        const delId = btn.dataset.delId;
+        const delType = btn.dataset.delType;
+        if(delType==='movie'){ delete watchMap.movies[delId]; }
+        else { delete watchMap.series[delId]; }
+        saveWatchMap(watchMap);
+      });
+    });
     libContent.querySelectorAll('.lib-card').forEach(card=>{
       card.addEventListener('click', ()=>{
         const id = card.dataset.id;
