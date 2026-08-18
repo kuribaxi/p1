@@ -83,7 +83,6 @@
   .result-row .ryear{font-size:11px; color:var(--cream-dim); font-family:'JetBrains Mono', monospace;}
   .result-row .rtype{margin-left:auto; font-size:10px; font-family:'JetBrains Mono', monospace; color:var(--gold-bright); border:1px solid var(--panel-line); padding:3px 7px; border-radius:20px; flex-shrink:0;}
 
-  /* NYTT: Bibliotek */
   .library{margin-top:22px; background:var(--panel); border:1px solid var(--panel-line); border-radius:var(--radius); padding:16px 16px 14px;}
   .lib-head{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:12px;}
   .lib-head h3{font-family:'Fraunces', serif; font-size:18px; font-weight:700;}
@@ -171,7 +170,6 @@
   .yt-preview.show{display:block;}
   .yt-preview iframe{width:100%; height:100%; border:none;}
 
-  /* NYTT: Klocka & datum alltid synlig i hörnet */
   .clock-badge{
     position:fixed;
     top:14px; right:14px;
@@ -201,7 +199,6 @@
 </head>
 <body>
 
-  <!-- NYTT: Klocka & datum alltid synlig -->
   <div class="clock-badge" id="clockBadge">
     <div class="clock-time"><span class="clock-dot"></span><span id="clockTime">--:--:--</span></div>
     <div class="clock-date" id="clockDate">laddar...</div>
@@ -241,7 +238,6 @@
     <div class="status" id="status"></div>
     <div class="results-list" id="resultsList"></div>
 
-    <!-- NYTT: MIN LISTA MED MAP film/serier -->
     <div class="library" id="library">
       <div class="lib-head">
         <h3>Min fortsättningslista</h3>
@@ -276,7 +272,6 @@
         <h3 id="playerHeading">Spelare</h3>
         <div class="source-picker" id="sourcePicker"></div>
 
-        <!-- NYTT: Episod-kontroller för serier -->
         <div class="ep-controls" id="epControls">
           <label>Säsong <input type="number" id="seasonInput" min="1" value="1"></label>
           <label>Avsnitt <input type="number" id="episodeInput" min="1" value="1"></label>
@@ -329,18 +324,13 @@
   let currentImdbId = null;
   let currentDetail = null;
 
-  // === NYTT: HUVUD-MAP MED 2 UNDER-MAPS ===
   const LS_KEY = 'kuribaxi_watch_map_v1';
-  /** @type {{ movies: Map, series: Map }} struktur
-   *  movies: { [tmdbId]: { id, title, poster, year, type:'movie', lastWatched, imdbId } }
-   *  series: { [tmdbId]: { id, title, poster, year, type:'tv', season, episode, lastWatched, imdbId } }
-   */
+
   function loadWatchMap(){
     try{
       const raw = localStorage.getItem(LS_KEY);
       if(!raw) return { movies: {}, series: {} };
       const parsed = JSON.parse(raw);
-      // säkerställ struktur
       return { movies: parsed.movies || {}, series: parsed.series || {} };
     } catch(e){ return { movies: {}, series: {} }; }
   }
@@ -362,13 +352,12 @@
       imdbId: detail.imdb_id || currentImdbId || null,
       lastWatched: Date.now()
     };
-    watchMap.movies[id] = entry; // ersätter tidigare
+    watchMap.movies[id] = entry;
     saveWatchMap(watchMap);
   }
 
   function upsertSeries(detail, season, episode){
     const id = String(detail.id);
-    // om det redan finns, behåll men ersätt med senaste säsong/avsnitt
     const existing = watchMap.series[id];
     const entry = {
       id: id,
@@ -382,11 +371,10 @@
       imdbId: detail.imdb_id || currentImdbId || existing?.imdbId || null,
       lastWatched: Date.now()
     };
-    watchMap.series[id] = entry; // senaste skriver över tidigare
+    watchMap.series[id] = entry;
     saveWatchMap(watchMap);
   }
 
-  // Bibliotek UI
   let libTab = localStorage.getItem('kuribaxi_lib_tab') || 'series';
   const libContent = document.getElementById('libContent');
   function renderLibrary(){
@@ -422,4 +410,27 @@
         saveWatchMap(watchMap);
       });
     });
-    libContent.querySelectorAll('.
+    libContent.querySelectorAll('.lib-card').forEach(card=>{
+      card.addEventListener('click', ()=>{
+        const id = card.dataset.id;
+        const type = card.dataset.type;
+        if(type==='movie'){
+          loadDetail(id, 'movie').catch(handleError);
+        } else {
+          const entry = watchMap.series[id];
+          loadDetail(id, 'tv', entry?.season, entry?.episode).catch(handleError);
+        }
+      });
+    });
+  }
+
+  document.getElementById('libTabs').addEventListener('click', e=>{
+    const btn = e.target.closest('button'); if(!btn) return;
+    libTab = btn.dataset.tab;
+    localStorage.setItem('kuribaxi_lib_tab', libTab);
+    renderLibrary();
+  });
+  document.getElementById('clearLibBtn').addEventListener('click', ()=>{
+    if(!confirm(`Rensa alla ${libTab==='movies'?'filmer':'serier'}?`)) return;
+    if(libTab==='movies') watchMap.movies = {}; else watchMap.series = {};
+    saveWatchMap
