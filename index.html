@@ -158,6 +158,19 @@
   .player-meta .tag{font-size:10px; font-family:'JetBrains Mono', monospace; color:var(--cream-dim); border:1px solid var(--panel-line); padding:3px 10px; border-radius:20px;}
   .player-meta .tag.active{color:#0a1a17; background:var(--teal); border-color:var(--teal);}
 
+  .fallback-box{margin-top:16px; padding:14px 16px; background:rgba(224,164,88,0.07); border:1px solid rgba(224,164,88,0.22); border-radius:12px; display:none;}
+  .fallback-box.show{display:block;}
+  .fallback-box h4{font-size:12px; font-weight:700; color:var(--amber); letter-spacing:0.05em; text-transform:uppercase; margin-bottom:8px; font-family:'JetBrains Mono', monospace;}
+  .fallback-box p{font-size:12px; color:var(--cream-dim); line-height:1.5; margin-bottom:10px;}
+  .fallback-links{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px;}
+  .fallback-links a{font-size:11px; font-family:'JetBrains Mono', monospace; padding:7px 12px; border-radius:20px; border:1px solid var(--panel-line); background:rgba(255,255,255,0.04); color:var(--cream); text-decoration:none; transition:all .15s; display:inline-flex; align-items:center; gap:6px;}
+  .fallback-links a:hover{border-color:var(--gold); color:var(--gold-bright); background:rgba(201,162,39,0.08);}
+  .fallback-links a.yt{border-color:rgba(255,0,0,0.25); color:#ff7a7a;}
+  .fallback-links a.yt:hover{background:rgba(255,0,0,0.12); border-color:#ff4444; color:#fff;}
+  .yt-preview{width:100%; aspect-ratio:16/9; border-radius:10px; overflow:hidden; border:1px solid var(--panel-line); background:#000; display:none;}
+  .yt-preview.show{display:block;}
+  .yt-preview iframe{width:100%; height:100%; border:none;}
+
   footer{max-width:980px; margin:32px auto 0; padding:0 20px; text-align:center; font-size:11px; color:var(--cream-dim); opacity:0.6;}
 </style>
 </head>
@@ -249,6 +262,12 @@
           <a class="open-browser-btn" id="openBrowserBtn" href="#" target="_blank" rel="noopener">Spela upp i ny flik &#8594;</a>
         </div>
         <div class="player-meta" id="playerMeta"></div>
+        <div class="fallback-box" id="fallbackBox">
+          <h4>⚠ Finns inte på vidsrc-servrarna? Prova här</h4>
+          <p id="fallbackText">Denna titel verkar saknas på de inbyggda servrarna (t.ex. "The Super Snooper" 1980 är ofta borttagen). Sök vidare på andra källor — klicka för att öppna direkt:</p>
+          <div class="fallback-links" id="fallbackLinks"></div>
+          <div class="yt-preview" id="ytPreview"><iframe id="ytFrame" allowfullscreen></iframe></div>
+        </div>
       </div>
     </div>
 
@@ -579,7 +598,6 @@
     const epControls = document.getElementById('epControls');
     if(type==='tv'){
       epControls.classList.add('show');
-      // om det finns sparad progress, använd den, annars forced eller 1/1
       const saved = watchMap.series[String(id)];
       const s = forcedSeason || saved?.season || 1;
       const e = forcedEpisode || saved?.episode || 1;
@@ -592,9 +610,41 @@
 
     renderSourcePicker();
     loadPlayer(type, id, imdbId);
+    renderFallback(d, type); // NYTT: alltid visa alternativa länkar
     document.getElementById('playerHeading').textContent = 'Spelare — ' + (type==='tv' ? 'Serie' : 'Film');
     ticket.classList.add('show');
     ticket.scrollIntoView({behavior:'smooth', block:'nearest'});
+  }
+
+  function renderFallback(detail, type){
+    const title = (detail.title || detail.name || '').trim();
+    const year = (detail.release_date || detail.first_air_date || '').slice(0,4);
+    const box = document.getElementById('fallbackBox');
+    const linksEl = document.getElementById('fallbackLinks');
+    const ytPreview = document.getElementById('ytPreview');
+    const ytFrame = document.getElementById('ytFrame');
+    const q = encodeURIComponent(`${title} ${year} ${type==='tv' ? 'serie' : 'full movie'}`.trim());
+    const qSimple = encodeURIComponent(title);
+    const qYT = encodeURIComponent(`${title} ${year} full movie`);
+    // Bygg länkar
+    const links = [
+      {label:`▶ YouTube: "${title}"`, href:`https://www.youtube.com/results?search_query=${qYT}`, cls:'yt'},
+      {label:`YouTube (svensk)`, href:`https://www.youtube.com/results?search_query=${qSimple}+svenska`, cls:'yt'},
+      {label:'JustWatch SE', href:`https://www.justwatch.com/se/search?q=${qSimple}`},
+      {label:'Archive.org', href:`https://archive.org/search?query=${qSimple}+AND+mediatype%3Amovies`},
+      {label:'Plex / gratis', href:`https://watch.plex.tv/search?query=${qSimple}`},
+      {label:'Google', href:`https://www.google.com/search?q=${q}+watch+online`},
+      {label:'SF Anytime', href:`https://www.sfanytime.com/sv/search/${qSimple}`},
+    ];
+    linksEl.innerHTML = links.map(l=>`<a class="${l.cls||''}" href="${l.href}" target="_blank" rel="noopener">${l.label} ↗</a>`).join('');
+
+    // Visa boxen alltid - särskilt användbart för sällsynta titlar som The Super Snooper
+    box.classList.add('show');
+    // Bädda in YouTube sök som förhandsvisning (klickbar)
+    ytPreview.classList.add('show');
+    ytFrame.src = `https://www.youtube.com/embed?listType=search&list=${qYT}`;
+    // Extra text
+    document.getElementById('fallbackText').innerHTML = `"${escapeHtml(title)}" ${year ? '('+year+')' : ''} kan saknas på vidsrc. Prova YouTube-förhandsvisningen nedan eller öppna en av länkarna. <span style="color:var(--amber)">Tips: The Super Snooper / Der Superbulle finns ofta på YouTube i delar.</span>`;
   }
 
   // Ep-knappar
