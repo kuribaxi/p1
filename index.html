@@ -196,6 +196,7 @@
 
   footer{max-width:980px; margin:32px auto 0; padding:0 20px; text-align:center; font-size:11px; color:var(--cream-dim); opacity:0.6;}
 </style>
+<base target="_blank">
 </head>
 <body>
 
@@ -289,7 +290,7 @@
         </div>
         <div class="player-meta" id="playerMeta"></div>
         <div class="fallback-box" id="fallbackBox">
-          <h4>⚠ Finns inte på vidsrc-servrarna? Prova här</h4>
+          <h4>&#9888; Finns inte på vidsrc-servrarna? Prova här</h4>
           <p id="fallbackText">Denna titel verkar saknas på de inbyggda servrarna. Sök vidare på andra källor — klicka för att öppna direkt:</p>
           <div class="fallback-links" id="fallbackLinks"></div>
           <div class="yt-preview" id="ytPreview"><iframe id="ytFrame" allowfullscreen></iframe></div>
@@ -303,9 +304,11 @@
 
 <script>
 (function(){
+  // === GLÖDLAMPOR ===
   const bulbsEl = document.getElementById('bulbs');
   for(let i=0;i<26;i++){const b=document.createElement('div');b.className='bulb';bulbsEl.appendChild(b);}
 
+  // === KÄLLOR ===
   const SOURCES = [
     {key:'vidsrc2',        name:'vidsrc2.ru',        base:'https://vidsrc2.ru/embed'},
     {key:'vidsrc_ir',      name:'vidsrc.ir',         base:'https://vidsrc.ir/embed'},
@@ -339,6 +342,20 @@
     renderLibrary();
   }
   let watchMap = loadWatchMap();
+
+  function escapeHtml(str){
+    if(!str) return '';
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function showStatus(msg, type='info'){
+    const el = document.getElementById('status');
+    el.textContent = msg;
+    el.className = 'status show ' + type;
+  }
+  function hideStatus(){
+    document.getElementById('status').className = 'status';
+  }
 
   function upsertFilm(detail){
     const id = String(detail.id);
@@ -375,6 +392,7 @@
     saveWatchMap(watchMap);
   }
 
+  // === BIBLIOTEK ===
   let libTab = localStorage.getItem('kuribaxi_lib_tab') || 'series';
   const libContent = document.getElementById('libContent');
   function renderLibrary(){
@@ -391,11 +409,11 @@
       const prog = !isMovies ? `<span class="lib-card-progress">S${it.season}:E${it.episode}</span>` : '';
       const date = new Date(it.lastWatched).toLocaleDateString('sv-SE');
       return `<div class="lib-card" data-id="${it.id}" data-type="${it.type}">
-        <button class="del-btn" data-del-id="${it.id}" data-del-type="${it.type}" title="Ta bort">×</button>
-        <img src="${img}" alt="" loading="lazy">
+        <button class="del-btn" data-del-id="${it.id}" data-del-type="${it.type}" title="Ta bort">&#215;</button>
+        <img src="${img}" alt="" loading="lazy" onerror="this.style.display='none'">
         <div class="lib-card-body">
           <div class="lib-card-title">${escapeHtml(it.title||'')}</div>
-          <div class="lib-card-sub">${it.year||''} · ${date}</div>
+          <div class="lib-card-sub">${it.year||''} &#183; ${date}</div>
           ${prog}
         </div>
       </div>`;
@@ -433,4 +451,350 @@
   document.getElementById('clearLibBtn').addEventListener('click', ()=>{
     if(!confirm(`Rensa alla ${libTab==='movies'?'filmer':'serier'}?`)) return;
     if(libTab==='movies') watchMap.movies = {}; else watchMap.series = {};
-    saveWatchMap
+    saveWatchMap(watchMap);
+  });
+
+  // === KLOCKA ===
+  function updateClock(){
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString('sv-SE', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+    const dateStr = now.toLocaleDateString('sv-SE', {weekday:'long', day:'numeric', month:'long'});
+    document.getElementById('clockTime').textContent = timeStr;
+    document.getElementById('clockDate').textContent = dateStr;
+  }
+  updateClock();
+  setInterval(updateClock, 1000);
+
+  // === SÖK ===
+  let searchMode = 'title';
+  const typeToggle = document.getElementById('typeToggle');
+  const mediaTypeToggle = document.getElementById('mediaTypeToggle');
+  const queryInput = document.getElementById('query');
+  const goBtn = document.getElementById('goBtn');
+  const resultsList = document.getElementById('resultsList');
+
+  typeToggle.addEventListener('click', e=>{
+    const btn = e.target.closest('button'); if(!btn) return;
+    typeToggle.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    searchMode = btn.dataset.mode;
+    if(searchMode==='title'){
+      mediaTypeToggle.style.display = 'flex';
+      queryInput.placeholder = 't.ex. Dune';
+    } else {
+      mediaTypeToggle.style.display = 'none';
+      queryInput.placeholder = searchMode==='tmdb' ? 't.ex. 693134' : 't.ex. tt15239678';
+    }
+  });
+
+  function getApiKey(){ return document.getElementById('apikey').value.trim(); }
+
+  async function searchTMDB(){
+    const key = getApiKey();
+    if(!key){ showStatus('Ange en TMDB API-nyckel först.', 'error'); return; }
+    const q = queryInput.value.trim();
+    if(!q){ showStatus('Skriv något att söka efter.', 'warn'); return; }
+
+    hideStatus();
+    resultsList.innerHTML = '';
+    goBtn.disabled = true;
+    showStatus('Söker...', 'info');
+
+    try{
+      let url;
+      if(searchMode==='title'){
+        const mediaType = mediaTypeToggle.querySelector('.active').dataset.type;
+        url = `https://api.themoviedb.org/3/search/${mediaType}?api_key=${key}&query=${encodeURIComponent(q)}&language=sv-SE&page=1`;
+      } else if(searchMode==='tmdb'){
+        // Sök både film och serie
+        const movieUrl = `https://api.themoviedb.org/3/movie/${q}?api_key=${key}&language=sv-SE`;
+        const tvUrl = `https://api.themoviedb.org/3/tv/${q}?api_key=${key}&language=sv-SE`;
+        let detail = null;
+        let type = null;
+        try{
+          const r = await fetch(movieUrl);
+          if(r.ok){ detail = await r.json(); type='movie'; }
+        }catch(e){}
+        if(!detail){
+          try{
+            const r = await fetch(tvUrl);
+            if(r.ok){ detail = await r.json(); type='tv'; }
+          }catch(e){}
+        }
+        if(!detail){ showStatus('Hittade ingen titel med det TMDB-ID:t.', 'error'); goBtn.disabled=false; return; }
+        loadDetail(detail.id, type);
+        goBtn.disabled = false;
+        return;
+      } else if(searchMode==='imdb'){
+        const findUrl = `https://api.themoviedb.org/3/find/${q}?api_key=${key}&external_source=imdb_id`;
+        const r = await fetch(findUrl);
+        const data = await r.json();
+        let found = null;
+        let type = null;
+        if(data.movie_results && data.movie_results.length>0){ found = data.movie_results[0]; type='movie'; }
+        else if(data.tv_results && data.tv_results.length>0){ found = data.tv_results[0]; type='tv'; }
+        else if(data.tv_episode_results && data.tv_episode_results.length>0){ found = data.tv_episode_results[0]; type='tv'; }
+        if(!found){ showStatus('Hittade ingen titel med det IMDb-ID:t.', 'error'); goBtn.disabled=false; return; }
+        loadDetail(found.id, type);
+        goBtn.disabled = false;
+        return;
+      }
+
+      const r = await fetch(url);
+      if(!r.ok) throw new Error('TMDB API-fel: ' + r.status);
+      const data = await r.json();
+      const results = data.results || [];
+      if(results.length===0){ showStatus('Inga resultat hittades.', 'warn'); goBtn.disabled=false; return; }
+
+      resultsList.innerHTML = results.slice(0,10).map(item=>{
+        const title = item.title || item.name;
+        const year = (item.release_date || item.first_air_date || '').slice(0,4);
+        const type = item.title ? 'FILM' : 'SERIE';
+        const img = item.poster_path ? `https://image.tmdb.org/t/p/w92${item.poster_path}` : '';
+        return `<div class="result-row" data-id="${item.id}" data-type="${item.title?'movie':'tv'}">
+          <img src="${img}" alt="" onerror="this.style.display='none'">
+          <div class="rmeta">
+            <div class="rtitle">${escapeHtml(title)}</div>
+            <div class="ryear">${year}</div>
+          </div>
+          <div class="rtype">${type}</div>
+        </div>`;
+      }).join('');
+
+      resultsList.querySelectorAll('.result-row').forEach(row=>{
+        row.addEventListener('click', ()=>{
+          loadDetail(row.dataset.id, row.dataset.type).catch(handleError);
+        });
+      });
+
+      hideStatus();
+    }catch(err){
+      handleError(err);
+    }
+    goBtn.disabled = false;
+  }
+
+  goBtn.addEventListener('click', searchTMDB);
+  queryInput.addEventListener('keydown', e=>{ if(e.key==='Enter') searchTMDB(); });
+
+  // === LADDA DETALJER ===
+  async function loadDetail(id, type, prefillSeason, prefillEpisode){
+    const key = getApiKey();
+    if(!key){ showStatus('Ange en TMDB API-nyckel först.', 'error'); return; }
+
+    hideStatus();
+    showStatus('Laddar detaljer...', 'info');
+    document.getElementById('ticket').classList.remove('show');
+    document.getElementById('resultsList').innerHTML = '';
+
+    try{
+      const url = `https://api.themoviedb.org/3/${type}/${id}?api_key=${key}&language=sv-SE&append_to_response=external_ids`;
+      const r = await fetch(url);
+      if(!r.ok) throw new Error('TMDB API-fel: ' + r.status);
+      const detail = await r.json();
+      currentDetail = detail;
+      currentType = type;
+      currentId = id;
+      currentImdbId = detail.external_ids?.imdb_id || detail.imdb_id || null;
+
+      // Visa biljett
+      document.getElementById('titleText').textContent = detail.title || detail.name;
+      const year = (detail.release_date || detail.first_air_date || '').slice(0,4);
+      const runtime = detail.runtime ? ` &#183; ${detail.runtime} min` : (detail.episode_run_time && detail.episode_run_time[0] ? ` &#183; ${detail.episode_run_time[0]} min/avsn` : '');
+      document.getElementById('subText').innerHTML = `${year}${runtime} &#183; ${(detail.vote_average||0).toFixed(1)}/10`;
+      document.getElementById('overviewText').textContent = detail.overview || 'Ingen beskrivning tillgänglig.';
+      document.getElementById('posterImg').src = detail.poster_path ? `https://image.tmdb.org/t/p/w300${detail.poster_path}` : '';
+
+      const genreTags = document.getElementById('genreTags');
+      genreTags.innerHTML = (detail.genres||[]).map(g=>`<span class="genre-tag">${escapeHtml(g.name)}</span>`).join('');
+
+      // Spelarinställningar
+      const epControls = document.getElementById('epControls');
+      if(type==='tv'){
+        epControls.classList.add('show');
+        document.getElementById('seasonInput').value = prefillSeason || 1;
+        document.getElementById('episodeInput').value = prefillEpisode || 1;
+        document.getElementById('playerHeading').textContent = 'Spelare — Serie';
+      } else {
+        epControls.classList.remove('show');
+        document.getElementById('playerHeading').textContent = 'Spelare — Film';
+      }
+
+      // Bygg källväljare
+      buildSourcePicker();
+
+      // Visa biljett
+      document.getElementById('ticket').classList.add('show');
+      document.getElementById('ticket').scrollIntoView({behavior:'smooth', block:'start'});
+
+      // Ladda spelare
+      loadPlayer();
+
+      // Bygg fallback-länkar
+      buildFallbackLinks(detail, type);
+
+      hideStatus();
+    }catch(err){
+      handleError(err);
+    }
+  }
+
+  function handleError(err){
+    console.error(err);
+    showStatus('Fel: ' + (err.message || 'Något gick fel'), 'error');
+    document.getElementById('goBtn').disabled = false;
+  }
+
+  // === SPELARE ===
+  function buildSourcePicker(){
+    const picker = document.getElementById('sourcePicker');
+    picker.innerHTML = SOURCES.map(s=>{
+      return `<button class="source-btn ${s.key===activeSource?'active':''}" data-key="${s.key}">${escapeHtml(s.name)}</button>`;
+    }).join('');
+    picker.querySelectorAll('.source-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        activeSource = btn.dataset.key;
+        localStorage.setItem('kuribaxi_active_source', activeSource);
+        buildSourcePicker();
+        loadPlayer();
+      });
+    });
+  }
+
+  function loadPlayer(){
+    const source = SOURCES.find(s=>s.key===activeSource);
+    if(!source || !currentId) return;
+
+    const frame = document.getElementById('vidsrcFrame');
+    const browserFrame = document.getElementById('browserFrame');
+    const playerFrame = document.getElementById('playerFrame');
+    const meta = document.getElementById('playerMeta');
+
+    let url;
+    if(source.isVidApi){
+      if(!currentImdbId){ 
+        showStatus('VidAPI kräver IMDb-ID. Sök med IMDb-ID eller välj en annan källa.', 'warn');
+        frame.src = '';
+        playerFrame.style.display = 'none';
+        browserFrame.style.display = 'flex';
+        return;
+      }
+      const s = currentType==='tv' ? (document.getElementById('seasonInput').value||1) : '';
+      const e = currentType==='tv' ? (document.getElementById('episodeInput').value||1) : '';
+      if(currentType==='tv'){
+        url = `${source.base}/${currentImdbId}/${s}/${e}`;
+      } else {
+        url = `${source.base}/${currentImdbId}`;
+      }
+    } else {
+      if(currentType==='tv'){
+        const s = document.getElementById('seasonInput').value || 1;
+        const e = document.getElementById('episodeInput').value || 1;
+        url = `${source.base}/tv/${currentId}/${s}/${e}`;
+      } else {
+        url = `${source.base}/movie/${currentId}`;
+      }
+    }
+
+    if(source.openInBrowser){
+      frame.src = '';
+      playerFrame.style.display = 'none';
+      browserFrame.style.display = 'flex';
+      document.getElementById('openBrowserBtn').href = url;
+    } else {
+      browserFrame.style.display = 'none';
+      playerFrame.style.display = 'block';
+      frame.src = url;
+    }
+
+    // Spara i bibliotek
+    if(currentType==='movie'){
+      upsertFilm(currentDetail);
+    } else {
+      const s = document.getElementById('seasonInput').value || 1;
+      const e = document.getElementById('episodeInput').value || 1;
+      upsertSeries(currentDetail, s, e);
+    }
+
+    // Meta
+    meta.innerHTML = `<span class="tag">${currentType==='movie'?'Film':'Serie'}</span>
+      <span class="tag active">TMDB: ${currentId}</span>
+      ${currentImdbId?`<span class="tag">IMDb: ${currentImdbId}</span>`:''}
+      <a href="https://www.themoviedb.org/${currentType}/${currentId}" target="_blank" rel="noopener">Öppna på TMDB &#8599;</a>
+      ${currentImdbId?`<a href="https://www.imdb.com/title/${currentImdbId}/" target="_blank" rel="noopener">Öppna på IMDb &#8599;</a>`:''}`;
+  }
+
+  document.getElementById('epGoBtn').addEventListener('click', ()=>{
+    loadPlayer();
+    if(currentType==='tv' && currentDetail){
+      const s = document.getElementById('seasonInput').value || 1;
+      const e = document.getElementById('episodeInput').value || 1;
+      upsertSeries(currentDetail, s, e);
+    }
+  });
+
+  // === FALLBACK-LÄNKAR ===
+  function buildFallbackLinks(detail, type){
+    const box = document.getElementById('fallbackBox');
+    const links = document.getElementById('fallbackLinks');
+    const title = encodeURIComponent((detail.title || detail.name || '').trim());
+    const cleanTitle = (detail.title || detail.name || '').replace(/[^a-zA-Z0-9\s]/g, ' ').trim().replace(/\s+/g, '+');
+
+    // Bygg alla fallback-länkar
+    let html = '';
+
+    // wco.tv (Watch Cartoon Online)
+    html += `<a href="https://www.wcofun.net/search?keyword=${cleanTitle}" target="_blank" rel="noopener">&#127912; wco.tv</a>`;
+
+    // === KANADA ===
+    html += `<a href="https://gem.cbc.ca/search?q=${title}" target="_blank" rel="noopener">&#127464;&#127462; CBC Gem</a>`;
+    html += `<a href="https://tubitv.com/search/${title}" target="_blank" rel="noopener">&#127464;&#127462; Tubi</a>`;
+    html += `<a href="https://pluto.tv/search?q=${title}" target="_blank" rel="noopener">&#127464;&#127462; Pluto TV</a>`;
+
+    // === STORBRITANNIEN ===
+    html += `<a href="https://www.bbc.co.uk/iplayer/search?q=${title}" target="_blank" rel="noopener">&#127468;&#127463; BBC iPlayer</a>`;
+    html += `<a href="https://www.channel4.com/search?q=${title}" target="_blank" rel="noopener">&#127468;&#127463; Channel 4</a>`;
+    html += `<a href="https://www.itv.com/watch/search?q=${title}" target="_blank" rel="noopener">&#127468;&#127463; ITV Hub</a>`;
+    html += `<a href="https://www.bbc.co.uk/search?q=${title}&filter=iplayer" target="_blank" rel="noopener">&#127468;&#127463; BBC Search</a>`;
+
+    // === USA ===
+    html += `<a href="https://tubitv.com/search/${title}" target="_blank" rel="noopener">&#127482;&#127480; Tubi</a>`;
+    html += `<a href="https://pluto.tv/search?q=${title}" target="_blank" rel="noopener">&#127482;&#127480; Pluto TV</a>`;
+    html += `<a href="https://www.crackle.com/search/${title}" target="_blank" rel="noopener">&#127482;&#127480; Crackle</a>`;
+    html += `<a href="https://www.amazon.com/gp/video/storefront/?contentType=merch&merchId=freevee" target="_blank" rel="noopener">&#127482;&#127480; Freevee</a>`;
+    html += `<a href="https://therokuchannel.roku.com/search?q=${title}" target="_blank" rel="noopener">&#127482;&#127480; Roku Channel</a>`;
+    html += `<a href="https://www.peacocktv.com/search?q=${title}" target="_blank" rel="noopener">&#127482;&#127480; Peacock</a>`;
+
+    // === AUSTRALIEN ===
+    html += `<a href="https://iview.abc.net.au/search?q=${title}" target="_blank" rel="noopener">&#127462;&#127482; ABC iview</a>`;
+    html += `<a href="https://www.sbs.com.au/ondemand/search?q=${title}" target="_blank" rel="noopener">&#127462;&#127482; SBS On Demand</a>`;
+    html += `<a href="https://7plus.com.au/search?q=${title}" target="_blank" rel="noopener">&#127462;&#127482; 7plus</a>`;
+    html += `<a href="https://www.9now.com.au/search?q=${title}" target="_blank" rel="noopener">&#127462;&#127482; 9Now</a>`;
+    html += `<a href="https://www.stan.com.au/search?q=${title}" target="_blank" rel="noopener">&#127462;&#127482; Stan</a>`;
+
+    // === EUROPA ===
+    html += `<a href="https://www.arte.tv/search/?q=${title}" target="_blank" rel="noopener">&#127466;&#127482; Arte (DE/FR)</a>`;
+    html += `<a href="https://www.rtve.es/play/buscador/?q=${title}" target="_blank" rel="noopener">&#127466;&#127480; RTVE Play (ES)</a>`;
+    html += `<a href="https://www.raiplay.it/ricerca.html?q=${title}" target="_blank" rel="noopener">&#127470;&#127481; RaiPlay (IT)</a>`;
+    html += `<a href="https://tv.nrk.no/sok?q=${title}" target="_blank" rel="noopener">&#127475;&#127476; NRK TV (NO)</a>`;
+    html += `<a href="https://www.svtplay.se/sok?q=${title}" target="_blank" rel="noopener">&#127480;&#127466; SVT Play (SE)</a>`;
+    html += `<a href="https://www.dr.dk/drtv/soeg?q=${title}" target="_blank" rel="noopener">&#127465;&#127472; DR TV (DK)</a>`;
+    html += `<a href="https://arenan.yle.fi/sok?q=${title}" target="_blank" rel="noopener">&#127467;&#127470; Yle Areena (FI)</a>`;
+    html += `<a href="https://www.zdf.de/suche?q=${title}" target="_blank" rel="noopener">&#127465;&#127466; ZDF (DE)</a>`;
+    html += `<a href="https://www.france.tv/recherche/?q=${title}" target="_blank" rel="noopener">&#127467;&#127479; France.tv</a>`;
+    html += `<a href="https://www.npostart.nl/zoeken?q=${title}" target="_blank" rel="noopener">&#127475;&#127473; NPO Start (NL)</a>`;
+    html += `<a href="https://tvthek.orf.at/search?q=${title}" target="_blank" rel="noopener">&#127471;&#127474; ORF TVthek (AT)</a>`;
+
+    // YouTube trailer
+    html += `<a class="yt" href="https://www.youtube.com/results?search_query=${title}+trailer" target="_blank" rel="noopener">&#9654; YouTube Trailer</a>`;
+
+    links.innerHTML = html;
+    box.classList.add('show');
+  }
+
+  // === INIT ===
+  renderLibrary();
+})();
+</script>
+</body>
+</html>
