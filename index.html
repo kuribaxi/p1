@@ -19,6 +19,8 @@
     --teal:#35c6b4;
     --amber:#e0a458;
     --error:#e2574c;
+    --green:#2f8f7f;
+    --green-light:#4ec9b0;
     --radius:14px;
   }
   *{box-sizing:border-box; margin:0; padding:0;}
@@ -49,7 +51,7 @@
   .marquee h1 span{color:var(--gold-bright);}
   .marquee p{margin-top:8px; font-size:13px; color:var(--cream-dim); max-width:520px; margin-left:auto; margin-right:auto; line-height:1.5;}
 
-  .wrap{max-width:980px; margin:0 auto; padding:0 20px;}
+  .wrap{max-width:1100px; margin:0 auto; padding:0 20px;}
 
   .config{margin-top:22px; background:var(--panel); border:1px solid var(--panel-line); border-radius:var(--radius); padding:16px 20px;}
   .config-row{display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end;}
@@ -82,6 +84,33 @@
   .result-row .rmeta{min-width:0;} .result-row .rtitle{font-size:13.5px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
   .result-row .ryear{font-size:11px; color:var(--cream-dim); font-family:'JetBrains Mono', monospace;}
   .result-row .rtype{margin-left:auto; font-size:10px; font-family:'JetBrains Mono', monospace; color:var(--gold-bright); border:1px solid var(--panel-line); padding:3px 7px; border-radius:20px; flex-shrink:0;}
+
+  /* WEBSITES SECTION */
+  .websites-section{margin-top:22px; background:var(--panel); border:1px solid var(--panel-line); border-radius:var(--radius); padding:16px 16px 14px;}
+  .websites-head{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:14px;}
+  .websites-head h3{font-family:'Fraunces', serif; font-size:18px; font-weight:700;}
+  .websites-head p{font-size:12px; color:var(--cream-dim);}
+  .site-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(160px,1fr)); gap:10px;}
+  .site-card{
+    background:linear-gradient(135deg,#1e4d45,#2a5e52);
+    border:1px solid rgba(78,201,176,0.15);
+    border-radius:14px; padding:14px 12px; cursor:pointer;
+    transition:all .15s; position:relative; overflow:hidden;
+  }
+  .site-card:hover{
+    border-color:rgba(78,201,176,0.4);
+    box-shadow:0 4px 16px rgba(47,143,127,.2);
+    transform:translateY(-2px);
+  }
+  .site-card .site-icon{font-size:22px; margin-bottom:8px; display:block;}
+  .site-card .site-name{font-size:13px; font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .site-card .site-type{font-size:10px; color:var(--green-light); margin-top:4px; font-family:'JetBrains Mono', monospace;}
+  .site-card .site-play{
+    position:absolute; top:8px; right:8px; width:26px; height:26px; border-radius:50%;
+    background:rgba(0,0,0,.3); border:1px solid rgba(78,201,176,.3); color:var(--green-light);
+    display:flex; align-items:center; justify-content:center; font-size:12px; opacity:0; transition:opacity .15s;
+  }
+  .site-card:hover .site-play{opacity:1;}
 
   .library{margin-top:22px; background:var(--panel); border:1px solid var(--panel-line); border-radius:var(--radius); padding:16px 16px 14px;}
   .lib-head{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:12px;}
@@ -162,10 +191,17 @@
   .fallback-box h4{font-size:12px; font-weight:700; color:var(--amber); letter-spacing:0.05em; text-transform:uppercase; margin-bottom:8px; font-family:'JetBrains Mono', monospace;}
   .fallback-box p{font-size:12px; color:var(--cream-dim); line-height:1.5; margin-bottom:10px;}
   .fallback-links{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px;}
-  .fallback-links a{font-size:11px; font-family:'JetBrains Mono', monospace; padding:7px 12px; border-radius:20px; border:1px solid var(--panel-line); background:rgba(255,255,255,0.04); color:var(--cream); text-decoration:none; transition:all .15s; display:inline-flex; align-items:center; gap:6px;}
-  .fallback-links a:hover{border-color:var(--gold); color:var(--gold-bright); background:rgba(201,162,39,0.08);}
+  .fallback-links a, .fallback-links button{
+    font-size:11px; font-family:'JetBrains Mono', monospace; padding:7px 12px; border-radius:20px;
+    border:1px solid var(--panel-line); background:rgba(255,255,255,0.04); color:var(--cream);
+    text-decoration:none; transition:all .15s; display:inline-flex; align-items:center; gap:6px;
+    cursor:pointer;
+  }
+  .fallback-links a:hover, .fallback-links button:hover{border-color:var(--gold); color:var(--gold-bright); background:rgba(201,162,39,0.08);}
   .fallback-links a.yt{border-color:rgba(255,0,0,0.25); color:#ff7a7a;}
   .fallback-links a.yt:hover{background:rgba(255,0,0,0.12); border-color:#ff4444; color:#fff;}
+  .fallback-links button.embed-btn{border-color:rgba(78,201,176,0.3); color:var(--green-light);}
+  .fallback-links button.embed-btn:hover{background:rgba(78,201,176,0.12); border-color:var(--green-light); color:#fff;}
   .yt-preview{width:100%; aspect-ratio:16/9; border-radius:10px; overflow:hidden; border:1px solid var(--panel-line); background:#000; display:none;}
   .yt-preview.show{display:block;}
   .yt-preview iframe{width:100%; height:100%; border:none;}
@@ -192,9 +228,10 @@
     .clock-badge{top:auto; bottom:14px; right:12px; left:auto; padding:7px 10px; min-width:102px;}
     .clock-time{font-size:13.5px}
     .clock-date{font-size:9.5px}
+    .site-grid{grid-template-columns:repeat(auto-fill, minmax(130px,1fr));}
   }
 
-  footer{max-width:980px; margin:32px auto 0; padding:0 20px; text-align:center; font-size:11px; color:var(--cream-dim); opacity:0.6;}
+  footer{max-width:1100px; margin:32px auto 0; padding:0 20px; text-align:center; font-size:11px; color:var(--cream-dim); opacity:0.6;}
 </style>
 <base target="_blank">
 </head>
@@ -239,6 +276,17 @@
     <div class="status" id="status"></div>
     <div class="results-list" id="resultsList"></div>
 
+    <!-- WEBSITES SECTION -->
+    <div class="websites-section" id="websitesSection">
+      <div class="websites-head">
+        <div>
+          <h3>&#127760; Streaming-webbplatser</h3>
+          <p>Klicka för att öppna direkt i spelaren. Vissa sajter kräver att du öppnar dem i ny flik.</p>
+        </div>
+      </div>
+      <div class="site-grid" id="siteGrid"></div>
+    </div>
+
     <div class="library" id="library">
       <div class="lib-head">
         <h3>Min fortsättningslista</h3>
@@ -281,7 +329,7 @@
         </div>
 
         <div class="player-frame" id="playerFrame" style="position:relative;">
-          <iframe id="vidsrcFrame" allowfullscreen referrerpolicy="origin"></iframe>
+          <iframe id="vidsrcFrame" allowfullscreen referrerpolicy="origin" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-presentation"></iframe>
         </div>
         <div class="browser-frame" id="browserFrame" style="display:none;">
           <div class="browser-icon">&#127760;</div>
@@ -290,8 +338,8 @@
         </div>
         <div class="player-meta" id="playerMeta"></div>
         <div class="fallback-box" id="fallbackBox">
-          <h4>&#9888; Finns inte på vidsrc-servrarna? Prova här</h4>
-          <p id="fallbackText">Denna titel verkar saknas på de inbyggda servrarna. Sök vidare på andra källor — klicka för att öppna direkt:</p>
+          <h4>&#9888; Hittade du inte det du sökte? Prova här</h4>
+          <p id="fallbackText">Klicka på en webbplats för att söka direkt efter titeln. Vissa kan spelas i spelaren, andra öppnas i ny flik.</p>
           <div class="fallback-links" id="fallbackLinks"></div>
           <div class="yt-preview" id="ytPreview"><iframe id="ytFrame" allowfullscreen></iframe></div>
         </div>
@@ -300,7 +348,7 @@
 
   </div>
 
-  <footer>Drivs av TMDB API. Spelare via vidsrc mirrors &amp; VidAPI. Lista sparas lokalt i webbläsaren.</footer>
+  <footer>Drivs av TMDB API. Spelare via vidsrc mirrors, VidAPI &amp; externa källor. Lista sparas lokalt.</footer>
 
 <script>
 (function(){
@@ -308,7 +356,7 @@
   const bulbsEl = document.getElementById('bulbs');
   for(let i=0;i<26;i++){const b=document.createElement('div');b.className='bulb';bulbsEl.appendChild(b);}
 
-  // === KÄLLOR ===
+  // === KÄLLOR (VIDSRC) ===
   const SOURCES = [
     {key:'vidsrc2',        name:'vidsrc2.ru',        base:'https://vidsrc2.ru/embed'},
     {key:'vidsrc_ir',      name:'vidsrc.ir',         base:'https://vidsrc.ir/embed'},
@@ -321,11 +369,43 @@
     {key:'vidapi_embed',  name:'VidAPI (Player)',   base:'https://vaplayer.ru/embed', needsImdb:true, isVidApi:true, openInBrowser:false},
     {key:'vidapi_tab',    name:'VidAPI (Ny flik)',  base:'https://vaplayer.ru/embed', needsImdb:true, isVidApi:true, openInBrowser:true},
   ];
+
+  // === EXTERNA WEBBPLATSER ===
+  const WEBSITES = [
+    {name:'YouTube',       url:'https://www.youtube.com',                icon:'&#9654;',   canEmbed:true,  searchTpl:'https://www.youtube.com/results?search_query={q}'},
+    {name:'Archive.org',   url:'https://archive.org',                    icon:'&#128451;', canEmbed:true,  searchTpl:'https://archive.org/search?query={q}'},
+    {name:'WCO.tv',        url:'https://www.wcofun.net',                 icon:'&#127912;', canEmbed:true,  searchTpl:'https://www.wcofun.net/search?keyword={q}'},
+    {name:'Solarmovie',    url:'https://vvw2.solarmovie.ma/home',        icon:'&#127909;', canEmbed:true,  searchTpl:'https://vvw2.solarmovie.ma/search/{q}'},
+    {name:'WatchSeries',   url:'https://watchseries.bar/home',           icon:'&#128250;', canEmbed:true,  searchTpl:'https://watchseries.bar/search?keyword={q}'},
+    {name:'NitesTV',       url:'https://nitestv.org/',                   icon:'&#127769;', canEmbed:true,  searchTpl:'https://nitestv.org/search/{q}'},
+    {name:'SwatchSeries',  url:'https://swatchseries.cx/',               icon:'&#128250;', canEmbed:true,  searchTpl:'https://swatchseries.cx/search?keyword={q}'},
+    {name:'WatchSeriesTV', url:'https://watchseriestv.org/',             icon:'&#128250;', canEmbed:true,  searchTpl:'https://watchseriestv.org/search?keyword={q}'},
+    {name:'StreamM4U',     url:'https://streamm4u.vip/',                 icon:'&#127916;', canEmbed:true,  searchTpl:'https://streamm4u.vip/search/{q}'},
+    {name:'FlixWave',      url:'https://flixwave.online/?category=Popular&page=1', icon:'&#127754;', canEmbed:true, searchTpl:'https://flixwave.online/search?keyword={q}'},
+    {name:'NostalgikTV',   url:'https://nostalgiktv.org/',               icon:'&#128247;', canEmbed:true,  searchTpl:'https://nostalgiktv.org/search/{q}'},
+    {name:'Putlocker',     url:'https://putlockerx.xyz/',                icon:'&#128273;', canEmbed:true,  searchTpl:'https://putlockerx.xyz/search?keyword={q}'},
+    {name:'XtubeFlix',     url:'https://xtubeflix.com/',                 icon:'&#127909;', canEmbed:true,  searchTpl:'https://xtubeflix.com/search?keyword={q}'},
+    {name:'FlixVer',       url:'https://flixver.net/',                   icon:'&#127916;', canEmbed:true,  searchTpl:'https://flixver.net/search?keyword={q}'},
+    {name:'Persiana Group',url:'https://www.persianagroup.tv/',          icon:'&#127988;', canEmbed:true,  searchTpl:'https://www.persianagroup.tv/search?keyword={q}'},
+    {name:'KimCartoon',    url:'https://kimcartoon.com.co/',             icon:'&#128053;', canEmbed:true,  searchTpl:'https://kimcartoon.com.co/search?keyword={q}'},
+    {name:'SNRT',          url:'https://www.snrt.ma/',                   icon:'&#127988;', canEmbed:true,  searchTpl:'https://www.snrt.ma/search?keyword={q}'},
+    {name:'KurdViewer',    url:'https://kurdviewer.com/',                icon:'&#127988;', canEmbed:true,  searchTpl:'https://kurdviewer.com/search?keyword={q}'},
+    {name:'F-Movies',      url:'https://www.f-movies.org/',              icon:'&#127909;', canEmbed:true,  searchTpl:'https://www.f-movies.org/search?keyword={q}'},
+    {name:'Soap2Day',      url:'https://soap2days.help/home/',           icon:'&#127853;', canEmbed:true,  searchTpl:'https://soap2days.help/search?keyword={q}'},
+    {name:'123Chill',      url:'https://123chill.in/',                   icon:'&#10052;',  canEmbed:true,  searchTpl:'https://123chill.in/search?keyword={q}'},
+    {name:'123ChillTV',    url:'https://123chilltv.site/',               icon:'&#128250;', canEmbed:true,  searchTpl:'https://123chilltv.site/search?keyword={q}'},
+    {name:'MoviesJoy 1',   url:'https://movies-joy.click/',              icon:'&#127916;', canEmbed:true,  searchTpl:'https://movies-joy.click/search?keyword={q}'},
+    {name:'MoviesJoy 2',   url:'https://moviesjoy.sx/home',              icon:'&#127916;', canEmbed:true,  searchTpl:'https://moviesjoy.sx/search?keyword={q}'},
+    {name:'AniWatch',      url:'https://aniwatch.co.at/',                icon:'&#127912;', canEmbed:true,  searchTpl:'https://aniwatch.co.at/search?keyword={q}'},
+    {name:'GIA TV',        url:'https://gia.tv/live.php',                icon:'&#127988;', canEmbed:true,  searchTpl:'https://gia.tv/live.php'},
+  ];
+
   let activeSource = localStorage.getItem('kuribaxi_active_source') || SOURCES[0].key;
   let currentType = 'movie';
   let currentId = null;
   let currentImdbId = null;
   let currentDetail = null;
+  let currentTitle = '';
 
   const LS_KEY = 'kuribaxi_watch_map_v1';
 
@@ -360,8 +440,7 @@
   function upsertFilm(detail){
     const id = String(detail.id);
     const entry = {
-      id: id,
-      tmdbId: detail.id,
+      id: id, tmdbId: detail.id,
       title: detail.title || detail.name,
       poster: detail.poster_path,
       year: (detail.release_date||'').slice(0,4),
@@ -377,8 +456,7 @@
     const id = String(detail.id);
     const existing = watchMap.series[id];
     const entry = {
-      id: id,
-      tmdbId: detail.id,
+      id: id, tmdbId: detail.id,
       title: detail.title || detail.name,
       poster: detail.poster_path,
       year: (detail.first_air_date||'').slice(0,4),
@@ -454,6 +532,59 @@
     saveWatchMap(watchMap);
   });
 
+  // === WEBBPLATSER-GRID ===
+  function renderWebsites(){
+    const grid = document.getElementById('siteGrid');
+    grid.innerHTML = WEBSITES.map(site=>{
+      return `<div class="site-card" data-name="${escapeHtml(site.name)}" data-url="${escapeHtml(site.url)}" data-search="${escapeHtml(site.searchTpl)}">
+        <span class="site-play">&#9654;</span>
+        <span class="site-icon">${site.icon}</span>
+        <div class="site-name">${escapeHtml(site.name)}</div>
+        <div class="site-type">${site.canEmbed?'Spelare':'Ny flik'}</div>
+      </div>`;
+    }).join('');
+
+    grid.querySelectorAll('.site-card').forEach(card=>{
+      card.addEventListener('click', ()=>{
+        const url = card.dataset.url;
+        const name = card.dataset.name;
+        openInPlayer(url, name);
+      });
+    });
+  }
+
+  function openInPlayer(url, title){
+    // Visa ticket med iframe
+    document.getElementById('ticket').classList.add('show');
+    document.getElementById('titleText').textContent = title || 'Extern webbplats';
+    document.getElementById('subText').textContent = url;
+    document.getElementById('overviewText').textContent = 'Klicka på knappen nedan för att öppna webbplatsen i spelaren eller i en ny flik. Vissa sajter blockeras av iframe-skydd (X-Frame-Options) och måste öppnas i ny flik.';
+    document.getElementById('posterImg').src = '';
+    document.getElementById('genreTags').innerHTML = '';
+    document.getElementById('playerHeading').textContent = 'Extern webbplats';
+    document.getElementById('epControls').classList.remove('show');
+    document.getElementById('sourcePicker').innerHTML = '';
+    document.getElementById('playerMeta').innerHTML = '';
+    document.getElementById('fallbackBox').classList.remove('show');
+
+    const frame = document.getElementById('vidsrcFrame');
+    const playerFrame = document.getElementById('playerFrame');
+    const browserFrame = document.getElementById('browserFrame');
+
+    // Försök iframe först
+    frame.src = url;
+    playerFrame.style.display = 'block';
+    browserFrame.style.display = 'none';
+
+    // Lägg till "Öppna i ny flik"-knapp i meta
+    document.getElementById('playerMeta').innerHTML = `
+      <a href="${url}" target="_blank" rel="noopener" style="background:var(--green);color:#fff;padding:6px 14px;border-radius:20px;text-decoration:none;font-size:12px;font-weight:700;">&#8599; Öppna i ny flik</a>
+      <span class="tag">iframe</span>
+    `;
+
+    document.getElementById('ticket').scrollIntoView({behavior:'smooth', block:'start'});
+  }
+
   // === KLOCKA ===
   function updateClock(){
     const now = new Date();
@@ -506,21 +637,11 @@
         const mediaType = mediaTypeToggle.querySelector('.active').dataset.type;
         url = `https://api.themoviedb.org/3/search/${mediaType}?api_key=${key}&query=${encodeURIComponent(q)}&language=sv-SE&page=1`;
       } else if(searchMode==='tmdb'){
-        // Sök både film och serie
         const movieUrl = `https://api.themoviedb.org/3/movie/${q}?api_key=${key}&language=sv-SE`;
         const tvUrl = `https://api.themoviedb.org/3/tv/${q}?api_key=${key}&language=sv-SE`;
-        let detail = null;
-        let type = null;
-        try{
-          const r = await fetch(movieUrl);
-          if(r.ok){ detail = await r.json(); type='movie'; }
-        }catch(e){}
-        if(!detail){
-          try{
-            const r = await fetch(tvUrl);
-            if(r.ok){ detail = await r.json(); type='tv'; }
-          }catch(e){}
-        }
+        let detail = null; let type = null;
+        try{ const r = await fetch(movieUrl); if(r.ok){ detail = await r.json(); type='movie'; } }catch(e){}
+        if(!detail){ try{ const r = await fetch(tvUrl); if(r.ok){ detail = await r.json(); type='tv'; } }catch(e){} }
         if(!detail){ showStatus('Hittade ingen titel med det TMDB-ID:t.', 'error'); goBtn.disabled=false; return; }
         loadDetail(detail.id, type);
         goBtn.disabled = false;
@@ -529,8 +650,7 @@
         const findUrl = `https://api.themoviedb.org/3/find/${q}?api_key=${key}&external_source=imdb_id`;
         const r = await fetch(findUrl);
         const data = await r.json();
-        let found = null;
-        let type = null;
+        let found = null; let type = null;
         if(data.movie_results && data.movie_results.length>0){ found = data.movie_results[0]; type='movie'; }
         else if(data.tv_results && data.tv_results.length>0){ found = data.tv_results[0]; type='tv'; }
         else if(data.tv_episode_results && data.tv_episode_results.length>0){ found = data.tv_episode_results[0]; type='tv'; }
@@ -596,9 +716,10 @@
       currentType = type;
       currentId = id;
       currentImdbId = detail.external_ids?.imdb_id || detail.imdb_id || null;
+      currentTitle = detail.title || detail.name || '';
 
       // Visa biljett
-      document.getElementById('titleText').textContent = detail.title || detail.name;
+      document.getElementById('titleText').textContent = currentTitle;
       const year = (detail.release_date || detail.first_air_date || '').slice(0,4);
       const runtime = detail.runtime ? ` &#183; ${detail.runtime} min` : (detail.episode_run_time && detail.episode_run_time[0] ? ` &#183; ${detail.episode_run_time[0]} min/avsn` : '');
       document.getElementById('subText').innerHTML = `${year}${runtime} &#183; ${(detail.vote_average||0).toFixed(1)}/10`;
@@ -672,7 +793,7 @@
 
     let url;
     if(source.isVidApi){
-      if(!currentImdbId){ 
+      if(!currentImdbId){
         showStatus('VidAPI kräver IMDb-ID. Sök med IMDb-ID eller välj en annan källa.', 'warn');
         frame.src = '';
         playerFrame.style.display = 'none';
@@ -681,11 +802,8 @@
       }
       const s = currentType==='tv' ? (document.getElementById('seasonInput').value||1) : '';
       const e = currentType==='tv' ? (document.getElementById('episodeInput').value||1) : '';
-      if(currentType==='tv'){
-        url = `${source.base}/${currentImdbId}/${s}/${e}`;
-      } else {
-        url = `${source.base}/${currentImdbId}`;
-      }
+      if(currentType==='tv'){ url = `${source.base}/${currentImdbId}/${s}/${e}`; }
+      else { url = `${source.base}/${currentImdbId}`; }
     } else {
       if(currentType==='tv'){
         const s = document.getElementById('seasonInput').value || 1;
@@ -708,9 +826,8 @@
     }
 
     // Spara i bibliotek
-    if(currentType==='movie'){
-      upsertFilm(currentDetail);
-    } else {
+    if(currentType==='movie'){ upsertFilm(currentDetail); }
+    else {
       const s = document.getElementById('seasonInput').value || 1;
       const e = document.getElementById('episodeInput').value || 1;
       upsertSeries(currentDetail, s, e);
@@ -740,60 +857,37 @@
     const title = encodeURIComponent((detail.title || detail.name || '').trim());
     const cleanTitle = (detail.title || detail.name || '').replace(/[^a-zA-Z0-9\s]/g, ' ').trim().replace(/\s+/g, '+');
 
-    // Bygg alla fallback-länkar
     let html = '';
 
-    // wco.tv (Watch Cartoon Online)
-    html += `<a href="https://www.wcofun.net/search?keyword=${cleanTitle}" target="_blank" rel="noopener">&#127912; wco.tv</a>`;
-
-    // === KANADA ===
-    html += `<a href="https://gem.cbc.ca/search?q=${title}" target="_blank" rel="noopener">&#127464;&#127462; CBC Gem</a>`;
-    html += `<a href="https://tubitv.com/search/${title}" target="_blank" rel="noopener">&#127464;&#127462; Tubi</a>`;
-    html += `<a href="https://pluto.tv/search?q=${title}" target="_blank" rel="noopener">&#127464;&#127462; Pluto TV</a>`;
-
-    // === STORBRITANNIEN ===
-    html += `<a href="https://www.bbc.co.uk/iplayer/search?q=${title}" target="_blank" rel="noopener">&#127468;&#127463; BBC iPlayer</a>`;
-    html += `<a href="https://www.channel4.com/search?q=${title}" target="_blank" rel="noopener">&#127468;&#127463; Channel 4</a>`;
-    html += `<a href="https://www.itv.com/watch/search?q=${title}" target="_blank" rel="noopener">&#127468;&#127463; ITV Hub</a>`;
-    html += `<a href="https://www.bbc.co.uk/search?q=${title}&filter=iplayer" target="_blank" rel="noopener">&#127468;&#127463; BBC Search</a>`;
-
-    // === USA ===
-    html += `<a href="https://tubitv.com/search/${title}" target="_blank" rel="noopener">&#127482;&#127480; Tubi</a>`;
-    html += `<a href="https://pluto.tv/search?q=${title}" target="_blank" rel="noopener">&#127482;&#127480; Pluto TV</a>`;
-    html += `<a href="https://www.crackle.com/search/${title}" target="_blank" rel="noopener">&#127482;&#127480; Crackle</a>`;
-    html += `<a href="https://www.amazon.com/gp/video/storefront/?contentType=merch&merchId=freevee" target="_blank" rel="noopener">&#127482;&#127480; Freevee</a>`;
-    html += `<a href="https://therokuchannel.roku.com/search?q=${title}" target="_blank" rel="noopener">&#127482;&#127480; Roku Channel</a>`;
-    html += `<a href="https://www.peacocktv.com/search?q=${title}" target="_blank" rel="noopener">&#127482;&#127480; Peacock</a>`;
-
-    // === AUSTRALIEN ===
-    html += `<a href="https://iview.abc.net.au/search?q=${title}" target="_blank" rel="noopener">&#127462;&#127482; ABC iview</a>`;
-    html += `<a href="https://www.sbs.com.au/ondemand/search?q=${title}" target="_blank" rel="noopener">&#127462;&#127482; SBS On Demand</a>`;
-    html += `<a href="https://7plus.com.au/search?q=${title}" target="_blank" rel="noopener">&#127462;&#127482; 7plus</a>`;
-    html += `<a href="https://www.9now.com.au/search?q=${title}" target="_blank" rel="noopener">&#127462;&#127482; 9Now</a>`;
-    html += `<a href="https://www.stan.com.au/search?q=${title}" target="_blank" rel="noopener">&#127462;&#127482; Stan</a>`;
-
-    // === EUROPA ===
-    html += `<a href="https://www.arte.tv/search/?q=${title}" target="_blank" rel="noopener">&#127466;&#127482; Arte (DE/FR)</a>`;
-    html += `<a href="https://www.rtve.es/play/buscador/?q=${title}" target="_blank" rel="noopener">&#127466;&#127480; RTVE Play (ES)</a>`;
-    html += `<a href="https://www.raiplay.it/ricerca.html?q=${title}" target="_blank" rel="noopener">&#127470;&#127481; RaiPlay (IT)</a>`;
-    html += `<a href="https://tv.nrk.no/sok?q=${title}" target="_blank" rel="noopener">&#127475;&#127476; NRK TV (NO)</a>`;
-    html += `<a href="https://www.svtplay.se/sok?q=${title}" target="_blank" rel="noopener">&#127480;&#127466; SVT Play (SE)</a>`;
-    html += `<a href="https://www.dr.dk/drtv/soeg?q=${title}" target="_blank" rel="noopener">&#127465;&#127472; DR TV (DK)</a>`;
-    html += `<a href="https://arenan.yle.fi/sok?q=${title}" target="_blank" rel="noopener">&#127467;&#127470; Yle Areena (FI)</a>`;
-    html += `<a href="https://www.zdf.de/suche?q=${title}" target="_blank" rel="noopener">&#127465;&#127466; ZDF (DE)</a>`;
-    html += `<a href="https://www.france.tv/recherche/?q=${title}" target="_blank" rel="noopener">&#127467;&#127479; France.tv</a>`;
-    html += `<a href="https://www.npostart.nl/zoeken?q=${title}" target="_blank" rel="noopener">&#127475;&#127473; NPO Start (NL)</a>`;
-    html += `<a href="https://tvthek.orf.at/search?q=${title}" target="_blank" rel="noopener">&#127471;&#127474; ORF TVthek (AT)</a>`;
+    // Bygg länkar för varje webbplats
+    WEBSITES.forEach(site=>{
+      const searchUrl = site.searchTpl.replace('{q}', cleanTitle);
+      if(site.canEmbed){
+        html += `<button class="embed-btn" data-url="${escapeHtml(searchUrl)}" data-name="${escapeHtml(site.name)}">&#9654; ${escapeHtml(site.name)}</button>`;
+      }
+      html += `<a href="${searchUrl}" target="_blank" rel="noopener">&#8599; ${escapeHtml(site.name)}</a>`;
+    });
 
     // YouTube trailer
     html += `<a class="yt" href="https://www.youtube.com/results?search_query=${title}+trailer" target="_blank" rel="noopener">&#9654; YouTube Trailer</a>`;
 
     links.innerHTML = html;
+
+    // Event listeners för embed-knappar
+    links.querySelectorAll('button.embed-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const url = btn.dataset.url;
+        const name = btn.dataset.name;
+        openInPlayer(url, name + ' — ' + currentTitle);
+      });
+    });
+
     box.classList.add('show');
   }
 
   // === INIT ===
   renderLibrary();
+  renderWebsites();
 })();
 </script>
 </body>
