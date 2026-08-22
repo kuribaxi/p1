@@ -9,7 +9,7 @@
 <style>
   :root{--bg:#0b1220;--bg-alt:#0f1830;--panel:#121b2e;--panel-line:rgba(212,175,55,0.16);--gold:#c9a227;--gold-bright:#e8c766;--cream:#f3ecdd;--cream-dim:#a9a290;--teal:#35c6b4;--amber:#e0a458;--error:#e2574c;--green:#2f8f7f;--green-light:#4ec9b0;--blue:#3b82f6;--blue-light:#60a5fa;--radius:14px;}
   *{box-sizing:border-box;margin:0;padding:0}
-  body{background:radial-gradient(700px 400px at 15% -10%,rgba(201,162,39,0.10),transparent),radial-gradient(900px 500px at 90% 10%,rgba(53,198,180,0.06),transparent),var(--bg);color:var(--cream);font-family:'Manrope',sans-serif;min-height:100vh;padding:0 0 40px;}
+  body{background:radial-gradient(700px 400px at 15% -10%,rgba(201,162,39,0.10),transparent),radial-gradient(900px 500px at 90% 10%,rgba(53,198,180,0.06),transparent),var(--bg);color:var(--cream);font-family:'Manrope',sans-serif;min-height:100vh;padding:0 0 140px;}
   .marquee{padding:32px 20px 22px;text-align:center;position:relative;border-bottom:1px solid var(--panel-line);background:linear-gradient(180deg,rgba(201,162,39,0.06),transparent);}
   .bulbs{display:flex;justify-content:center;gap:7px;margin-bottom:14px;}
   .bulb{width:6px;height:6px;border-radius:50%;background:var(--gold-bright);box-shadow:0 0 6px 1px rgba(232,199,102,0.6);animation:flicker 3.2s ease-in-out infinite;}
@@ -126,10 +126,82 @@
   @keyframes blink{0%,100%{opacity:1}50%{opacity:0.35}}
   @media(max-width:600px){.clock-badge{top:auto;bottom:14px;right:12px;left:auto;padding:7px 10px;min-width:102px;}.clock-time{font-size:13.5px}.clock-date{font-size:9.5px}}
   footer{max-width:1200px;margin:32px auto 0;padding:0 20px;text-align:center;font-size:11px;color:var(--cream-dim);opacity:0.6;}
+
+  /* === LIVE USERS WIDGET === */
+  .live-users-badge{position:fixed;top:14px;left:14px;z-index:9999;background:rgba(18,27,46,0.92);border:1px solid var(--panel-line);border-radius:12px;padding:10px 14px;backdrop-filter:blur(10px);box-shadow:0 8px 24px rgba(0,0,0,0.35),0 0 0 1px rgba(201,162,39,0.08) inset;min-width:200px;max-width:260px;}
+  .live-users-head{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+  .live-pulse{width:8px;height:8px;border-radius:50%;background:var(--green-light);box-shadow:0 0 8px var(--green-light);animation:pulse-live 2s infinite;}
+  @keyframes pulse-live{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.5;transform:scale(0.85);}}
+  .live-users-title{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:var(--green-light);text-transform:uppercase;letter-spacing:0.04em;}
+  .live-count{font-family:'Fraunces',serif;font-size:18px;font-weight:700;color:var(--cream);margin-bottom:6px;}
+  .live-count span{color:var(--gold-bright);font-size:13px;font-weight:500;}
+  .live-list{display:flex;flex-direction:column;gap:4px;max-height:140px;overflow-y:auto;}
+  .live-user{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:11.5px;color:var(--cream-dim);border-bottom:1px solid rgba(255,255,255,0.03);}
+  .live-user:last-child{border-bottom:none;}
+  .live-user-flag{font-size:14px;}
+  .live-user-name{color:var(--cream);font-weight:500;}
+  .live-user-country{font-size:10px;color:var(--cream-dim);opacity:0.7;}
+  .live-user-time{font-size:9px;color:var(--gold-bright);margin-left:auto;font-family:'JetBrains Mono',monospace;}
+  .live-user-status{width:5px;height:5px;border-radius:50%;background:var(--green-light);margin-left:4px;box-shadow:0 0 4px var(--green-light);}
+  .live-user-status.recent{background:var(--amber);box-shadow:0 0 4px var(--amber);}
+  @media(max-width:600px){.live-users-badge{top:70px;left:12px;right:12px;max-width:none;min-width:auto;}}
+
+  /* === MUSIC PLAYER === */
+  .music-player{position:fixed;bottom:0;left:0;right:0;z-index:9998;background:rgba(11,18,32,0.97);border-top:1px solid var(--panel-line);backdrop-filter:blur(16px);box-shadow:0 -8px 32px rgba(0,0,0,0.4);padding:10px 20px;display:flex;align-items:center;gap:14px;transition:transform .3s ease,opacity .3s ease;}
+  .music-player.hidden-player{transform:translateY(100%);opacity:0;pointer-events:none;}
+  .music-player-left{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+  .music-play-btn{width:38px;height:38px;border-radius:50%;background:var(--gold);border:none;color:#1a1305;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;font-size:16px;}
+  .music-play-btn:hover{background:var(--gold-bright);transform:scale(1.05);}
+  .music-track-info{min-width:0;}
+  .music-track-title{font-size:12px;font-weight:600;color:var(--cream);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;}
+  .music-track-station{font-size:10px;color:var(--cream-dim);font-family:'JetBrains Mono',monospace;}
+  .music-player-center{flex:1;display:flex;align-items:center;gap:12px;min-width:0;}
+  .music-volume{display:flex;align-items:center;gap:6px;}
+  .music-volume input[type=range]{width:80px;height:3px;-webkit-appearance:none;appearance:none;background:var(--panel-line);border-radius:2px;outline:none;}
+  .music-volume input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:var(--gold);cursor:pointer;}
+  .music-volume input[type=range]::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:var(--gold);cursor:pointer;border:none;}
+  .music-visualizer{display:flex;align-items:flex-end;gap:2px;height:20px;}
+  .music-bar{width:3px;background:var(--gold-bright);border-radius:2px;animation:music-bounce 1s ease-in-out infinite;}
+  .music-bar:nth-child(1){height:6px;animation-delay:0s;}
+  .music-bar:nth-child(2){height:12px;animation-delay:.1s;}
+  .music-bar:nth-child(3){height:8px;animation-delay:.2s;}
+  .music-bar:nth-child(4){height:14px;animation-delay:.15s;}
+  .music-bar:nth-child(5){height:10px;animation-delay:.05s;}
+  .music-bar:nth-child(6){height:16px;animation-delay:.25s;}
+  .music-bar:nth-child(7){height:7px;animation-delay:.1s;}
+  @keyframes music-bounce{0%,100%{transform:scaleY(1);}50%{transform:scaleY(0.4);}}
+  .music-player.paused .music-bar{animation-play-state:paused;opacity:0.3;}
+  .music-station-select{background:rgba(255,255,255,0.04);border:1px solid var(--panel-line);color:var(--cream);border-radius:8px;padding:5px 10px;font-size:11px;font-family:'JetBrains Mono',monospace;cursor:pointer;outline:none;max-width:160px;}
+  .music-station-select:focus{border-color:var(--gold);}
+  .music-player-right{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+  .music-mute-btn{background:transparent;border:1px solid var(--panel-line);color:var(--cream-dim);border-radius:8px;padding:5px 10px;font-size:11px;cursor:pointer;font-family:'JetBrains Mono',monospace;transition:all .15s;}
+  .music-mute-btn:hover{border-color:var(--gold);color:var(--gold-bright);}
+  .music-close-btn{background:transparent;border:1px solid var(--panel-line);color:var(--cream-dim);border-radius:8px;padding:5px 10px;font-size:11px;cursor:pointer;font-family:'JetBrains Mono',monospace;transition:all .15s;}
+  .music-close-btn:hover{border-color:var(--error);color:var(--error);}
+  .music-reopen-btn{position:fixed;bottom:14px;right:14px;z-index:9997;background:var(--gold);color:#1a1305;border:none;border-radius:50%;width:44px;height:44px;display:none;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 16px rgba(201,162,39,0.3);transition:all .15s;font-size:18px;}
+  .music-reopen-btn:hover{background:var(--gold-bright);transform:scale(1.05);}
+  .music-reopen-btn.show{display:flex;}
+  @media(max-width:700px){
+    .music-player{flex-wrap:wrap;padding:8px 12px;gap:8px;}
+    .music-track-title{max-width:120px;}
+    .music-volume input[type=range]{width:50px;}
+    .music-station-select{max-width:120px;}
+  }
 </style>
+<base target="_blank">
 <base target="_blank">
 </head>
 <body>
+
+<!-- LIVE USERS BADGE -->
+<div class="live-users-badge" id="liveUsersBadge">
+  <div class="live-users-head">
+    <div class="live-pulse"></div>
+    <div class="live-users-title">LIVE BESOKARE</div>
+  </div>
+  <div class="live-count" id="liveCount">0 <span>online nu</span></div>
+  <div class="live-list" id="liveList"></div>
+</div>
 
 <div class="clock-badge" id="clockBadge">
   <div class="clock-time"><span class="clock-dot"></span><span id="clockTime">--:--:--</span></div>
@@ -231,6 +303,70 @@
 
 <footer>Drivs av TMDB API. Spelare via vidsrc mirrors &amp; VidAPI. Lista sparas lokalt.</footer>
 
+<!-- MUSIC PLAYER -->
+<div class="music-player" id="musicPlayer">
+  <div class="music-player-left">
+    <button class="music-play-btn" id="musicPlayBtn" title="Spela/Pausa">&#9654;</button>
+    <div class="music-track-info">
+      <div class="music-track-title" id="musicTrackTitle">Klassisk Radio</div>
+      <div class="music-track-station" id="musicTrackStation">Laddar...</div>
+    </div>
+  </div>
+  <div class="music-player-center">
+    <div class="music-visualizer" id="musicVisualizer">
+      <div class="music-bar"></div>
+      <div class="music-bar"></div>
+      <div class="music-bar"></div>
+      <div class="music-bar"></div>
+      <div class="music-bar"></div>
+      <div class="music-bar"></div>
+      <div class="music-bar"></div>
+    </div>
+    <select class="music-station-select" id="musicStationSelect">
+      <option value="0">Radio Swiss Classic</option>
+      <option value="1">Public Domain Classical</option>
+      <option value="2">Classic FM UK</option>
+      <option value="3">Adagio.FM</option>
+      <option value="4">DR P2 Klassik</option>
+      <option value="5">NPO Radio 4</option>
+      <option value="6">Venice Classic Radio</option>
+      <option value="7">Radio Caprice Cello</option>
+      <option value="8">Baroque Sonatas</option>
+      <option value="9">WQXR Classical</option>
+      <option value="10">Colorado Public Radio</option>
+      <option value="11">WWFM Classical</option>
+      <option value="12">Classic Praha</option>
+      <option value="13">Radio Paradise Mellow</option>
+      <option value="14">Linn Classical</option>
+      <option value="15">YourClassical Relax</option>
+      <option value="16">BBC Radio 3</option>
+      <option value="17">France Musique</option>
+      <option value="18">Klassik Radio</option>
+      <option value="19">Sonatica</option>
+      <option value="20">CMBF Radio Musical</option>
+      <option value="21">Maine Public Classical</option>
+      <option value="22">Vermont Public Classical</option>
+      <option value="23">Yellowstone Classical</option>
+      <option value="24">Northwest Public Classical</option>
+      <option value="25">Minnesota Public Choral</option>
+      <option value="26">WFCC Cape Classical</option>
+      <option value="27">KANO Hawaii Classical</option>
+      <option value="28">Classical 89 BYU</option>
+      <option value="29">ClassicalNH</option>
+    </select>
+    <div class="music-volume">
+      <span style="font-size:12px;color:var(--cream-dim);">&#128266;</span>
+      <input type="range" id="musicVolume" min="0" max="100" value="40">
+    </div>
+  </div>
+  <div class="music-player-right">
+    <button class="music-mute-btn" id="musicMuteBtn">LJUD AV</button>
+    <button class="music-close-btn" id="musicCloseBtn">STANG</button>
+  </div>
+  <audio id="musicAudio" crossorigin="anonymous"></audio>
+</div>
+<button class="music-reopen-btn" id="musicReopenBtn" title="Visa musikspelaren">&#127925;</button>
+
 <script>
 (function(){
   // === GLODLAMPOR ===
@@ -328,6 +464,282 @@
   updateClock();
   setInterval(updateClock,1000);
 
+  // === LIVE USERS WIDGET ===
+  var LIVE_USERS = [
+    {name:'Erik',country:'Sverige',flag:'SE'},{name:'Anna',country:'Sverige',flag:'SE'},{name:'Lars',country:'Norge',flag:'NO'},
+    {name:'Ingrid',country:'Danmark',flag:'DK'},{name:'Oliver',country:'Finland',flag:'FI'},{name:'Emma',country:'Tyskland',flag:'DE'},
+    {name:'Lucas',country:'Frankrike',flag:'FR'},{name:'Sophie',country:'Storbritannien',flag:'GB'},{name:'Marco',country:'Italien',flag:'IT'},
+    {name:'Elena',country:'Spanien',flag:'ES'},{name:'Jakub',country:'Polen',flag:'PL'},{name:'Nina',country:'Nederländerna',flag:'NL'},
+    {name:'Liam',country:'Irland',flag:'IE'},{name:'Sofia',country:'Grekland',flag:'GR'},{name:'Mateo',country:'Portugal',flag:'PT'},
+    {name:'Lea',country:'Schweiz',flag:'CH'},{name:'Noah',country:'Österrike',flag:'AT'},{name:'Mia',country:'Belgien',flag:'BE'},
+    {name:'Felix',country:'Tjeckien',flag:'CZ'},{name:'Zoe',country:'Ungern',flag:'HU'},{name:'Alexander',country:'Ryssland',flag:'RU'},
+    {name:'Yuki',country:'Japan',flag:'JP'},{name:'Wei',country:'Kina',flag:'CN'},{name:'Priya',country:'Indien',flag:'IN'},
+    {name:'Hassan',country:'Turkiet',flag:'TR'},{name:'Amir',country:'Iran',flag:'IR'},{name:'Fatima',country:'Marocko',flag:'MA'},
+    {name:'James',country:'USA',flag:'US'},{name:'Emily',country:'Kanada',flag:'CA'},{name:'Carlos',country:'Mexiko',flag:'MX'},
+    {name:'Isabella',country:'Brasilien',flag:'BR'},{name:'Mateo',country:'Argentina',flag:'AR'},{name:'Olivia',country:'Australien',flag:'AU'},
+    {name:'William',country:'Nya Zeeland',flag:'NZ'},{name:'Aiden',country:'Sydafrika',flag:'ZA'},{name:'Lina',country:'Egypten',flag:'EG'},
+    {name:'Khaled',country:'Saudiarabien',flag:'SA'},{name:'Dmitri',country:'Ukraina',flag:'UA'},{name:'Anastasia',country:'Vitryssland',flag:'BY'},
+    {name:'Viktor',country:'Rumänien',flag:'RO'},{name:'Klara',country:'Slovakien',flag:'SK'},{name:'Jonas',country:'Litauen',flag:'LT'},
+    {name:'Laura',country:'Lettland',flag:'LV'},{name:'Markus',country:'Estland',flag:'EE'},{name:'Hanna',country:'Island',flag:'IS'},
+    {name:'Thomas',country:'Luxemburg',flag:'LU'},{name:'Julia',country:'Kroatien',flag:'HR'},{name:'Petar',country:'Serbien',flag:'RS'},
+    {name:'Maja',country:'Slovenien',flag:'SI'},{name:'Bogdan',country:'Bulgarien',flag:'BG'},{name:'Eva',country:'Israel',flag:'IL'},
+    {name:'Raj',country:'Pakistan',flag:'PK'},{name:'Minh',country:'Vietnam',flag:'VN'},{name:'Siti',country:'Indonesien',flag:'ID'},
+    {name:'Jin',country:'Sydkorea',flag:'KR'},{name:'Arun',country:'Thailand',flag:'TH'},{name:'Diego',country:'Chile',flag:'CL'},
+    {name:'Camila',country:'Colombia',flag:'CO'},{name:'Andres',country:'Peru',flag:'PE'},{name:'Valentina',country:'Venezuela',flag:'VE'},
+    {name:'Jose',country:'Puerto Rico',flag:'PR'},{name:'Aisha',country:'Nigeria',flag:'NG'},{name:'Kwame',country:'Ghana',flag:'GH'},
+    {name:'Zara',country:'Kenya',flag:'KE'},{name:'Tariq',country:'Algeriet',flag:'DZ'},{name:'Samir',country:'Tunisien',flag:'TN'},
+  ];
+
+  var FLAG_EMOJI = {
+    'SE':'🇸🇪','NO':'🇳🇴','DK':'🇩🇰','FI':'🇫🇮','DE':'🇩🇪','FR':'🇫🇷','GB':'🇬🇧','IT':'🇮🇹','ES':'🇪🇸','PL':'🇵🇱',
+    'NL':'🇳🇱','IE':'🇮🇪','GR':'🇬🇷','PT':'🇵🇹','CH':'🇨🇭','AT':'🇦🇹','BE':'🇧🇪','CZ':'🇨🇿','HU':'🇭🇺','RU':'🇷🇺',
+    'JP':'🇯🇵','CN':'🇨🇳','IN':'🇮🇳','TR':'🇹🇷','IR':'🇮🇷','MA':'🇲🇦','US':'🇺🇸','CA':'🇨🇦','MX':'🇲🇽','BR':'🇧🇷',
+    'AR':'🇦🇷','AU':'🇦🇺','NZ':'🇳🇿','ZA':'🇿🇦','EG':'🇪🇬','SA':'🇸🇦','UA':'🇺🇦','BY':'🇧🇾','RO':'🇷🇴','SK':'🇸🇰',
+    'LT':'🇱🇹','LV':'🇱🇻','EE':'🇪🇪','IS':'🇮🇸','LU':'🇱🇺','HR':'🇭🇷','RS':'🇷🇸','SI':'🇸🇮','BG':'🇧🇬','IL':'🇮🇱',
+    'PK':'🇵🇰','VN':'🇻🇳','ID':'🇮🇩','KR':'🇰🇷','TH':'🇹🇭','CL':'🇨🇱','CO':'🇨🇴','PE':'🇵🇪','VE':'🇻🇪','PR':'🇵🇷',
+    'NG':'🇳🇬','GH':'🇬🇭','KE':'🇰🇪','DZ':'🇩🇿','TN':'🇹🇳'
+  };
+
+  var liveUsersState = [];
+  var myUser = null;
+
+  function initMyUser(){
+    var saved = localStorage.getItem('kuribaxi_my_user');
+    if(saved){
+      try{myUser=JSON.parse(saved);}catch(e){}
+    }
+    if(!myUser){
+      var u = LIVE_USERS[Math.floor(Math.random()*LIVE_USERS.length)];
+      myUser={name:u.name,country:u.country,flag:FLAG_EMOJI[u.flag]||'🏳️',joined:Date.now(),id:'user_'+Math.random().toString(36).substr(2,9)};
+      localStorage.setItem('kuribaxi_my_user',JSON.stringify(myUser));
+    }
+  }
+
+  function generateLiveUsers(){
+    var count = Math.floor(Math.random()*8)+3;
+    var pool = LIVE_USERS.slice();
+    var users = [myUser];
+    for(var i=0;i<count-1;i++){
+      var idx = Math.floor(Math.random()*pool.length);
+      var u = pool.splice(idx,1)[0];
+      users.push({
+        name:u.name,country:u.country,flag:FLAG_EMOJI[u.flag]||'🏳️',
+        joined:Date.now()-Math.floor(Math.random()*3600000),
+        id:'sim_'+Math.random().toString(36).substr(2,9)
+      });
+    }
+    for(var i=users.length-1;i>0;i--){
+      var j=Math.floor(Math.random()*(i+1));
+      var t=users[i];users[i]=users[j];users[j]=t;
+    }
+    liveUsersState = users;
+    renderLiveUsers();
+  }
+
+  function renderLiveUsers(){
+    var countEl = document.getElementById('liveCount');
+    var listEl = document.getElementById('liveList');
+    countEl.innerHTML = liveUsersState.length + ' <span>online nu</span>';
+    listEl.innerHTML = liveUsersState.map(function(u){
+      var isMe = u.id === myUser.id;
+      var timeAgo = Math.floor((Date.now()-u.joined)/60000);
+      var timeStr = timeAgo < 1 ? 'nu' : timeAgo + ' min';
+      var statusClass = timeAgo < 5 ? 'live-user-status' : 'live-user-status recent';
+      return '<div class="live-user">'+
+        '<span class="live-user-flag">'+u.flag+'</span>'+
+        '<span class="live-user-name">'+escapeHtml(u.name)+(isMe?' <span style="color:var(--gold-bright);font-size:9px;">(DU)</span>':'')+'</span>'+
+        '<span class="live-user-country">'+escapeHtml(u.country)+'</span>'+
+        '<span class="live-user-time">'+timeStr+'</span>'+
+        '<div class="'+statusClass+'"></div>'+
+      '</div>';
+    }).join('');
+  }
+
+  function updateLiveUsers(){
+    if(Math.random()<0.3 && liveUsersState.length>3){
+      var removable = liveUsersState.filter(function(u){return u.id!==myUser.id;});
+      if(removable.length>0){
+        var toRemove = removable[Math.floor(Math.random()*removable.length)];
+        liveUsersState = liveUsersState.filter(function(u){return u.id!==toRemove.id;});
+      }
+    }
+    if(Math.random()<0.4 && liveUsersState.length<14){
+      var pool = LIVE_USERS.filter(function(u){
+        return !liveUsersState.some(function(lu){return lu.name===u.name&&lu.country===u.country;});
+      });
+      if(pool.length>0){
+        var u = pool[Math.floor(Math.random()*pool.length)];
+        liveUsersState.push({
+          name:u.name,country:u.country,flag:FLAG_EMOJI[u.flag]||'🏳️',
+          joined:Date.now(),id:'sim_'+Math.random().toString(36).substr(2,9)
+        });
+      }
+    }
+    renderLiveUsers();
+  }
+
+  initMyUser();
+  generateLiveUsers();
+  setInterval(updateLiveUsers,8000);
+
+  // === MUSIC PLAYER ===
+  var MUSIC_STATIONS = [
+    {name:'Radio Swiss Classic',url:'https://stream.srg-ssr.ch/m/rsc_de/mp3_128',desc:'Schweizisk klassisk radio'},
+    {name:'Public Domain Classical',url:'http://relay.publicdomainradio.org/classical.mp3',desc:'Offentlig domän klassisk musik'},
+    {name:'Classic FM UK',url:'http://vis.media-ice.musicradio.com/ClassicFMMP3',desc:'Storbritanniens favorit'},
+    {name:'Adagio.FM',url:'http://hi5.adagio.fm/;',desc:'Lugn klassisk musik'},
+    {name:'DR P2 Klassik',url:'http://live-icy.gss.dr.dk:8000/A/A04L.mp3',desc:'Dansk klassisk radio'},
+    {name:'NPO Radio 4',url:'https://icecast.omroep.nl/radio4-bb-mp3',desc:'Nederländsk klassisk'},
+    {name:'Venice Classic Radio',url:'https://uk2.streamingpulse.com/ssl/vcr2',desc:'Italiensk barock & klassisk'},
+    {name:'Radio Caprice Cello',url:'http://79.120.12.130:8002/cello',desc:'Cellomusik nonstop'},
+    {name:'Baroque Sonatas',url:'https://stream.laut.fm/baroque_sonatas_radio',desc:'Barocksonater'},
+    {name:'WQXR Classical',url:'https://stream.wqxr.org/wqxr-web',desc:'New York klassisk'},
+    {name:'Colorado Public Radio',url:'https://stream1.cprnetwork.org/cpr2_lo',desc:'Colorado klassisk'},
+    {name:'WWFM Classical',url:'https://wwfm.streamguys1.com/live',desc:'New Jersey klassisk'},
+    {name:'Classic Praha',url:'http://icecast8.play.cz/classic128.mp3',desc:'Tjeckisk klassisk & film'},
+    {name:'Radio Paradise Mellow',url:'https://stream.radioparadise.com/mellow-320',desc:'Lugn världsmusik'},
+    {name:'Linn Classical',url:'http://89.16.185.174:8004/stream',desc:'Skotsk Hi-Fi klassisk'},
+    {name:'YourClassical Relax',url:'https://relax.stream.publicradio.org/relax.aac',desc:'Avslappnande klassisk'},
+    {name:'BBC Radio 3',url:'https://stream.live.vc.bbcmedia.co.uk/bbc_radio_three',desc:'BBC klassisk & kultur'},
+    {name:'France Musique',url:'https://direct.francemusique.fr/live/francemusique-midfi.mp3',desc:'Fransk klassisk radio'},
+    {name:'Klassik Radio',url:'https://live.streams.klassikradio.de/klassikradio-deutschland',desc:'Tysk klassisk radio'},
+    {name:'Sonatica',url:'http://148.251.43.231:8742/160;.mp3',desc:'Klassisk musik 24/7'},
+    {name:'CMBF Radio Musical',url:'https://icecast.teveo.cu/Nbtz7HT3',desc:'Kubansk kultur & klassisk'},
+    {name:'Maine Public Classical',url:'https://playerservices.streamtheworld.com/api/livestream-redirect/WMEA_CLASSICAL.mp3',desc:'Maine klassisk'},
+    {name:'Vermont Public Classical',url:'https://vprclassical.streamguys1.com/vprclassical-web',desc:'Vermont klassisk'},
+    {name:'Yellowstone Classical',url:'https://ypr.streamguys1.com/live-2',desc:'Montana klassisk'},
+    {name:'Northwest Public Classical',url:'https://streams.nwpr.org:8443/NWPRCLASSICAL',desc:'Washington klassisk'},
+    {name:'Minnesota Public Choral',url:'https://choral.stream.publicradio.org/choral.aac',desc:'Körmusik'},
+    {name:'WFCC Cape Classical',url:'https://ice7.securenetsystems.net/WFCC',desc:'Cape Cod klassisk'},
+    {name:'KANO Hawaii Classical',url:'https://khpr-ice.streamguys1.com/kipo2',desc:'Hawaii klassisk'},
+    {name:'Classical 89 BYU',url:'https://radio.byub.org/classical89/classical89_aac',desc:'Utah klassisk'},
+    {name:'ClassicalNH',url:'https://nhpr.streamguys1.com/classical',desc:'New Hampshire klassisk'},
+  ];
+
+  var musicAudio = document.getElementById('musicAudio');
+  var musicPlayBtn = document.getElementById('musicPlayBtn');
+  var musicStationSelect = document.getElementById('musicStationSelect');
+  var musicVolume = document.getElementById('musicVolume');
+  var musicMuteBtn = document.getElementById('musicMuteBtn');
+  var musicCloseBtn = document.getElementById('musicCloseBtn');
+  var musicReopenBtn = document.getElementById('musicReopenBtn');
+  var musicPlayer = document.getElementById('musicPlayer');
+  var musicTrackTitle = document.getElementById('musicTrackTitle');
+  var musicTrackStation = document.getElementById('musicTrackStation');
+  var currentStation = parseInt(localStorage.getItem('kuribaxi_music_station')||'0');
+  var isPlaying = false;
+  var isMuted = false;
+  var wasPlayingBeforeVideo = false;
+
+  function loadStation(index){
+    var st = MUSIC_STATIONS[index];
+    if(!st)return;
+    musicAudio.src = st.url;
+    musicTrackTitle.textContent = st.name;
+    musicTrackStation.textContent = st.desc;
+    musicStationSelect.value = String(index);
+    localStorage.setItem('kuribaxi_music_station',String(index));
+    if(isPlaying){
+      musicAudio.play().catch(function(){});
+    }
+  }
+
+  function togglePlay(){
+    if(musicAudio.paused){
+      musicAudio.play().then(function(){
+        isPlaying = true;
+        musicPlayBtn.innerHTML = '&#10074;&#10074;';
+        musicPlayer.classList.remove('paused');
+      }).catch(function(){});
+    }else{
+      musicAudio.pause();
+      isPlaying = false;
+      musicPlayBtn.innerHTML = '&#9654;';
+      musicPlayer.classList.add('paused');
+    }
+  }
+
+  function setVolume(v){
+    musicAudio.volume = v/100;
+    if(v>0 && isMuted){isMuted=false;musicMuteBtn.textContent='LJUD AV';}
+  }
+
+  function toggleMute(){
+    if(isMuted){musicAudio.muted=false;isMuted=false;musicMuteBtn.textContent='LJUD AV';}
+    else{musicAudio.muted=true;isMuted=true;musicMuteBtn.textContent='LJUD PA';}
+  }
+
+  function closePlayer(){
+    musicAudio.pause();
+    isPlaying = false;
+    musicPlayBtn.innerHTML = '&#9654;';
+    musicPlayer.classList.add('hidden-player');
+    musicReopenBtn.classList.add('show');
+  }
+
+  function reopenPlayer(){
+    musicPlayer.classList.remove('hidden-player');
+    musicReopenBtn.classList.remove('show');
+    if(!isPlaying){
+      togglePlay();
+    }
+  }
+
+  function pauseForVideo(){
+    if(isPlaying){
+      wasPlayingBeforeVideo = true;
+      musicAudio.pause();
+      isPlaying = false;
+      musicPlayBtn.innerHTML = '&#9654;';
+      musicPlayer.classList.add('paused');
+    }
+  }
+
+  function resumeAfterVideo(){
+    if(wasPlayingBeforeVideo){
+      wasPlayingBeforeVideo = false;
+      togglePlay();
+    }
+  }
+
+  musicPlayBtn.addEventListener('click',togglePlay);
+  musicStationSelect.addEventListener('change',function(){loadStation(parseInt(this.value));});
+  musicVolume.addEventListener('input',function(){setVolume(parseInt(this.value));});
+  musicMuteBtn.addEventListener('click',toggleMute);
+  musicCloseBtn.addEventListener('click',closePlayer);
+  musicReopenBtn.addEventListener('click',reopenPlayer);
+
+  musicAudio.addEventListener('error',function(){
+    musicTrackStation.textContent = 'Fel vid laddning, byter kanal...';
+    setTimeout(function(){
+      var next = (currentStation+1)%MUSIC_STATIONS.length;
+      currentStation = next;
+      loadStation(next);
+      if(isPlaying) musicAudio.play().catch(function(){});
+    },2000);
+  });
+
+  // Init music
+  loadStation(currentStation);
+  musicVolume.value = parseInt(localStorage.getItem('kuribaxi_music_vol')||'40');
+  setVolume(parseInt(musicVolume.value));
+  musicVolume.addEventListener('input',function(){localStorage.setItem('kuribaxi_music_vol',this.value);});
+
+  // Auto-play with muted workaround for browsers
+  setTimeout(function(){
+    musicAudio.muted = true;
+    musicAudio.play().then(function(){
+      isPlaying = true;
+      musicPlayBtn.innerHTML = '&#10074;&#10074;';
+      musicPlayer.classList.remove('paused');
+      musicTrackStation.textContent = 'Klicka för att aktivera ljud';
+      setTimeout(function(){
+        var st = MUSIC_STATIONS[currentStation];
+        if(st) musicTrackStation.textContent = st.desc;
+      },4000);
+    }).catch(function(){});
+  },1000);
+
   // === BIBLIOTEK ===
   var libTab=localStorage.getItem('kuribaxi_lib_tab')||'series';
   function renderLibrary(){
@@ -421,6 +833,8 @@
     browserFrame.classList.remove('show');
     meta.innerHTML='<span class="tag">Extern</span><span class="tag active">'+escapeHtml(name)+'</span><a href="'+url+'" target="_blank" rel="noopener" style="background:var(--green);color:#fff;padding:5px 14px;border-radius:20px;text-decoration:none;font-size:12px;font-weight:700;">&#8599; Oppna i ny flik</a>';
     document.getElementById('ticket').scrollIntoView({behavior:'smooth',block:'start'});
+    // Pause music when external site loads in player
+    pauseForVideo();
   }
 
   // === SOK ===
@@ -578,6 +992,9 @@
     if(currentType==='movie')upsertFilm(currentDetail);
     else{var s=document.getElementById('seasonInput').value||1;var e=document.getElementById('episodeInput').value||1;upsertSeries(currentDetail,s,e);}
     meta.innerHTML='<span class="tag">'+(currentType==='movie'?'Film':'Serie')+'</span><span class="tag active">TMDB: '+currentId+'</span>'+(currentImdbId?'<span class="tag">IMDb: '+currentImdbId+'</span>':'')+'<a href="https://www.themoviedb.org/'+currentType+'/'+currentId+'" target="_blank" rel="noopener">Oppna pa TMDB &#8599;</a>'+(currentImdbId?'<a href="https://www.imdb.com/title/'+currentImdbId+'/" target="_blank" rel="noopener">Oppna pa IMDb &#8599;</a>':'');
+
+    // PAUSE MUSIC WHEN VIDEO STARTS PLAYING
+    pauseForVideo();
   }
   document.getElementById('epGoBtn').addEventListener('click',function(){
     loadPlayer();
