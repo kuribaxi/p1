@@ -539,8 +539,10 @@
   };
 
   var vkbWrap = document.getElementById('vkbWrap');
+  var vkbPanel = document.getElementById('vkbPanel');
   var vkbHandle = document.getElementById('vkbHandle');
   var vkbClose = document.getElementById('vkbClose');
+  var vkbModeBtn = document.getElementById('vkbModeBtn');
   var vkbRows = document.getElementById('vkbRows');
   var vkbLangs = document.getElementById('vkbLangs');
   var vkbSuggestions = document.getElementById('vkbSuggestions');
@@ -549,6 +551,24 @@
   var activeInput = queryInput;
   var currentLang = 'en';
   var vkbOpen = false;
+  var vkbLightMode = localStorage.getItem('kuribaxi_vkb_light') === 'true';
+
+  function applyVkbMode(){
+    if(vkbLightMode){
+      vkbWrap.classList.add('light');
+      vkbModeBtn.innerHTML = '&#9790; MÖRK';
+    }else{
+      vkbWrap.classList.remove('light');
+      vkbModeBtn.innerHTML = '&#9788; LJUS';
+    }
+  }
+  function toggleVkbMode(){
+    vkbLightMode = !vkbLightMode;
+    localStorage.setItem('kuribaxi_vkb_light', vkbLightMode ? 'true' : 'false');
+    applyVkbMode();
+  }
+  vkbModeBtn.addEventListener('click', function(e){e.stopPropagation();toggleVkbMode();});
+  applyVkbMode();
 
   // === WORD DICTIONARY FOR SUGGESTIONS ===
   var WORD_DICT = {
@@ -605,8 +625,10 @@
   }
 
   var vkbWrap = document.getElementById('vkbWrap');
+  var vkbPanel = document.getElementById('vkbPanel');
   var vkbHandle = document.getElementById('vkbHandle');
   var vkbClose = document.getElementById('vkbClose');
+  var vkbModeBtn = document.getElementById('vkbModeBtn');
   var vkbRows = document.getElementById('vkbRows');
   var vkbLangs = document.getElementById('vkbLangs');
   var vkbSuggestions = document.getElementById('vkbSuggestions');
@@ -615,6 +637,24 @@
   var activeInput = queryInput;
   var currentLang = 'en';
   var vkbOpen = false;
+  var vkbLightMode = localStorage.getItem('kuribaxi_vkb_light') === 'true';
+
+  function applyVkbMode(){
+    if(vkbLightMode){
+      vkbWrap.classList.add('light');
+      vkbModeBtn.innerHTML = '&#9790; MÖRK';
+    }else{
+      vkbWrap.classList.remove('light');
+      vkbModeBtn.innerHTML = '&#9788; LJUS';
+    }
+  }
+  function toggleVkbMode(){
+    vkbLightMode = !vkbLightMode;
+    localStorage.setItem('kuribaxi_vkb_light', vkbLightMode ? 'true' : 'false');
+    applyVkbMode();
+  }
+  vkbModeBtn.addEventListener('click', function(e){e.stopPropagation();toggleVkbMode();});
+  applyVkbMode();
 
   function renderVkb(lang){
     currentLang = lang;
