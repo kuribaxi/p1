@@ -238,7 +238,21 @@
   @media(max-width:900px) and (min-width:601px){
     .vkb-panel{width:240px;padding:10px;}
     .vkb-key{min-width:19px;height:19px;font-size:12px;padding:0 4px;}
-  }  .music-player{position:fixed;bottom:0;left:0;right:0;z-index:9998;background:rgba(11,18,32,0.97);border-top:1px solid var(--panel-line);backdrop-filter:blur(16px);box-shadow:0 -8px 32px rgba(0,0,0,0.4);padding:10px 20px;display:flex;align-items:center;gap:14px;transition:transform .3s ease,opacity .3s ease;}
+  }
+  /* === SITE SEARCH OVERLAY === */
+  .site-search-overlay{position:fixed;inset:0;z-index:99990;background:rgba(11,18,32,0.92);backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;flex-direction:column;gap:18px;padding:20px;}
+  .site-search-overlay.show{display:flex;}
+  .site-search-box{background:var(--panel);border:1px solid var(--panel-line);border-radius:var(--radius);padding:28px 24px;max-width:480px;width:100%;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,0.5);}
+  .site-search-box h3{font-family:'Fraunces',serif;font-weight:700;font-size:18px;color:var(--gold-bright);margin-bottom:4px;}
+  .site-search-box p{font-size:12px;color:var(--cream-dim);margin-bottom:18px;}
+  .site-search-field{display:flex;gap:10px;margin-bottom:14px;}
+  .site-search-field input{flex:1;font-size:14px;padding:12px 14px;background:rgba(255,255,255,0.04);border:1px solid var(--panel-line);color:var(--cream);border-radius:8px;outline:none;font-family:'Manrope',sans-serif;}
+  .site-search-field input:focus{border-color:var(--gold);}
+  .site-search-btns{display:flex;gap:10px;justify-content:center;}
+  .site-search-btns .go-btn{padding:10px 24px;font-size:13px;}
+  .site-search-btns .ghost-btn{padding:10px 20px;font-size:13px;}
+
+  .music-player{position:fixed;bottom:0;left:0;right:0;z-index:9998;background:rgba(11,18,32,0.97);border-top:1px solid var(--panel-line);backdrop-filter:blur(16px);box-shadow:0 -8px 32px rgba(0,0,0,0.4);padding:10px 20px;display:flex;align-items:center;gap:14px;transition:transform .3s ease,opacity .3s ease;}
   .music-player.hidden-player{transform:translateY(100%);opacity:0;pointer-events:none;}
   .music-player-left{display:flex;align-items:center;gap:10px;flex-shrink:0;}
   .music-play-btn{width:38px;height:38px;border-radius:50%;background:var(--gold);border:none;color:#1a1305;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;font-size:16px;}
@@ -727,8 +741,9 @@ function renderVkb(lang){
 
   // Close keyboard when clicking outside search inputs and keyboard
   document.addEventListener('click',function(e){
-    var isSearchInput = e.target===queryInput || e.target===googleQueryInput;
-    if(!vkbWrap.contains(e.target) && !isSearchInput){closeVkb();}
+    var isSearchInput = e.target===queryInput || e.target===googleQueryInput || e.target===siteSearchInput;
+    var isOverlay = siteSearchOverlay.contains(e.target);
+    if(!vkbWrap.contains(e.target) && !isSearchInput && !isOverlay){closeVkb();}
   });
   renderVkb('en');
 
@@ -1037,6 +1052,54 @@ function renderVkb(lang){
   });
 
   // === WEBBPLATSER ===
+
+  // === SITE SEARCH OVERLAY ===
+  var siteSearchOverlay = document.getElementById('siteSearchOverlay');
+  var siteSearchInput = document.getElementById('siteSearchInput');
+  var siteSearchGoBtn = document.getElementById('siteSearchGoBtn');
+  var siteSearchCancelBtn = document.getElementById('siteSearchCancelBtn');
+  var siteSearchTitle = document.getElementById('siteSearchTitle');
+  var siteSearchDesc = document.getElementById('siteSearchDesc');
+  var pendingSite = null;
+
+  function openSiteSearch(site){
+    pendingSite = site;
+    siteSearchTitle.textContent = 'Sok pa ' + site.name;
+    siteSearchDesc.textContent = 'Skriv ditt sokord med tangentbordet nedan';
+    siteSearchInput.value = '';
+    siteSearchOverlay.classList.add('show');
+    activeInput = siteSearchInput;
+    openVkb();
+    setTimeout(function(){siteSearchInput.focus();},50);
+  }
+  function closeSiteSearch(){
+    siteSearchOverlay.classList.remove('show');
+    closeVkb();
+    pendingSite = null;
+  }
+  function doSiteSearch(){
+    if(!pendingSite) return;
+    var q = siteSearchInput.value.trim();
+    var url;
+    if(q){
+      var cleanQ = q.replace(/[^a-zA-Z0-9\s]/g, ' ').trim().replace(/\s+/g, '+');
+      url = pendingSite.searchTpl.replace('{q}', cleanQ);
+    } else {
+      url = pendingSite.url;
+    }
+    closeSiteSearch();
+    if(pendingSite.openInNewTab){
+      window.open(url, '_blank', 'noopener,noreferrer');
+    } else {
+      loadInPlayer(url, pendingSite.name);
+    }
+  }
+  siteSearchGoBtn.addEventListener('click', doSiteSearch);
+  siteSearchCancelBtn.addEventListener('click', closeSiteSearch);
+  siteSearchInput.addEventListener('click', function(e){ activeInput = siteSearchInput; openVkb(); });
+  siteSearchInput.addEventListener('focus', function(e){ activeInput = siteSearchInput; openVkb(); });
+  siteSearchInput.addEventListener('keydown', function(e){ if(e.key === 'Enter') doSiteSearch(); });
+
   function renderWebsites(){
     var list=document.getElementById('siteList');
     var sorted=WEBSITES.slice().sort(function(a,b){return(a.openInNewTab?1:0)-(b.openInNewTab?1:0);});
@@ -1051,16 +1114,7 @@ function renderVkb(lang){
     list.querySelectorAll('.site-item').forEach(function(item,index){
       item.addEventListener('click',function(){
         var site=sorted[index];
-        var url;
-        if(currentTitle){
-          var cleanQ=currentTitle.replace(/[^a-zA-Z0-9\s]/g,' ').trim().replace(/\s+/g,'+');
-          url=site.searchTpl.replace('{q}',cleanQ);
-        }else{url=site.url;}
-        if(site.openInNewTab){
-          window.open(url,'_blank','noopener,noreferrer');
-        }else{
-          loadInPlayer(url,site.name);
-        }
+        openSiteSearch(site);
       });
     });
   }
@@ -1259,5 +1313,21 @@ function renderVkb(lang){
   renderWebsites();
 })();
 </script>
+
+<!-- SITE SEARCH OVERLAY -->
+<div class="site-search-overlay" id="siteSearchOverlay">
+  <div class="site-search-box">
+    <h3 id="siteSearchTitle">Sok pa webbplats</h3>
+    <p id="siteSearchDesc">Skriv ditt sokord med tangentbordet nedan</p>
+    <div class="site-search-field">
+      <input type="text" id="siteSearchInput" placeholder="Skriv sokord..." autocomplete="off" readonly inputmode="none">
+    </div>
+    <div class="site-search-btns">
+      <button class="go-btn" id="siteSearchGoBtn">Sok</button>
+      <button class="ghost-btn" id="siteSearchCancelBtn">Avbryt</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
