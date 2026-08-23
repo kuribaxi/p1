@@ -288,6 +288,7 @@
 <base target="_blank">
 <base target="_blank">
 <base target="_blank">
+<base target="_blank">
 </head>
 <body>
 
@@ -600,7 +601,54 @@
   vkbModeBtn.addEventListener('click', function(e){e.stopPropagation();toggleVkbMode();});
 
 
-  function renderVkb(lang){
+  
+  function getSuggestions(prefix, lang){
+    var dict = {
+      en: ['the','movie','film','series','watch','online','stream','episode','season','action','comedy','drama','horror','thriller','animation','documentary','romance','sci-fi','fantasy','adventure','crime','mystery','family','music','war','western','history','biography','sport','short','news','reality','talk','game','show'],
+      fa: ['فیلم','سریال','قسمت','فصل','اکشن','کمدی','درام','ترسناک','هیجان','انیمیشن','مستند','عاشقانه','علمی','تخیلی','ماجراجویی','جنایی','معمایی','خانوادگی','موسیقی','جنگی','وسترن','تاریخی','زندگی','ورزشی','کوتاه','خبری','واقعیت','گفتگو','بازی','نمایش'],
+      ckb: ['فیلم','زنجیرە','بەش','وەرز','ئاکشن','کۆمێدی','دراما','ترسناک','هیجان','ئەنیمەیشن','بەڵگەنامەیی','ڕۆمانسی','زانستی','خەیاڵی','سەرکێشی','تاوان','نھێنی','خێزانی','مۆسیقا','شەڕی','وێسترن','مێژوویی','ژیاننامە','وەرزشی','کورت','هەواڵ','ڕاستی','وتووێژ','یاری','پیشانگا'],
+      ar: ['فيلم','مسلسل','حلقة','موسم','اكشن','كوميدي','دراما','رعب','اثارة','انمي','وثائقي','رومانسي','خيال','علمي','مغامرة','جريمة','غموض','عائلي','موسيقى','حرب','غربي','تاريخي','سيرة','رياضة','قصير','اخبار','واقع','حوار','لعبة','عرض']
+    };
+    var words = dict[lang] || dict['en'];
+    var lower = prefix.toLowerCase();
+    return words.filter(function(w){ return w.toLowerCase().startsWith(lower) && w.toLowerCase() !== lower; }).slice(0,6);
+  }
+
+  function showSuggestions(letter){
+    var val = activeInput.value;
+    var lastSpace = val.lastIndexOf(' ');
+    var prefix = lastSpace >= 0 ? val.slice(lastSpace+1) + letter : val + letter;
+    if(prefix.length < 2){
+      vkbSuggestions.classList.remove('show');
+      return;
+    }
+    var suggestions = getSuggestions(prefix, currentLang);
+    vkbSuggestions.innerHTML = '<span class="vkb-suggestions-label">Förslag</span>';
+    if(suggestions.length===0){
+      vkbSuggestions.classList.remove('show');
+      return;
+    }
+    suggestions.forEach(function(word){
+      var chip = document.createElement('span');
+      chip.className = 'vkb-suggestion-chip';
+      chip.textContent = word;
+      chip.addEventListener('click', function(e){
+        e.stopPropagation();
+        var before = val.lastIndexOf(' ') >= 0 ? val.slice(0, val.lastIndexOf(' ')+1) : '';
+        activeInput.value = before + word + ' ';
+        activeInput.focus();
+        vkbSuggestions.classList.remove('show');
+      });
+      vkbSuggestions.appendChild(chip);
+    });
+    vkbSuggestions.classList.add('show');
+  }
+
+  function hideSuggestions(){
+    vkbSuggestions.classList.remove('show');
+  }
+
+function renderVkb(lang){
     currentLang = lang;
     var layout = VKB_LAYOUTS[lang];
     vkbRows.innerHTML = '';
