@@ -179,7 +179,7 @@
   .vkb-lang.active{background:var(--gold);color:#1a1305;border-color:var(--gold);font-weight:700;}
   .vkb-rows{display:flex;flex-direction:column;gap:10px;}
   .vkb-row{display:flex;gap:10px;justify-content:center;}
-  .vkb-key{min-width:68px;height:64px;padding:0 10px;background:linear-gradient(180deg,#5a5d62 0%,#4a4d52 100%);border:2px solid #6a6d72;border-radius:10px;color:#fff;font-size:22px;font-weight:700;font-family:'Manrope',sans-serif;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s,border-color .15s;user-select:none;flex:1;box-shadow:0 4px 0 #3a3d42,0 6px 12px rgba(0,0,0,0.3);text-shadow:0 1px 2px rgba(0,0,0,0.4);position:relative;overflow:hidden;}
+  .vkb-key{min-width:68px;height:48px;padding:0 10px;background:linear-gradient(180deg,#5a5d62 0%,#4a4d52 100%);border:2px solid #6a6d72;border-radius:10px;color:#fff;font-size:22px;font-weight:700;font-family:'Manrope',sans-serif;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s,border-color .15s;user-select:none;flex:1;box-shadow:0 4px 0 #3a3d42,0 6px 12px rgba(0,0,0,0.3);text-shadow:0 1px 2px rgba(0,0,0,0.4);position:relative;overflow:hidden;}
   .vkb-key::before{content:'';position:absolute;top:0;left:0;right:0;height:35%;background:linear-gradient(180deg,rgba(255,255,255,0.1),transparent);border-radius:8px 8px 0 0;pointer-events:none;}
   .vkb-key:hover{background:linear-gradient(180deg,#6a6d72 0%,#5a5d62 100%);border-color:#8a8d92;}
   .vkb-key:active{transform:translateY(2px);box-shadow:0 1px 0 #3a3d42,0 2px 4px rgba(0,0,0,0.3);}
@@ -218,7 +218,7 @@
     .vkb-wrap .vkb-handle:hover{background:#4a4d52;}
     .vkb-handle-line{width:3px;height:36px;border-radius:2px;background:var(--gold-bright);opacity:.7;}
     .vkb-panel{width:330px;background:#3a3d42;border:2px solid #4a4d52;border-radius:16px 0 0 16px;padding:14px 16px 16px;box-shadow:-12px 0 40px rgba(0,0,0,0.45);}
-    .vkb-key{min-width:28px;height:36px;padding:0 6px;font-size:13px;border-radius:8px;}
+    .vkb-key{min-width:28px;height:27px;padding:0 6px;font-size:13px;border-radius:8px;}
     .vkb-key.wide{min-width:48px;flex:1.4;font-size:11px;}
     .vkb-key.space{flex:4;}
     .vkb-row{gap:5px;}
@@ -233,11 +233,11 @@
   }
   @media(max-width:600px){
     .vkb-panel{width:280px;padding:12px;}
-    .vkb-key{min-width:22px;height:32px;font-size:12px;padding:0 4px;}
+    .vkb-key{min-width:22px;height:24px;font-size:12px;padding:0 4px;}
   }
   @media(max-width:900px) and (min-width:601px){
     .vkb-panel{width:310px;padding:14px;}
-    .vkb-key{min-width:26px;height:34px;font-size:12px;padding:0 5px;}
+    .vkb-key{min-width:26px;height:26px;font-size:12px;padding:0 5px;}
   }  .music-player{position:fixed;bottom:0;left:0;right:0;z-index:9998;background:rgba(11,18,32,0.97);border-top:1px solid var(--panel-line);backdrop-filter:blur(16px);box-shadow:0 -8px 32px rgba(0,0,0,0.4);padding:10px 20px;display:flex;align-items:center;gap:14px;transition:transform .3s ease,opacity .3s ease;}
   .music-player.hidden-player{transform:translateY(100%);opacity:0;pointer-events:none;}
   .music-player-left{display:flex;align-items:center;gap:10px;flex-shrink:0;}
@@ -283,6 +283,7 @@
     .music-station-select{max-width:120px;}
   }
 </style>
+<base target="_blank">
 <base target="_blank">
 <base target="_blank">
 <base target="_blank">
@@ -339,14 +340,14 @@
       <button data-type="movie" class="active">FILM</button>
       <button data-type="tv">SERIE</button>
     </div>
-    <input type="text" id="query" placeholder="t.ex. Dune, 693134, eller tt15239678" autocomplete="off" inputmode="none" readonly>
+    <input type="text" id="query" placeholder="t.ex. Dune, 693134, eller tt15239678" autocomplete="off">
     <button class="go-btn" id="goBtn">Sok</button>
   </div>
 
   <!-- Google Search -->
   <div class="google-search">
     <span class="google-search-label">&#128269; Google</span>
-    <input type="text" id="googleQuery" placeholder="Sok pa Google..." autocomplete="off" inputmode="none" readonly>
+    <input type="text" id="googleQuery" placeholder="Sok pa Google..." autocomplete="off">
     <button class="google-btn" id="googleBtn">Sok pa Google</button>
   </div>
 
@@ -626,37 +627,7 @@
     vkbLangs.querySelectorAll('.vkb-lang').forEach(function(b){b.classList.toggle('active',b.dataset.lang===lang);});
   }
 
-  function vkbPress(key){
-    hideSuggestions();
-    // Remove readonly temporarily to allow value changes
-    activeInput.removeAttribute('readonly');
-    var start = activeInput.selectionStart || activeInput.value.length;
-    var end = activeInput.selectionEnd || activeInput.value.length;
-    var val = activeInput.value;
-    if(key==='SPACE'){
-      activeInput.value = val.slice(0,start)+' '+val.slice(end);
-      activeInput.selectionStart = activeInput.selectionEnd = start+1;
-    }else if(key==='BACK'){
-      if(start===end && start>0){
-        activeInput.value = val.slice(0,start-1)+val.slice(end);
-        activeInput.selectionStart = activeInput.selectionEnd = start-1;
-      }else if(start!==end){
-        activeInput.value = val.slice(0,start)+val.slice(end);
-        activeInput.selectionStart = activeInput.selectionEnd = start;
-      }
-    }else if(key==='ENTER'){
-      activeInput.setAttribute('readonly','readonly');
-      if(activeInput === queryInput) searchTMDB();
-      else if(activeInput === googleQueryInput) searchGoogle();
-      return;
-    }else{
-      activeInput.value = val.slice(0,start)+key+val.slice(end);
-      activeInput.selectionStart = activeInput.selectionEnd = start+key.length;
-    }
-    activeInput.setAttribute('readonly','readonly');
-    activeInput.focus();
-  }
-
+  function vkbPress(key){    hideSuggestions();    var start = activeInput.selectionStart || activeInput.value.length;    var end = activeInput.selectionEnd || activeInput.value.length;    var val = activeInput.value;    if(key==='SPACE'){      activeInput.value = val.slice(0,start)+' '+val.slice(end);      activeInput.selectionStart = activeInput.selectionEnd = start+1;    }else if(key==='BACK'){      if(start===end && start>0){        activeInput.value = val.slice(0,start-1)+val.slice(end);        activeInput.selectionStart = activeInput.selectionEnd = start-1;      }else if(start!==end){        activeInput.value = val.slice(0,start)+val.slice(end);        activeInput.selectionStart = activeInput.selectionEnd = start;      }    }else if(key==='ENTER'){      if(activeInput === queryInput) searchTMDB();      else if(activeInput === googleQueryInput) searchGoogle();      return;    }else{      activeInput.value = val.slice(0,start)+key+val.slice(end);      activeInput.selectionStart = activeInput.selectionEnd = start+key.length;    }    activeInput.focus();  }
   function openVkb(){vkbOpen=true;vkbWrap.classList.add('open');}
   function closeVkb(){vkbOpen=false;vkbWrap.classList.remove('open');}
   function toggleVkb(){vkbOpen?closeVkb():openVkb();}
