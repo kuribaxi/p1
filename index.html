@@ -627,7 +627,33 @@
     vkbLangs.querySelectorAll('.vkb-lang').forEach(function(b){b.classList.toggle('active',b.dataset.lang===lang);});
   }
 
-  function vkbPress(key){    hideSuggestions();    var start = activeInput.selectionStart || activeInput.value.length;    var end = activeInput.selectionEnd || activeInput.value.length;    var val = activeInput.value;    if(key==='SPACE'){      activeInput.value = val.slice(0,start)+' '+val.slice(end);      activeInput.selectionStart = activeInput.selectionEnd = start+1;    }else if(key==='BACK'){      if(start===end && start>0){        activeInput.value = val.slice(0,start-1)+val.slice(end);        activeInput.selectionStart = activeInput.selectionEnd = start-1;      }else if(start!==end){        activeInput.value = val.slice(0,start)+val.slice(end);        activeInput.selectionStart = activeInput.selectionEnd = start;      }    }else if(key==='ENTER'){      if(activeInput === queryInput) searchTMDB();      else if(activeInput === googleQueryInput) searchGoogle();      return;    }else{      activeInput.value = val.slice(0,start)+key+val.slice(end);      activeInput.selectionStart = activeInput.selectionEnd = start+key.length;    }    activeInput.focus();  }
+  function vkbPress(key){
+    hideSuggestions();
+    var start = activeInput.selectionStart || activeInput.value.length;
+    var end = activeInput.selectionEnd || activeInput.value.length;
+    var val = activeInput.value;
+    if(key==='SPACE'){
+      activeInput.value = val.slice(0,start)+' '+val.slice(end);
+      activeInput.selectionStart = activeInput.selectionEnd = start+1;
+    }else if(key==='BACK'){
+      if(start===end && start>0){
+        activeInput.value = val.slice(0,start-1)+val.slice(end);
+        activeInput.selectionStart = activeInput.selectionEnd = start-1;
+      }else if(start!==end){
+        activeInput.value = val.slice(0,start)+val.slice(end);
+        activeInput.selectionStart = activeInput.selectionEnd = start;
+      }
+    }else if(key==='ENTER'){
+      if(activeInput === queryInput) searchTMDB();
+      else if(activeInput === googleQueryInput) searchGoogle();
+      return;
+    }else{
+      activeInput.value = val.slice(0,start)+key+val.slice(end);
+      activeInput.selectionStart = activeInput.selectionEnd = start+key.length;
+    }
+    activeInput.focus();
+  }
+
   function openVkb(){vkbOpen=true;vkbWrap.classList.add('open');}
   function closeVkb(){vkbOpen=false;vkbWrap.classList.remove('open');}
   function toggleVkb(){vkbOpen?closeVkb():openVkb();}
@@ -640,16 +666,16 @@
   });
 
   // Show keyboard when clicking on search inputs (readonly prevents system keyboard)
-  queryInput.addEventListener('click',function(e){e.preventDefault();activeInput=queryInput;openVkb();});
-  googleQueryInput.addEventListener('click',function(e){e.preventDefault();activeInput=googleQueryInput;openVkb();});
+  queryInput.addEventListener('click',function(e){activeInput=queryInput;openVkb();});
+  googleQueryInput.addEventListener('click',function(e){activeInput=googleQueryInput;openVkb();});
 
   // Also handle focus for TV remote navigation
-  queryInput.addEventListener('focus',function(e){e.preventDefault();activeInput=queryInput;openVkb();});
-  googleQueryInput.addEventListener('focus',function(e){e.preventDefault();activeInput=googleQueryInput;openVkb();});
+  queryInput.addEventListener('focus',function(e){activeInput=queryInput;openVkb();});
+  googleQueryInput.addEventListener('focus',function(e){activeInput=googleQueryInput;openVkb();});
 
   // Prevent system keyboard on mobile/TV
-  queryInput.addEventListener('touchstart',function(e){e.preventDefault();activeInput=queryInput;openVkb();});
-  googleQueryInput.addEventListener('touchstart',function(e){e.preventDefault();activeInput=googleQueryInput;openVkb();});
+  queryInput.addEventListener('touchstart',function(e){activeInput=queryInput;openVkb();});
+  googleQueryInput.addEventListener('touchstart',function(e){activeInput=googleQueryInput;openVkb();});
 
   // Close keyboard when clicking outside search inputs and keyboard
   document.addEventListener('click',function(e){
