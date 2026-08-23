@@ -332,10 +332,16 @@
     <div class="vkb-handle" id="vkbHandle" title="Virtuellt tangentbord">
       <div class="vkb-handle-line"></div>
     </div>
-    <div class="vkb-panel">
+    <div class="vkb-panel" id="vkbPanel">
       <div class="vkb-head">
         <div class="vkb-title">Tangentbord</div>
-        <div class="vkb-close" id="vkbClose" title="Stäng">&#215;</div>
+        <div class="vkb-head-right">
+          <button class="vkb-mode-btn" id="vkbModeBtn" title="Växla ljust/mörkt läge">&#9788; LJUS</button>
+          <div class="vkb-close" id="vkbClose" title="Stäng">&#215;</div>
+        </div>
+      </div>
+      <div class="vkb-suggestions" id="vkbSuggestions">
+        <span class="vkb-suggestions-label">Förslag</span>
       </div>
       <div class="vkb-langs" id="vkbLangs">
         <button class="vkb-lang active" data-lang="en">EN</button>
