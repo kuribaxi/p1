@@ -1122,11 +1122,13 @@ function renderVkb(lang){
     } else {
       url = pendingSite.url;
     }
+    var siteName = pendingSite.name;
+    var openInNew = pendingSite.openInNewTab;
     closeSiteSearch();
-    if(pendingSite.openInNewTab){
+    if(openInNew){
       window.open(url, '_blank', 'noopener,noreferrer');
     } else {
-      loadInPlayer(url, pendingSite.name);
+      loadInPlayer(url, siteName);
     }
   }
   siteSearchGoBtn.addEventListener('click', doSiteSearch);
