@@ -44,6 +44,14 @@
   input:focus,select:focus{border-color:var(--gold);}input::placeholder{color:var(--cream-dim);}
   .search{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;}
   .search input{flex:1;min-width:220px;font-size:14.5px;padding:12px 14px;}
+  .google-search{margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;background:var(--panel);border:1px solid var(--panel-line);border-radius:var(--radius);padding:12px 16px;}
+  .google-search-label{font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--gold-bright);text-transform:uppercase;letter-spacing:0.06em;font-weight:700;white-space:nowrap;}
+  .google-search input{flex:1;min-width:200px;font-size:14px;padding:10px 12px;background:rgba(255,255,255,0.04);border:1px solid var(--panel-line);color:var(--cream);border-radius:8px;outline:none;transition:border-color .15s;font-family:'Manrope',sans-serif;}
+  .google-search input:focus{border-color:var(--gold);}
+  .google-search input::placeholder{color:var(--cream-dim);}
+  .google-btn{background:var(--blue);color:#fff;border:none;font-weight:700;font-size:13px;padding:10px 20px;border-radius:8px;cursor:pointer;transition:background .15s,transform .1s;font-family:'Manrope',sans-serif;}
+  .google-btn:hover{background:var(--blue-light);}
+  .google-btn:active{transform:scale(0.98);}
   .type-toggle{display:flex;border:1px solid var(--panel-line);border-radius:8px;overflow:hidden;}
   .type-toggle button{background:transparent;border:none;color:var(--cream-dim);font-size:12px;font-weight:600;padding:0 14px;cursor:pointer;font-family:'JetBrains Mono',monospace;letter-spacing:0.03em;}
   .type-toggle button.active{background:var(--gold);color:#1a1305;}
@@ -142,16 +150,33 @@
   .clock-date{font-family:'Manrope',sans-serif;font-size:10.5px;color:var(--cream-dim);margin-top:3px;text-transform:capitalize;line-height:1.2;}
   .clock-dot{width:6px;height:6px;border-radius:50%;background:var(--teal);display:inline-block;margin-right:6px;box-shadow:0 0 6px var(--teal);animation:blink 1.5s infinite;}
   @keyframes blink{0%,100%{opacity:1}50%{opacity:0.35}}
-  @media(max-width:600px){.clock-badge{top:auto;bottom:14px;right:12px;left:auto;padding:7px 10px;min-width:102px;}.clock-time{font-size:13.5px}.clock-date{font-size:9.5px}}
+  @media(max-width:600px){.clock-badge{top:14px;left:12px;right:auto;bottom:auto;padding:7px 10px;min-width:102px;}.clock-time{font-size:13.5px}.clock-date{font-size:9.5px}}
   footer{max-width:1200px;margin:32px auto 0;padding:0 20px;text-align:center;font-size:11px;color:var(--cream-dim);opacity:0.6;}
 
   /* === VIRTUAL KEYBOARD === */
-  .vkb-wrap{position:fixed;top:50%;right:0;transform:translateY(-50%) translateX(calc(100% - 5px));z-index:9995;transition:transform .35s cubic-bezier(.4,0,.2,1);}
-  .vkb-wrap.open{transform:translateY(-50%) translateX(0);}
-  .vkb-handle{position:absolute;left:-18px;top:50%;transform:translateY(-50%);width:18px;height:90px;background:var(--panel);border:1px solid var(--panel-line);border-right:none;border-radius:8px 0 0 8px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:-4px 0 12px rgba(0,0,0,0.3);transition:background .2s;}
-  .vkb-handle:hover{background:rgba(201,162,39,0.15);}
-  .vkb-handle-line{width:3px;height:36px;border-radius:2px;background:var(--gold-bright);opacity:.7;}
-  .vkb-panel{width:330px;background:var(--panel);border:1px solid var(--panel-line);border-radius:var(--radius) 0 0 var(--radius);padding:12px 14px 14px;box-shadow:-12px 0 40px rgba(0,0,0,0.45);}
+  /* Desktop: fullscreen keyboard under the page */
+  .vkb-wrap{position:relative;width:100%;max-width:1200px;margin:22px auto 0;padding:0 20px;z-index:10;}
+  .vkb-wrap .vkb-handle{display:none;}
+  .vkb-panel{width:100%;background:var(--panel);border:1px solid var(--panel-line);border-radius:var(--radius);padding:18px 22px 22px;box-shadow:0 12px 40px rgba(0,0,0,0.35);}
+  .vkb-key{min-width:36px;height:48px;padding:0 8px;font-size:15px;}
+  .vkb-key.wide{min-width:64px;flex:1.6;font-size:13px;}
+  .vkb-key.space{flex:5;}
+  .vkb-row{gap:6px;}
+  .vkb-rows{gap:7px;}
+  /* Mobile: keep as sliding panel */
+  @media(max-width:900px){
+    .vkb-wrap{position:fixed;top:50%;right:0;transform:translateY(-50%) translateX(calc(100% - 5px));z-index:9995;transition:transform .35s cubic-bezier(.4,0,.2,1);max-width:none;margin:0;padding:0;}
+    .vkb-wrap.open{transform:translateY(-50%) translateX(0);}
+    .vkb-wrap .vkb-handle{position:absolute;left:-18px;top:50%;transform:translateY(-50%);width:18px;height:90px;background:var(--panel);border:1px solid var(--panel-line);border-right:none;border-radius:8px 0 0 8px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:-4px 0 12px rgba(0,0,0,0.3);transition:background .2s;}
+    .vkb-wrap .vkb-handle:hover{background:rgba(201,162,39,0.15);}
+    .vkb-handle-line{width:3px;height:36px;border-radius:2px;background:var(--gold-bright);opacity:.7;}
+    .vkb-panel{width:330px;background:var(--panel);border:1px solid var(--panel-line);border-radius:var(--radius) 0 0 var(--radius);padding:12px 14px 14px;box-shadow:-12px 0 40px rgba(0,0,0,0.45);}
+    .vkb-key{min-width:28px;height:36px;padding:0 6px;font-size:13px;}
+    .vkb-key.wide{min-width:48px;flex:1.4;font-size:11px;}
+    .vkb-key.space{flex:4;}
+    .vkb-row{gap:4px;}
+    .vkb-rows{gap:5px;}
+  }
   .vkb-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
   .vkb-title{font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--gold-bright);text-transform:uppercase;letter-spacing:0.06em;font-weight:700;}
   .vkb-close{width:26px;height:26px;border-radius:6px;background:rgba(255,255,255,0.04);border:1px solid var(--panel-line);color:var(--cream-dim);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;transition:all .15s;}
@@ -176,6 +201,10 @@
   @media(max-width:600px){
     .vkb-panel{width:280px;padding:10px;}
     .vkb-key{min-width:22px;height:32px;font-size:12px;padding:0 4px;}
+  }
+  @media(max-width:900px) and (min-width:601px){
+    .vkb-panel{width:310px;padding:12px;}
+    .vkb-key{min-width:26px;height:34px;font-size:12px;padding:0 5px;}
   }
 
   /* === MUSIC PLAYER === */
@@ -223,6 +252,7 @@
     .music-station-select{max-width:120px;}
   }
 </style>
+<base target="_blank">
 <base target="_blank">
 <base target="_blank">
 </head>
@@ -279,6 +309,13 @@
     </div>
     <input type="text" id="query" placeholder="t.ex. Dune, 693134, eller tt15239678" autocomplete="off">
     <button class="go-btn" id="goBtn">Sok</button>
+  </div>
+
+  <!-- Google Search -->
+  <div class="google-search">
+    <span class="google-search-label">&#128269; Google</span>
+    <input type="text" id="googleQuery" placeholder="Sok pa Google..." autocomplete="off">
+    <button class="google-btn" id="googleBtn">Sok pa Google</button>
   </div>
 
   <div class="status" id="status"></div>
@@ -599,6 +636,7 @@
     {name:'AniWatch',url:'https://aniwatch.co.at/',icon:'&#127912;',searchTpl:'https://aniwatch.co.at/search?keyword={q}',openInNewTab:true},
     {name:'GIA TV',url:'https://gia.tv/live.php',icon:'&#127988;',searchTpl:'https://gia.tv/live.php',openInNewTab:true},
     {name:'FreeClassicMovies',url:'https://freeclassicmovies.tv/',icon:'&#127909;',searchTpl:'https://freeclassicmovies.tv/?s={q}',openInNewTab:true},
+    {name:'Aparat Playlist',url:'https://www.aparat.com/playlist/9976833/%D8%A2%D8%B3%D9%85%D8%A7%D9%86_%D8%A2%D8%A8%DB%8C_%D8%B1%D9%88%D9%85%D8%A6%D9%88',icon:'&#127988;',searchTpl:'https://www.aparat.com/playlist/9976833/%D8%A2%D8%B3%D9%85%D8%A7%D9%86_%D8%A2%D8%A8%DB%8C_%D8%B1%D9%88%D9%85%D8%A6%D9%88',openInNewTab:true},
   ];
 
   var activeSource = localStorage.getItem('kuribaxi_active_source') || SOURCES[0].key;
@@ -980,6 +1018,18 @@
   }
   goBtn.addEventListener('click',searchTMDB);
   queryInput.addEventListener('keydown',function(e){if(e.key==='Enter')searchTMDB();});
+
+  // === GOOGLE SEARCH ===
+  var googleQuery = document.getElementById('googleQuery');
+  var googleBtn = document.getElementById('googleBtn');
+  function searchGoogle(){
+    var q = googleQuery.value.trim();
+    if(!q){showStatus('Skriv nagot att soka efter pa Google.','warn');return;}
+    var url = 'https://www.google.com/search?q=' + encodeURIComponent(q);
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }
+  googleBtn.addEventListener('click', searchGoogle);
+  googleQuery.addEventListener('keydown', function(e){if(e.key==='Enter')searchGoogle();});
 
   // === LADDA DETALJER ===
   async function loadDetail(id,type,prefillSeason,prefillEpisode){
