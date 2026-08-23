@@ -348,14 +348,14 @@
       <button data-type="movie" class="active">FILM</button>
       <button data-type="tv">SERIE</button>
     </div>
-    <input type="text" id="query" placeholder="t.ex. Dune, 693134, eller tt15239678" autocomplete="off">
+    <input type="text" id="query" placeholder="t.ex. Dune, 693134, eller tt15239678" autocomplete="off" inputmode="none" readonly>
     <button class="go-btn" id="goBtn">Sok</button>
   </div>
 
   <!-- Google Search -->
   <div class="google-search">
     <span class="google-search-label">&#128269; Google</span>
-    <input type="text" id="googleQuery" placeholder="Sok pa Google..." autocomplete="off">
+    <input type="text" id="googleQuery" placeholder="Sok pa Google..." autocomplete="off" inputmode="none" readonly>
     <button class="google-btn" id="googleBtn">Sok pa Google</button>
   </div>
 
@@ -812,8 +812,10 @@
 
   function vkbPress(key){
     hideSuggestions();
-    var start = activeInput.selectionStart;
-    var end = activeInput.selectionEnd;
+    // Remove readonly temporarily to allow value changes
+    activeInput.removeAttribute('readonly');
+    var start = activeInput.selectionStart || activeInput.value.length;
+    var end = activeInput.selectionEnd || activeInput.value.length;
     var val = activeInput.value;
     if(key==='SPACE'){
       activeInput.value = val.slice(0,start)+' '+val.slice(end);
@@ -827,12 +829,15 @@
         activeInput.selectionStart = activeInput.selectionEnd = start;
       }
     }else if(key==='ENTER'){
+      activeInput.setAttribute('readonly','readonly');
       if(activeInput === queryInput) searchTMDB();
       else if(activeInput === googleQueryInput) searchGoogle();
+      return;
     }else{
       activeInput.value = val.slice(0,start)+key+val.slice(end);
       activeInput.selectionStart = activeInput.selectionEnd = start+key.length;
     }
+    activeInput.setAttribute('readonly','readonly');
     activeInput.focus();
   }
 
@@ -847,9 +852,17 @@
     renderVkb(btn.dataset.lang);
   });
 
-  // Show keyboard when any search input is focused
-  queryInput.addEventListener('focus',function(){activeInput=queryInput;openVkb();});
-  googleQueryInput.addEventListener('focus',function(){activeInput=googleQueryInput;openVkb();});
+  // Show keyboard when clicking on search inputs (readonly prevents system keyboard)
+  queryInput.addEventListener('click',function(e){e.preventDefault();activeInput=queryInput;openVkb();});
+  googleQueryInput.addEventListener('click',function(e){e.preventDefault();activeInput=googleQueryInput;openVkb();});
+
+  // Also handle focus for TV remote navigation
+  queryInput.addEventListener('focus',function(e){e.preventDefault();activeInput=queryInput;openVkb();});
+  googleQueryInput.addEventListener('focus',function(e){e.preventDefault();activeInput=googleQueryInput;openVkb();});
+
+  // Prevent system keyboard on mobile/TV
+  queryInput.addEventListener('touchstart',function(e){e.preventDefault();activeInput=queryInput;openVkb();});
+  googleQueryInput.addEventListener('touchstart',function(e){e.preventDefault();activeInput=googleQueryInput;openVkb();});
 
   // Close keyboard when clicking outside search inputs and keyboard
   document.addEventListener('click',function(e){
