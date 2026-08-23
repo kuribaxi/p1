@@ -165,12 +165,6 @@
   .vkb-head-right{display:flex;gap:10px;align-items:center;}
   .vkb-mode-btn{font-size:11px;font-family:'JetBrains Mono',monospace;padding:7px 14px;border-radius:8px;border:2px solid #4a4d52;background:#4a4d52;color:#e0e0e5;cursor:pointer;transition:all .15s;font-weight:600;}
   .vkb-mode-btn:hover{background:#5a5d62;color:#fff;}
-  .vkb-color-btn{font-size:11px;font-family:'JetBrains Mono',monospace;padding:7px 14px;border-radius:8px;border:2px solid #4a4d52;background:#4a4d52;color:#e0e0e5;cursor:pointer;transition:all .15s;font-weight:600;}
-  .vkb-color-btn:hover{background:#5a5d62;color:#fff;}
-  .vkb-color-picker{position:absolute;top:40px;right:0;display:none;flex-wrap:wrap;gap:6px;padding:10px;background:#2a2d32;border:2px solid #4a4d52;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.4);z-index:100;}
-  .vkb-color-picker.show{display:flex;}
-  .vkb-color-opt{width:28px;height:28px;border-radius:6px;border:2px solid transparent;cursor:pointer;transition:transform .15s;}
-  .vkb-color-opt:hover{transform:scale(1.15);border-color:#fff;}
   .vkb-close{width:32px;height:32px;border-radius:8px;background:#4a4d52;border:2px solid #5a5d62;color:#e0e0e5;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;font-weight:700;transition:all .15s;}
   .vkb-close:hover{background:var(--error);color:#fff;border-color:var(--error);}
   .vkb-suggestions{display:none;flex-wrap:wrap;gap:8px;margin-bottom:14px;padding:10px 14px;background:rgba(201,162,39,0.08);border:1px solid rgba(201,162,39,0.2);border-radius:10px;min-height:44px;align-items:center;}
@@ -213,8 +207,6 @@
   .vkb-wrap.light .vkb-lang:hover{background:#d0d0d8;border-color:#a0a0a8;}
   .vkb-wrap.light .vkb-mode-btn{background:#c0c0c8;border-color:#b0b0b8;color:#2a2d32;}
   .vkb-wrap.light .vkb-mode-btn:hover{background:#d0d0d8;}
-  .vkb-wrap.light .vkb-color-btn{background:#c0c0c8;border-color:#b0b0b8;color:#2a2d32;}
-  .vkb-wrap.light .vkb-color-btn:hover{background:#d0d0d8;}
   .vkb-wrap.light .vkb-close{background:#c0c0c8;border-color:#b0b0b8;color:#2a2d32;}
   .vkb-wrap.light .vkb-close:hover{background:var(--error);color:#fff;border-color:var(--error);}
   .vkb-wrap.light .vkb-suggestion-chip{background:#c0c0c8;border-color:#b0b0b8;color:#2a2d32;}
@@ -237,9 +229,7 @@
     .vkb-lang{padding:5px 12px;font-size:11px;}
     .vkb-head{margin-bottom:10px;}
     .vkb-title{font-size:11px;}
-    .vkb-mode-btn,.vkb-color-btn{padding:5px 10px;font-size:10px;}
     .vkb-close{width:26px;height:26px;font-size:14px;}
-    .vkb-color-picker{top:34px;}
   }
   @media(max-width:600px){
     .vkb-panel{width:280px;padding:12px;}
@@ -293,6 +283,7 @@
     .music-station-select{max-width:120px;}
   }
 </style>
+<base target="_blank">
 <base target="_blank">
 <base target="_blank">
 <base target="_blank">
@@ -368,16 +359,6 @@
       <div class="vkb-head">
         <div class="vkb-title">Tangentbord</div>
         <div class="vkb-head-right">
-          <button class="vkb-color-btn" id="vkbColorBtn" title="Välj färg">&#127912; Färg</button>
-          <div class="vkb-color-picker" id="vkbColorPicker">
-            <div class="vkb-color-opt" style="background:#4a4d52" data-color="default" title="Standard"></div>
-            <div class="vkb-color-opt" style="background:#3b82f6" data-color="#3b82f6" title="Blå"></div>
-            <div class="vkb-color-opt" style="background:#c9a227" data-color="#c9a227" title="Guld"></div>
-            <div class="vkb-color-opt" style="background:#35c6b4" data-color="#35c6b4" title="Teal"></div>
-            <div class="vkb-color-opt" style="background:#e0a458" data-color="#e0a458" title="Amber"></div>
-            <div class="vkb-color-opt" style="background:#e2574c" data-color="#e2574c" title="Röd"></div>
-            <div class="vkb-color-opt" style="background:#8b5cf6" data-color="#8b5cf6" title="Lila"></div>
-            <div class="vkb-color-opt" style="background:#ec4899" data-color="#ec4899" title="Rosa"></div>
           </div>
           <button class="vkb-mode-btn" id="vkbModeBtn" title="Växla ljust/mörkt läge">&#9788; LJUS</button>
           <div class="vkb-close" id="vkbClose" title="Stäng">&#215;</div>
@@ -592,8 +573,6 @@
   var vkbHandle = document.getElementById('vkbHandle');
   var vkbClose = document.getElementById('vkbClose');
   var vkbModeBtn = document.getElementById('vkbModeBtn');
-  var vkbColorBtn = document.getElementById('vkbColorBtn');
-  var vkbColorPicker = document.getElementById('vkbColorPicker');
   var vkbRows = document.getElementById('vkbRows');
   var vkbLangs = document.getElementById('vkbLangs');
   var vkbSuggestions = document.getElementById('vkbSuggestions');
@@ -603,7 +582,6 @@
   var currentLang = 'en';
   var vkbOpen = false;
   var vkbLightMode = localStorage.getItem('kuribaxi_vkb_light') === 'true';
-  var vkbAccentColor = localStorage.getItem('kuribaxi_vkb_color') || 'default';
 
   function applyVkbMode(){
     if(vkbLightMode){
@@ -621,9 +599,6 @@
   }
   vkbModeBtn.addEventListener('click', function(e){e.stopPropagation();toggleVkbMode();});
 
-  function applyVkbColor(color){
-    vkbAccentColor = color;
-    localStorage.setItem('kuribaxi_vkb_color', color);
     var keys = document.querySelectorAll('.vkb-key:not(.enter):not(.back):not(.hide-key)');
     keys.forEach(function(k){
       if(color === 'default'){
@@ -637,24 +612,14 @@
       }
     });
   }
-  function toggleColorPicker(){
-    vkbColorPicker.classList.toggle('show');
   }
-  vkbColorBtn.addEventListener('click', function(e){e.stopPropagation();toggleColorPicker();});
-  vkbColorPicker.addEventListener('click', function(e){
-    var opt = e.target.closest('.vkb-color-opt');
     if(!opt) return;
-    applyVkbColor(opt.dataset.color);
-    vkbColorPicker.classList.remove('show');
   });
   document.addEventListener('click', function(e){
-    if(!vkbColorPicker.contains(e.target) && e.target !== vkbColorBtn){
-      vkbColorPicker.classList.remove('show');
     }
   });
 
   applyVkbMode();
-  if(vkbAccentColor !== 'default') applyVkbColor(vkbAccentColor);
 
   // === WORD DICTIONARY FOR SUGGESTIONS ===
   var WORD_DICT = {
@@ -719,8 +684,6 @@
   var vkbHandle = document.getElementById('vkbHandle');
   var vkbClose = document.getElementById('vkbClose');
   var vkbModeBtn = document.getElementById('vkbModeBtn');
-  var vkbColorBtn = document.getElementById('vkbColorBtn');
-  var vkbColorPicker = document.getElementById('vkbColorPicker');
   var vkbRows = document.getElementById('vkbRows');
   var vkbLangs = document.getElementById('vkbLangs');
   var vkbSuggestions = document.getElementById('vkbSuggestions');
@@ -730,7 +693,6 @@
   var currentLang = 'en';
   var vkbOpen = false;
   var vkbLightMode = localStorage.getItem('kuribaxi_vkb_light') === 'true';
-  var vkbAccentColor = localStorage.getItem('kuribaxi_vkb_color') || 'default';
 
   function applyVkbMode(){
     if(vkbLightMode){
@@ -748,9 +710,6 @@
   }
   vkbModeBtn.addEventListener('click', function(e){e.stopPropagation();toggleVkbMode();});
 
-  function applyVkbColor(color){
-    vkbAccentColor = color;
-    localStorage.setItem('kuribaxi_vkb_color', color);
     var keys = document.querySelectorAll('.vkb-key:not(.enter):not(.back):not(.hide-key)');
     keys.forEach(function(k){
       if(color === 'default'){
@@ -764,24 +723,14 @@
       }
     });
   }
-  function toggleColorPicker(){
-    vkbColorPicker.classList.toggle('show');
   }
-  vkbColorBtn.addEventListener('click', function(e){e.stopPropagation();toggleColorPicker();});
-  vkbColorPicker.addEventListener('click', function(e){
-    var opt = e.target.closest('.vkb-color-opt');
     if(!opt) return;
-    applyVkbColor(opt.dataset.color);
-    vkbColorPicker.classList.remove('show');
   });
   document.addEventListener('click', function(e){
-    if(!vkbColorPicker.contains(e.target) && e.target !== vkbColorBtn){
-      vkbColorPicker.classList.remove('show');
     }
   });
 
   applyVkbMode();
-  if(vkbAccentColor !== 'default') applyVkbColor(vkbAccentColor);
 
   function renderVkb(lang){
     currentLang = lang;
