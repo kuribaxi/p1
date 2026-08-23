@@ -162,14 +162,15 @@
   .vkb-suggestions{display:none;flex-wrap:wrap;gap:8px;margin-bottom:14px;padding:10px 12px;background:rgba(201,162,39,0.08);border:1px solid rgba(201,162,39,0.2);border-radius:10px;min-height:44px;align-items:center;}
   .vkb-suggestions.show{display:flex;}
   .vkb-suggestions-label{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--gold-bright);text-transform:uppercase;letter-spacing:0.06em;font-weight:700;margin-right:6px;white-space:nowrap;}
-  .vkb-suggestion-chip{font-size:14px;font-weight:600;padding:6px 14px;border-radius:20px;border:1px solid var(--panel-line);background:rgba(255,255,255,0.05);color:var(--cream);cursor:pointer;transition:all .15s;white-space:nowrap;}
+  .vkb-suggestion-chip{font-size:18px;font-weight:700;padding:10px 20px;border-radius:24px;border:1px solid var(--panel-line);background:rgba(255,255,255,0.05);color:var(--cream);cursor:pointer;transition:all .15s;white-space:nowrap;}
   .vkb-suggestion-chip:hover{background:var(--gold);color:#1a1305;border-color:var(--gold);transform:translateY(-1px);}
   .vkb-suggestion-chip:active{transform:scale(0.96);}
-  .vkb-key{min-width:52px;height:58px;padding:0 10px;font-size:18px;font-weight:700;}
-  .vkb-key.wide{min-width:80px;flex:1.6;font-size:14px;font-weight:700;}
+  .vkb-key{min-width:72px;height:78px;padding:0 14px;font-size:26px;font-weight:800;letter-spacing:0.02em;text-shadow:0 1px 2px rgba(0,0,0,0.4);}
+  .vkb-key.wide{min-width:110px;flex:1.6;font-size:18px;font-weight:700;}
   .vkb-key.space{flex:5;}
-  .vkb-row{gap:8px;}
-  .vkb-rows{gap:9px;}
+  .vkb-row{gap:10px;}
+  .vkb-rows{gap:12px;}
+  .vkb-panel{padding:24px 28px 28px;}
   /* Mobile: keep as sliding panel */
   @media(max-width:900px){
     .vkb-wrap{display:block;position:fixed;top:50%;right:0;transform:translateY(-50%) translateX(calc(100% - 5px));z-index:9995;transition:transform .35s cubic-bezier(.4,0,.2,1);max-width:none;margin:0;padding:0;}
@@ -239,7 +240,8 @@
   .music-bar:nth-child(7){height:7px;animation-delay:.1s;}
   @keyframes music-bounce{0%,100%{transform:scaleY(1);}50%{transform:scaleY(0.4);}}
   .music-player.paused .music-bar{animation-play-state:paused;opacity:0.3;}
-  .music-station-select{background:rgba(255,255,255,0.04);border:1px solid var(--panel-line);color:var(--cream);border-radius:8px;padding:5px 10px;font-size:11px;font-family:'JetBrains Mono',monospace;cursor:pointer;outline:none;max-width:160px;}
+  .music-station-select{background:#0b1220;border:1px solid var(--panel-line);color:var(--cream);border-radius:8px;padding:5px 10px;font-size:11px;font-family:'JetBrains Mono',monospace;cursor:pointer;outline:none;max-width:160px;}
+  .music-station-select option{background:#0b1220;color:var(--cream);font-family:'JetBrains Mono',monospace;font-size:11px;padding:6px 10px;}
   .music-station-select:focus{border-color:var(--gold);}
   .music-player-right{display:flex;align-items:center;gap:10px;flex-shrink:0;}
   .music-mute-btn{background:transparent;border:1px solid var(--panel-line);color:var(--cream-dim);border-radius:8px;padding:5px 10px;font-size:11px;cursor:pointer;font-family:'JetBrains Mono',monospace;transition:all .15s;}
@@ -587,6 +589,7 @@
       chip.textContent = word;
       chip.addEventListener('click', function(e){
         e.stopPropagation();
+        // Only write when user CLICKS a suggestion chip
         var before = val.lastIndexOf(' ') >= 0 ? val.slice(0, val.lastIndexOf(' ')+1) : '';
         activeInput.value = before + word + ' ';
         activeInput.focus();
