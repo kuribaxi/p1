@@ -160,7 +160,7 @@
   /* === VIRTUAL KEYBOARD === */
   /* Desktop: keyboard appears under search fields */
     /* === VIRTUAL KEYBOARD === */
-  .vkb-wrap{display:none;position:relative;width:100%;max-width:1200px;margin:10px auto 0;padding:0 20px;z-index:10;}
+  .vkb-wrap{display:none;position:relative;width:100%;max-width:1200px;margin:10px auto 0;padding:0 20px;z-index:99991;}
   .vkb-wrap.open{display:block;}
   .vkb-wrap .vkb-handle{display:none;}
   .vkb-panel{width:100%;background:#3a3d42;border:2px solid #4a4d52;border-radius:16px;padding:18px 21px 21px;box-shadow:0 20px 60px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.06);}
@@ -216,7 +216,7 @@
   .vkb-wrap.light .vkb-suggestion-chip{background:#c0c0c8;border-color:#b0b0b8;color:#2a2d32;}
   /* Mobile: sliding panel */
   @media(max-width:900px){
-    .vkb-wrap{display:block;position:fixed;top:50%;right:0;transform:translateY(-50%) translateX(calc(100% - 5px));z-index:9995;transition:transform .35s cubic-bezier(.4,0,.2,1);max-width:none;margin:0;padding:0;}
+    .vkb-wrap{display:block;position:fixed;top:50%;right:0;transform:translateY(-50%) translateX(calc(100% - 5px));z-index:99991;transition:transform .35s cubic-bezier(.4,0,.2,1);max-width:none;margin:0;padding:0;}
     .vkb-wrap.open{transform:translateY(-50%) translateX(0);display:block;}
     .vkb-wrap .vkb-handle{position:absolute;left:-14px;top:50%;transform:translateY(-50%);width:14px;height:68px;background:#3a3d42;border:2px solid #4a4d52;border-right:none;border-radius:8px 0 0 8px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:-4px 0 12px rgba(0,0,0,0.3);transition:background .2s;}
     .vkb-wrap .vkb-handle:hover{background:#4a4d52;}
