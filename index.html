@@ -154,8 +154,9 @@
   footer{max-width:1200px;margin:32px auto 0;padding:0 20px;text-align:center;font-size:11px;color:var(--cream-dim);opacity:0.6;}
 
   /* === VIRTUAL KEYBOARD === */
-  /* Desktop: fullscreen keyboard under the page */
-  .vkb-wrap{position:relative;width:100%;max-width:1200px;margin:22px auto 0;padding:0 20px;z-index:10;}
+  /* Desktop: keyboard appears under search fields */
+  .vkb-wrap{display:none;position:relative;width:100%;max-width:1200px;margin:10px auto 0;padding:0 20px;z-index:10;}
+  .vkb-wrap.open{display:block;}
   .vkb-wrap .vkb-handle{display:none;}
   .vkb-panel{width:100%;background:var(--panel);border:1px solid var(--panel-line);border-radius:var(--radius);padding:18px 22px 22px;box-shadow:0 12px 40px rgba(0,0,0,0.35);}
   .vkb-key{min-width:36px;height:48px;padding:0 8px;font-size:15px;}
@@ -165,8 +166,8 @@
   .vkb-rows{gap:7px;}
   /* Mobile: keep as sliding panel */
   @media(max-width:900px){
-    .vkb-wrap{position:fixed;top:50%;right:0;transform:translateY(-50%) translateX(calc(100% - 5px));z-index:9995;transition:transform .35s cubic-bezier(.4,0,.2,1);max-width:none;margin:0;padding:0;}
-    .vkb-wrap.open{transform:translateY(-50%) translateX(0);}
+    .vkb-wrap{display:block;position:fixed;top:50%;right:0;transform:translateY(-50%) translateX(calc(100% - 5px));z-index:9995;transition:transform .35s cubic-bezier(.4,0,.2,1);max-width:none;margin:0;padding:0;}
+    .vkb-wrap.open{transform:translateY(-50%) translateX(0);display:block;}
     .vkb-wrap .vkb-handle{position:absolute;left:-18px;top:50%;transform:translateY(-50%);width:18px;height:90px;background:var(--panel);border:1px solid var(--panel-line);border-right:none;border-radius:8px 0 0 8px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:-4px 0 12px rgba(0,0,0,0.3);transition:background .2s;}
     .vkb-wrap .vkb-handle:hover{background:rgba(201,162,39,0.15);}
     .vkb-handle-line{width:3px;height:36px;border-radius:2px;background:var(--gold-bright);opacity:.7;}
@@ -318,6 +319,26 @@
     <button class="google-btn" id="googleBtn">Sok pa Google</button>
   </div>
 
+  <!-- VIRTUAL KEYBOARD -->
+  <div class="vkb-wrap" id="vkbWrap">
+    <div class="vkb-handle" id="vkbHandle" title="Virtuellt tangentbord">
+      <div class="vkb-handle-line"></div>
+    </div>
+    <div class="vkb-panel">
+      <div class="vkb-head">
+        <div class="vkb-title">Tangentbord</div>
+        <div class="vkb-close" id="vkbClose" title="Stäng">&#215;</div>
+      </div>
+      <div class="vkb-langs" id="vkbLangs">
+        <button class="vkb-lang active" data-lang="en">EN</button>
+        <button class="vkb-lang" data-lang="fa">FA</button>
+        <button class="vkb-lang" data-lang="ckb">CKB</button>
+        <button class="vkb-lang" data-lang="ar">AR</button>
+      </div>
+      <div class="vkb-rows" id="vkbRows"></div>
+    </div>
+  </div>
+
   <div class="status" id="status"></div>
   <div class="results-list" id="resultsList"></div>
 
@@ -384,25 +405,7 @@
 
 <footer>Drivs av TMDB API. Spelare via vidsrc mirrors &amp; VidAPI. Lista sparas lokalt.</footer>
 
-<!-- VIRTUAL KEYBOARD -->
-<div class="vkb-wrap" id="vkbWrap">
-  <div class="vkb-handle" id="vkbHandle" title="Virtuellt tangentbord">
-    <div class="vkb-handle-line"></div>
-  </div>
-  <div class="vkb-panel">
-    <div class="vkb-head">
-      <div class="vkb-title">Tangentbord</div>
-      <div class="vkb-close" id="vkbClose" title="Stäng">&#215;</div>
-    </div>
-    <div class="vkb-langs" id="vkbLangs">
-      <button class="vkb-lang active" data-lang="en">EN</button>
-      <button class="vkb-lang" data-lang="fa">FA</button>
-      <button class="vkb-lang" data-lang="ckb">CKB</button>
-      <button class="vkb-lang" data-lang="ar">AR</button>
-    </div>
-    <div class="vkb-rows" id="vkbRows"></div>
-  </div>
-</div>
+
 
 <!-- MUSIC PLAYER -->
 <div class="music-player paused" id="musicPlayer">
@@ -533,6 +536,8 @@
   var vkbRows = document.getElementById('vkbRows');
   var vkbLangs = document.getElementById('vkbLangs');
   var queryInput = document.getElementById('query');
+  var googleQueryInput = document.getElementById('googleQuery');
+  var activeInput = queryInput;
   var currentLang = 'en';
   var vkbOpen = false;
 
@@ -559,27 +564,28 @@
   }
 
   function vkbPress(key){
-    var start = queryInput.selectionStart;
-    var end = queryInput.selectionEnd;
-    var val = queryInput.value;
+    var start = activeInput.selectionStart;
+    var end = activeInput.selectionEnd;
+    var val = activeInput.value;
     if(key==='SPACE'){
-      queryInput.value = val.slice(0,start)+' '+val.slice(end);
-      queryInput.selectionStart = queryInput.selectionEnd = start+1;
+      activeInput.value = val.slice(0,start)+' '+val.slice(end);
+      activeInput.selectionStart = activeInput.selectionEnd = start+1;
     }else if(key==='BACK'){
       if(start===end && start>0){
-        queryInput.value = val.slice(0,start-1)+val.slice(end);
-        queryInput.selectionStart = queryInput.selectionEnd = start-1;
+        activeInput.value = val.slice(0,start-1)+val.slice(end);
+        activeInput.selectionStart = activeInput.selectionEnd = start-1;
       }else if(start!==end){
-        queryInput.value = val.slice(0,start)+val.slice(end);
-        queryInput.selectionStart = queryInput.selectionEnd = start;
+        activeInput.value = val.slice(0,start)+val.slice(end);
+        activeInput.selectionStart = activeInput.selectionEnd = start;
       }
     }else if(key==='ENTER'){
-      searchTMDB();
+      if(activeInput === queryInput) searchTMDB();
+      else if(activeInput === googleQueryInput) searchGoogle();
     }else{
-      queryInput.value = val.slice(0,start)+key+val.slice(end);
-      queryInput.selectionStart = queryInput.selectionEnd = start+key.length;
+      activeInput.value = val.slice(0,start)+key+val.slice(end);
+      activeInput.selectionStart = activeInput.selectionEnd = start+key.length;
     }
-    queryInput.focus();
+    activeInput.focus();
   }
 
   function openVkb(){vkbOpen=true;vkbWrap.classList.add('open');}
@@ -592,9 +598,15 @@
     var btn=e.target.closest('.vkb-lang');if(!btn)return;
     renderVkb(btn.dataset.lang);
   });
-  queryInput.addEventListener('focus',function(){openVkb();});
+
+  // Show keyboard when any search input is focused
+  queryInput.addEventListener('focus',function(){activeInput=queryInput;openVkb();});
+  googleQueryInput.addEventListener('focus',function(){activeInput=googleQueryInput;openVkb();});
+
+  // Close keyboard when clicking outside search inputs and keyboard
   document.addEventListener('click',function(e){
-    if(!vkbWrap.contains(e.target) && e.target!==queryInput){closeVkb();}
+    var isSearchInput = e.target===queryInput || e.target===googleQueryInput;
+    if(!vkbWrap.contains(e.target) && !isSearchInput){closeVkb();}
   });
   renderVkb('en');
 
