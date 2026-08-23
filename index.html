@@ -1155,7 +1155,8 @@ function renderVkb(lang){
       '</div>';
     }).join('');
     list.querySelectorAll('.site-item').forEach(function(item,index){
-      item.addEventListener('click',function(){
+      item.addEventListener('click',function(e){
+        e.stopPropagation();
         var site=sorted[index];
         openSiteSearch(site);
       });
