@@ -328,7 +328,7 @@
     <input type="text" id="query" placeholder="t.ex. Dune, 693134, eller tt15239678" autocomplete="off">
     <button class="go-btn" id="goBtn">Sök</button>
   </div>
-
+  
   <!-- KEYBOARD MODE TOGGLE -->
   <div style="margin-top:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
     <span style="font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--gold-bright);text-transform:uppercase;letter-spacing:0.06em;font-weight:700;">Tangentbord:</span>
@@ -717,12 +717,10 @@ function renderVkb(lang){
 
   function applyKeyboardMode(){
     var isTv = keyboardMode === 'tv';
-    // Update toggle UI
     keyboardModeToggle.querySelectorAll('button').forEach(function(b){b.classList.toggle('active',b.dataset.kbmode===keyboardMode);});
     kbModeHint.textContent = isTv ? 'Virtuellt tangentbord aktivt – klicka i ett fält för att skriva' : 'Vanligt tangentbord aktivt – skriv direkt i fälten';
-
-    // Set input attributes based on mode
-    var inputs = [queryInput, googleQueryInput, siteSearchInput];
+    var inputs = [queryInput, googleQueryInput];
+    if(typeof siteSearchInput !== 'undefined'){inputs.push(siteSearchInput);}
     inputs.forEach(function(inp){
       if(isTv){
         inp.setAttribute('readonly','readonly');
@@ -732,11 +730,7 @@ function renderVkb(lang){
         inp.removeAttribute('inputmode');
       }
     });
-
-    // If switching to computer mode, close virtual keyboard
-    if(!isTv){
-      closeVkb();
-    }
+    if(!isTv){closeVkb();}
   }
 
   keyboardModeToggle.addEventListener('click',function(e){
@@ -747,20 +741,19 @@ function renderVkb(lang){
     applyKeyboardMode();
   });
 
-  function onInputFocus(input, e){
+  function onInputFocus(input){
     if(keyboardMode !== 'tv') return;
     activeInput = input;
     openVkb();
   }
 
-  queryInput.addEventListener('click',function(e){onInputFocus(queryInput, e);});
-  googleQueryInput.addEventListener('click',function(e){onInputFocus(googleQueryInput, e);});
-  queryInput.addEventListener('focus',function(e){onInputFocus(queryInput, e);});
-  googleQueryInput.addEventListener('focus',function(e){onInputFocus(googleQueryInput, e);});
-  queryInput.addEventListener('touchstart',function(e){onInputFocus(queryInput, e);});
-  googleQueryInput.addEventListener('touchstart',function(e){onInputFocus(googleQueryInput, e);});
-  siteSearchInput.addEventListener('click',function(e){onInputFocus(siteSearchInput, e);});
-  siteSearchInput.addEventListener('focus',function(e){onInputFocus(siteSearchInput, e);});
+  queryInput.addEventListener('click',function(e){onInputFocus(queryInput);});
+  googleQueryInput.addEventListener('click',function(e){onInputFocus(googleQueryInput);});
+  queryInput.addEventListener('focus',function(e){onInputFocus(queryInput);});
+  googleQueryInput.addEventListener('focus',function(e){onInputFocus(googleQueryInput);});
+  queryInput.addEventListener('touchstart',function(e){onInputFocus(queryInput);});
+  googleQueryInput.addEventListener('touchstart',function(e){onInputFocus(googleQueryInput);});
+
 
   document.addEventListener('click',function(e){
     if(keyboardMode !== 'tv') return;
@@ -842,15 +835,14 @@ function renderVkb(lang){
     document.getElementById('clockTime').textContent=timeStr;
     document.getElementById('clockDate').textContent=dateStr;
   }
-  // Sync to nearest second for smooth updates
   function startClock(){
     updateClock();
-    var now = new Date();
-    var msToNext = 1000 - now.getMilliseconds();
+    var now=new Date();
+    var msToNext=1000-now.getMilliseconds();
     setTimeout(function(){
       updateClock();
-      setInterval(updateClock, 1000);
-    }, msToNext);
+      setInterval(updateClock,1000);
+    },msToNext);
   }
   startClock();
 
@@ -1064,6 +1056,12 @@ function renderVkb(lang){
   var siteSearchOverlay = document.getElementById('siteSearchOverlay');
   var siteSearchInput = document.getElementById('siteSearchInput');
   var siteSearchGoBtn = document.getElementById('siteSearchGoBtn');
+
+  // Register siteSearchInput virtual keyboard listeners
+  siteSearchInput.addEventListener('click',function(e){onInputFocus(siteSearchInput);});
+  siteSearchInput.addEventListener('focus',function(e){onInputFocus(siteSearchInput);});
+  // Re-apply keyboard mode now that siteSearchInput exists
+  applyKeyboardMode();
   var siteSearchCancelBtn = document.getElementById('siteSearchCancelBtn');
   var siteSearchTitle = document.getElementById('siteSearchTitle');
   var siteSearchDesc = document.getElementById('siteSearchDesc');
