@@ -24,7 +24,7 @@
   .field label{font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:var(--gold-bright);font-weight:600;}
   input[type=text],input[type=password],select,input[type=number]{background:rgba(255,255,255,0.04);border:1px solid var(--panel-line);color:var(--cream);border-radius:8px;padding:10px 12px;font-size:13.5px;font-family:'Manrope',sans-serif;outline:none;transition:border-color .15s;}
   input:focus,select:focus{border-color:var(--gold);}input::placeholder{color:var(--cream-dim);}
-  .search{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;}
+  .search{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
   .search input{flex:1;min-width:220px;font-size:14.5px;padding:12px 14px;}
   .google-search{margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;background:var(--panel);border:1px solid var(--panel-line);border-radius:var(--radius);padding:12px 16px;}
   .google-search-label{font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--gold-bright);text-transform:uppercase;letter-spacing:0.06em;font-weight:700;white-space:nowrap;}
@@ -33,9 +33,9 @@
   .google-btn{background:var(--blue);color:#fff;border:none;font-weight:700;font-size:13px;padding:10px 20px;border-radius:8px;cursor:pointer;transition:background .15s,transform .1s;font-family:'Manrope',sans-serif;}
   .google-btn:hover{background:var(--blue-light);}
   .type-toggle{display:flex;border:1px solid var(--panel-line);border-radius:8px;overflow:hidden;}
-  .type-toggle button{background:transparent;border:none;color:var(--cream-dim);font-size:12px;font-weight:600;padding:0 14px;cursor:pointer;font-family:'JetBrains Mono',monospace;letter-spacing:0.03em;}
+  .type-toggle button{background:transparent;border:none;color:var(--cream-dim);font-size:12px;font-weight:600;padding:0 14px;cursor:pointer;font-family:'JetBrains Mono',monospace;letter-spacing:0.03em;height:36px;}
   .type-toggle button.active{background:var(--gold);color:#1a1305;}
-  .go-btn{background:var(--gold);color:#1a1305;border:none;font-weight:700;font-size:13.5px;padding:0 22px;border-radius:8px;cursor:pointer;transition:background .15s,transform .1s;}
+  .go-btn{background:var(--gold);color:#1a1305;border:none;font-weight:700;font-size:13.5px;padding:0 22px;border-radius:8px;cursor:pointer;transition:background .15s,transform .1s;height:44px;}
   .go-btn:hover{background:var(--gold-bright);}.go-btn:active{transform:scale(0.98);}.go-btn:disabled{opacity:0.5;cursor:default;}
   .status{margin-top:12px;font-size:13px;padding:10px 14px;border-radius:8px;display:none;}
   .status.show{display:block;}
@@ -116,89 +116,40 @@
   @keyframes blink{0%,100%{opacity:1}50%{opacity:0.35}}
   @media(max-width:600px){.clock-badge{top:14px;left:12px;right:auto;bottom:auto;padding:7px 10px;min-width:102px;}.clock-time{font-size:13.5px}.clock-date{font-size:9.5px}}
   footer{max-width:1200px;margin:32px auto 0;padding:0 20px;text-align:center;font-size:11px;color:var(--cream-dim);opacity:0.6;}
-  /* VIRTUAL KEYBOARD */
-  .vkb-wrap{display:none;position:relative;width:100%;max-width:1200px;margin:10px auto 0;padding:0 20px;z-index:99991;}
-  .vkb-wrap.open{display:block;}
-  .vkb-wrap .vkb-handle{display:none;}
-  .vkb-panel{width:100%;background:#3a3d42;border:2px solid #4a4d52;border-radius:16px;padding:18px 21px 21px;box-shadow:0 20px 60px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.06);}
-  .vkb-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
-  .vkb-title{font-size:13px;font-family:'JetBrains Mono',monospace;color:var(--gold-bright);text-transform:uppercase;letter-spacing:0.08em;font-weight:700;}
-  .vkb-head-right{display:flex;gap:10px;align-items:center;}
-  .vkb-mode-btn{font-size:11px;font-family:'JetBrains Mono',monospace;padding:5px 10px;border-radius:8px;border:2px solid #4a4d52;background:#4a4d52;color:#e0e0e5;cursor:pointer;transition:all .15s;font-weight:600;}
-  .vkb-mode-btn:hover{background:#5a5d62;color:#fff;}
-  .vkb-close{width:24px;height:24px;border-radius:8px;background:#4a4d52;border:2px solid #5a5d62;color:#e0e0e5;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;font-weight:700;transition:all .15s;}
-  .vkb-close:hover{background:var(--error);color:#fff;border-color:var(--error);}
-  .vkb-suggestions{display:none;flex-wrap:wrap;gap:6px;margin-bottom:10px;padding:7px 10px;background:rgba(201,162,39,0.08);border:1px solid rgba(201,162,39,0.2);border-radius:10px;min-height:44px;align-items:center;}
-  .vkb-suggestions.show{display:flex;}
-  .vkb-suggestions-label{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--gold-bright);text-transform:uppercase;letter-spacing:0.06em;font-weight:700;margin-right:6px;white-space:nowrap;}
-  .vkb-suggestion-chip{font-size:15px;font-weight:600;padding:5px 12px;border-radius:20px;border:1px solid #4a4d52;background:#4a4d52;color:#fff;cursor:pointer;transition:all .15s;white-space:nowrap;}
-  .vkb-suggestion-chip:hover{background:var(--gold);color:#1a1305;border-color:var(--gold);}
-  .vkb-suggestion-chip:active{transform:scale(0.96);}
-  .vkb-langs{display:flex;gap:4px;margin-bottom:10px;}
-  .vkb-lang{font-size:12px;font-family:'JetBrains Mono',monospace;padding:5px 12px;border-radius:10px;border:2px solid #4a4d52;background:#4a4d52;color:#e0e0e5;cursor:pointer;transition:all .15s;font-weight:600;}
-  .vkb-lang:hover{background:#5a5d62;color:#fff;border-color:#6a6d72;}
-  .vkb-lang.active{background:var(--gold);color:#1a1305;border-color:var(--gold);font-weight:700;}
-  .vkb-rows{display:flex;flex-direction:column;gap:7px;}
-  .vkb-row{display:flex;gap:7px;justify-content:center;}
-  .vkb-key{min-width:51px;height:36px;padding:0 7px;background:linear-gradient(180deg,#5a5d62 0%,#4a4d52 100%);border:2px solid #6a6d72;border-radius:10px;color:#fff;font-size:22px;font-weight:700;font-family:'Manrope',sans-serif;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s,border-color .15s;user-select:none;flex:1;box-shadow:0 4px 0 #3a3d42,0 6px 12px rgba(0,0,0,0.3);text-shadow:0 1px 2px rgba(0,0,0,0.4);position:relative;overflow:hidden;}
-  .vkb-key::before{content:'';position:absolute;top:0;left:0;right:0;height:35%;background:linear-gradient(180deg,rgba(255,255,255,0.1),transparent);border-radius:8px 8px 0 0;pointer-events:none;}
-  .vkb-key:hover{background:linear-gradient(180deg,#6a6d72 0%,#5a5d62 100%);border-color:#8a8d92;}
-  .vkb-key:active{transform:translateY(2px);box-shadow:0 1px 0 #3a3d42,0 2px 4px rgba(0,0,0,0.3);}
-  .vkb-key.wide{min-width:75px;flex:1.5;font-size:14px;font-family:'JetBrains Mono',monospace;}
-  .vkb-key.space{flex:5;}
-  .vkb-key.enter{background:linear-gradient(180deg,#3cb371 0%,#2e8b57 100%);border-color:#4cd581;color:#fff;box-shadow:0 4px 0 #1e6b3a,0 6px 12px rgba(0,0,0,0.3);}
-  .vkb-key.enter:hover{background:linear-gradient(180deg,#4cd581 0%,#3cb371 100%);border-color:#5ce591;}
-  .vkb-key.enter:active{box-shadow:0 1px 0 #1e6b3a,0 2px 4px rgba(0,0,0,0.3);}
-  .vkb-key.back{background:linear-gradient(180deg,#c44 0%,#a33 100%);border-color:#d55;color:#fff;box-shadow:0 4px 0 #822,0 6px 12px rgba(0,0,0,0.3);}
-  .vkb-key.back:hover{background:linear-gradient(180deg,#d55 0%,#c44 100%);border-color:#e66;}
-  .vkb-key.back:active{box-shadow:0 1px 0 #822,0 2px 4px rgba(0,0,0,0.3);}
-  .vkb-key.hide-key{background:linear-gradient(180deg,#6a5d3a 0%,#5a4d2a 100%);border-color:#8a7d4a;color:#e8d78a;box-shadow:0 4px 0 #3a3010,0 6px 12px rgba(0,0,0,0.3);}
-  .vkb-key.hide-key:hover{background:linear-gradient(180deg,#8a7d4a 0%,#6a5d3a 100%);border-color:#aa9d5a;}
-  .vkb-key.hide-key:active{box-shadow:0 1px 0 #3a3010,0 2px 4px rgba(0,0,0,0.3);}
-  .vkb-wrap.light .vkb-panel{background:#d4d6da;border-color:#b4b6ba;box-shadow:0 20px 60px rgba(0,0,0,0.2),inset 0 1px 0 rgba(255,255,255,0.8);}
-  .vkb-wrap.light .vkb-key{background:linear-gradient(180deg,#f0f0f4 0%,#d8d8dc 100%);border-color:#c0c0c8;color:#2a2d32;box-shadow:0 4px 0 #b4b6ba,0 6px 12px rgba(0,0,0,0.15);text-shadow:none;}
-  .vkb-wrap.light .vkb-key::before{background:linear-gradient(180deg,rgba(255,255,255,0.6),transparent);}
-  .vkb-wrap.light .vkb-key:hover{background:linear-gradient(180deg,#fff 0%,#e8e8ec 100%);border-color:#a0a0a8;}
-  .vkb-wrap.light .vkb-key:active{box-shadow:0 1px 0 #b4b6ba,0 2px 4px rgba(0,0,0,0.15);}
-  .vkb-wrap.light .vkb-key.enter{background:linear-gradient(180deg,#3cb371 0%,#2e8b57 100%);border-color:#4cd581;color:#fff;box-shadow:0 4px 0 #1e6b3a,0 6px 12px rgba(0,0,0,0.2);}
-  .vkb-wrap.light .vkb-key.back{background:linear-gradient(180deg,#c44 0%,#a33 100%);border-color:#d55;color:#fff;box-shadow:0 4px 0 #822,0 6px 12px rgba(0,0,0,0.2);}
-  .vkb-wrap.light .vkb-key.hide-key{background:linear-gradient(180deg,#e8d78a 0%,#d4c46a 100%);border-color:#c4b45a;color:#3a3010;box-shadow:0 4px 0 #a49440,0 6px 12px rgba(0,0,0,0.15);}
-  .vkb-wrap.light .vkb-lang{background:#c0c0c8;border-color:#b0b0b8;color:#2a2d32;}
-  .vkb-wrap.light .vkb-lang:hover{background:#d0d0d8;border-color:#a0a0a8;}
-  .vkb-wrap.light .vkb-mode-btn{background:#c0c0c8;border-color:#b0b0b8;color:#2a2d32;}
-  .vkb-wrap.light .vkb-mode-btn:hover{background:#d0d0d8;}
-  .vkb-wrap.light .vkb-close{background:#c0c0c8;border-color:#b0b0b8;color:#2a2d32;}
-  .vkb-wrap.light .vkb-close:hover{background:var(--error);color:#fff;border-color:var(--error);}
-  .vkb-wrap.light .vkb-suggestion-chip{background:#c0c0c8;border-color:#b0b0b8;color:#2a2d32;}
-  @media(max-width:900px){
-    .vkb-wrap{display:block;position:fixed;top:50%;right:0;transform:translateY(-50%) translateX(calc(100% - 5px));z-index:99991;transition:transform .35s cubic-bezier(.4,0,.2,1);max-width:none;margin:0;padding:0;}
-    .vkb-wrap.open{transform:translateY(-50%) translateX(0);display:block;}
-    .vkb-wrap .vkb-handle{position:absolute;left:-14px;top:50%;transform:translateY(-50%);width:14px;height:68px;background:#3a3d42;border:2px solid #4a4d52;border-right:none;border-radius:8px 0 0 8px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:-4px 0 12px rgba(0,0,0,0.3);transition:background .2s;}
-    .vkb-wrap .vkb-handle:hover{background:#4a4d52;}
-    .vkb-handle-line{width:3px;height:27px;border-radius:2px;background:var(--gold-bright);opacity:.7;}
-    .vkb-panel{width:260px;background:#3a3d42;border:2px solid #4a4d52;border-radius:16px 0 0 16px;padding:10px 12px 12px;box-shadow:-12px 0 40px rgba(0,0,0,0.45);}
-    .vkb-key{min-width:21px;height:20px;padding:0 4px;font-size:13px;border-radius:8px;}
-    .vkb-key.wide{min-width:36px;flex:1.4;font-size:11px;}
-    .vkb-key.space{flex:3;}
-    .vkb-row{gap:4px;}
-    .vkb-rows{gap:4px;}
-    .vkb-suggestions{margin-bottom:7px;padding:6px 8px;min-height:28px;}
-    .vkb-suggestion-chip{font-size:12px;padding:4px 9px;}
-    .vkb-langs{margin-bottom:7px;}
-    .vkb-lang{padding:4px 9px;font-size:11px;}
-    .vkb-head{margin-bottom:7px;}
-    .vkb-title{font-size:11px;}
-    .vkb-close{width:20px;height:20px;font-size:14px;}
-  }
-  @media(max-width:600px){
-    .vkb-panel{width:220px;padding:9px;}
-    .vkb-key{min-width:16px;height:18px;font-size:12px;padding:0 3px;}
-  }
-  @media(max-width:900px) and (min-width:601px){
-    .vkb-panel{width:240px;padding:10px;}
-    .vkb-key{min-width:19px;height:19px;font-size:12px;padding:0 4px;}
-  }
-  /* MUSIC PLAYER */
+  #loginOverlay{position:fixed;inset:0;z-index:100000;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:18px;}
+  .login-box{background:var(--panel);border:1px solid var(--panel-line);border-radius:var(--radius);padding:36px 32px;max-width:340px;width:90%;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,0.5);}
+  .login-box h1{font-family:'Fraunces',serif;font-weight:900;font-size:28px;color:var(--gold-bright);margin-bottom:6px;}
+  .login-box p{font-size:12px;color:var(--cream-dim);margin-bottom:22px;}
+  .login-field{display:flex;flex-direction:column;gap:6px;text-align:left;margin-bottom:14px;}
+  .login-field label{font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--gold-bright);font-weight:700;}
+  .login-field input{background:rgba(255,255,255,0.04);border:1px solid var(--panel-line);color:var(--cream);border-radius:8px;padding:12px 14px;font-size:14px;font-family:'Manrope',sans-serif;outline:none;transition:border-color .15s;width:100%;}
+  .login-field input:focus{border-color:var(--gold);}
+  .login-field input::placeholder{color:var(--cream-dim);}
+  .login-btn{background:var(--gold);color:#1a1305;border:none;font-weight:700;font-size:14px;padding:12px 0;width:100%;border-radius:8px;cursor:pointer;transition:background .15s,transform .1s;margin-top:4px;}
+  .login-btn:hover{background:var(--gold-bright);}
+  .login-btn:active{transform:scale(0.98);}
+  .login-error{color:var(--error);font-size:12px;margin-top:10px;display:none;}
+  .login-error.show{display:block;}
+  .login-avatar{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--teal));display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 16px;box-shadow:0 0 20px rgba(201,162,39,0.2);}
+  .video-test-section{margin-top:20px;background:var(--panel);border:1px solid var(--panel-line);border-radius:var(--radius);padding:20px;}
+  .video-test-section h3{font-family:'Fraunces',serif;font-size:18px;color:var(--gold-bright);margin-bottom:12px;}
+  .video-test-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;}
+  .video-test-item{background:rgba(255,255,255,0.03);border:1px solid var(--panel-line);border-radius:8px;padding:12px;cursor:pointer;transition:all .15s;text-align:center;}
+  .video-test-item:hover{border-color:var(--gold);background:rgba(201,162,39,0.06);}
+  .video-test-item .test-title{font-size:13px;font-weight:600;}
+  .video-test-item .test-desc{font-size:11px;color:var(--cream-dim);margin-top:4px;}
+  .video-test-item .test-badge{display:inline-block;margin-top:6px;padding:2px 10px;border-radius:12px;font-size:10px;font-family:'JetBrains Mono',monospace;background:var(--green);color:#0a1a17;}
+  .site-search-overlay{position:fixed;inset:0;z-index:99990;background:rgba(11,18,32,0.92);backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;flex-direction:column;gap:18px;padding:20px;}
+  .site-search-overlay.show{display:flex;}
+  .site-search-box{background:var(--panel);border:1px solid var(--panel-line);border-radius:var(--radius);padding:28px 24px;max-width:480px;width:100%;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,0.5);}
+  .site-search-box h3{font-family:'Fraunces',serif;font-weight:700;font-size:18px;color:var(--gold-bright);margin-bottom:4px;}
+  .site-search-box p{font-size:12px;color:var(--cream-dim);margin-bottom:18px;}
+  .site-search-field{display:flex;gap:10px;margin-bottom:14px;}
+  .site-search-field input{flex:1;font-size:14px;padding:12px 14px;background:rgba(255,255,255,0.04);border:1px solid var(--panel-line);color:var(--cream);border-radius:8px;outline:none;font-family:'Manrope',sans-serif;}
+  .site-search-field input:focus{border-color:var(--gold);}
+  .site-search-btns{display:flex;gap:10px;justify-content:center;}
+  .site-search-btns .go-btn{padding:10px 24px;font-size:13px;}
+  .site-search-btns .ghost-btn{padding:10px 20px;font-size:13px;}
   .music-player{position:fixed;bottom:0;left:0;right:0;z-index:9998;background:rgba(11,18,32,0.97);border-top:1px solid var(--panel-line);backdrop-filter:blur(16px);box-shadow:0 -8px 32px rgba(0,0,0,0.4);padding:10px 20px;display:flex;align-items:center;gap:14px;transition:transform .3s ease,opacity .3s ease;}
   .music-player.hidden-player{transform:translateY(100%);opacity:0;pointer-events:none;}
   .music-player-left{display:flex;align-items:center;gap:10px;flex-shrink:0;}
@@ -243,36 +194,7 @@
     .music-volume input[type=range]{width:50px;}
     .music-station-select{max-width:120px;}
   }
-  /* LOGIN OVERLAY */
-  #loginOverlay{position:fixed;inset:0;z-index:100000;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:18px;}
-  .login-box{background:var(--panel);border:1px solid var(--panel-line);border-radius:var(--radius);padding:36px 32px;max-width:340px;width:90%;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,0.5);}
-  .login-box h1{font-family:'Fraunces',serif;font-weight:900;font-size:28px;color:var(--gold-bright);margin-bottom:6px;}
-  .login-box p{font-size:12px;color:var(--cream-dim);margin-bottom:22px;}
-  .login-field{display:flex;flex-direction:column;gap:6px;text-align:left;margin-bottom:14px;}
-  .login-field label{font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--gold-bright);font-weight:700;}
-  .login-field input{background:rgba(255,255,255,0.04);border:1px solid var(--panel-line);color:var(--cream);border-radius:8px;padding:12px 14px;font-size:14px;font-family:'Manrope',sans-serif;outline:none;transition:border-color .15s;width:100%;}
-  .login-field input:focus{border-color:var(--gold);}
-  .login-field input::placeholder{color:var(--cream-dim);}
-  .login-btn{background:var(--gold);color:#1a1305;border:none;font-weight:700;font-size:14px;padding:12px 0;width:100%;border-radius:8px;cursor:pointer;transition:background .15s,transform .1s;margin-top:4px;}
-  .login-btn:hover{background:var(--gold-bright);}
-  .login-btn:active{transform:scale(0.98);}
-  .login-error{color:var(--error);font-size:12px;margin-top:10px;display:none;}
-  .login-error.show{display:block;}
-  .login-avatar{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--teal));display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 16px;box-shadow:0 0 20px rgba(201,162,39,0.2);}
-  .site-search-overlay{position:fixed;inset:0;z-index:99990;background:rgba(11,18,32,0.92);backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;flex-direction:column;gap:18px;padding:20px;}
-  .site-search-overlay.show{display:flex;}
-  .site-search-box{background:var(--panel);border:1px solid var(--panel-line);border-radius:var(--radius);padding:28px 24px;max-width:480px;width:100%;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,0.5);}
-  .site-search-box h3{font-family:'Fraunces',serif;font-weight:700;font-size:18px;color:var(--gold-bright);margin-bottom:4px;}
-  .site-search-box p{font-size:12px;color:var(--cream-dim);margin-bottom:18px;}
-  .site-search-field{display:flex;gap:10px;margin-bottom:14px;}
-  .site-search-field input{flex:1;font-size:14px;padding:12px 14px;background:rgba(255,255,255,0.04);border:1px solid var(--panel-line);color:var(--cream);border-radius:8px;outline:none;font-family:'Manrope',sans-serif;}
-  .site-search-field input:focus{border-color:var(--gold);}
-  .site-search-btns{display:flex;gap:10px;justify-content:center;}
-  .site-search-btns .go-btn{padding:10px 24px;font-size:13px;}
-  .site-search-btns .ghost-btn{padding:10px 20px;font-size:13px;}
 </style>
-<base target="_blank">
-<base target="_blank">
 </head>
 <body>
 
@@ -295,6 +217,7 @@
   </div>
 </div>
 
+<!-- CLOCK -->
 <div class="clock-badge" id="clockBadge">
   <div class="clock-time"><span class="clock-dot"></span><span id="clockTime">--:--:--</span></div>
   <div class="clock-date" id="clockDate">laddar...</div>
@@ -321,7 +244,7 @@
       <button data-mode="tmdb">TMDB-ID</button>
       <button data-mode="imdb">IMDB-ID</button>
     </div>
-    <div class="type-toggle" id="mediaTypeToggle" style="display:none;">
+    <div class="type-toggle" id="mediaTypeToggle">
       <button data-type="movie" class="active">FILM</button>
       <button data-type="tv">SERIE</button>
     </div>
@@ -344,32 +267,6 @@
     <span class="google-search-label">&#128269; Google</span>
     <input type="text" id="googleQuery" placeholder="Sök på Google..." autocomplete="off">
     <button class="google-btn" id="googleBtn">Sök på Google</button>
-  </div>
-
-  <!-- VIRTUAL KEYBOARD -->
-  <div class="vkb-wrap" id="vkbWrap">
-    <div class="vkb-handle" id="vkbHandle" title="Virtuellt tangentbord">
-      <div class="vkb-handle-line"></div>
-    </div>
-    <div class="vkb-panel" id="vkbPanel">
-      <div class="vkb-head">
-        <div class="vkb-title">Tangentbord</div>
-        <div class="vkb-head-right">
-          <button class="vkb-mode-btn" id="vkbModeBtn" title="Växla ljust/mörkt läge">&#9788; LJUS</button>
-          <div class="vkb-close" id="vkbClose" title="Stäng">&#215;</div>
-        </div>
-      </div>
-      <div class="vkb-suggestions" id="vkbSuggestions">
-        <span class="vkb-suggestions-label">Förslag</span>
-      </div>
-      <div class="vkb-langs" id="vkbLangs">
-        <button class="vkb-lang active" data-lang="en">EN</button>
-        <button class="vkb-lang" data-lang="fa">FA</button>
-        <button class="vkb-lang" data-lang="ckb">CKB</button>
-        <button class="vkb-lang" data-lang="ar">AR</button>
-      </div>
-      <div class="vkb-rows" id="vkbRows"></div>
-    </div>
   </div>
 
   <div class="status" id="status"></div>
@@ -410,7 +307,45 @@
     </div>
   </div>
 
-  <!-- BOTTOM SECTION (only library, no websites) -->
+  <!-- VIDEO TEST SECTION -->
+  <div class="video-test-section">
+    <h3>&#127916; Testa direktuppspelning</h3>
+    <p style="font-size:12px;color:var(--cream-dim);margin-bottom:12px;">Klicka på en film för att testa spelaren med inbäddade videor (fungerar utan TMDB-nyckel)</p>
+    <div class="video-test-grid" id="videoTestGrid">
+      <div class="video-test-item" data-url="https://www.youtube.com/embed/dQw4w9WgXcQ" data-title="Rick Astley - Never Gonna Give You Up">
+        <div class="test-title">🎵 Rick Astley</div>
+        <div class="test-desc">Never Gonna Give You Up</div>
+        <span class="test-badge">YouTube</span>
+      </div>
+      <div class="video-test-item" data-url="https://www.youtube.com/embed/3JZ_D3ELwOQ" data-title="The Lion King - Circle of Life">
+        <div class="test-title">🦁 The Lion King</div>
+        <div class="test-desc">Circle of Life (HD)</div>
+        <span class="test-badge">YouTube</span>
+      </div>
+      <div class="video-test-item" data-url="https://www.youtube.com/embed/8B0nMiPJbPw" data-title="Jurassic Park - Theme">
+        <div class="test-title">🦖 Jurassic Park</div>
+        <div class="test-desc">Film soundtrack (HQ)</div>
+        <span class="test-badge">YouTube</span>
+      </div>
+      <div class="video-test-item" data-url="https://www.youtube.com/embed/2g5Hz17C4is" data-title="Interstellar - Docking Scene">
+        <div class="test-title">🚀 Interstellar</div>
+        <div class="test-desc">Docking scene (IMAX)</div>
+        <span class="test-badge">YouTube</span>
+      </div>
+      <div class="video-test-item" data-url="https://www.youtube.com/embed/uYPbbksJxIg" data-title="Pink Floyd - The Wall">
+        <div class="test-title">🎸 Pink Floyd</div>
+        <div class="test-desc">Another Brick in the Wall</div>
+        <span class="test-badge">YouTube</span>
+      </div>
+      <div class="video-test-item" data-url="https://www.youtube.com/embed/04aixd0eWbc" data-title="The Godfather - Theme">
+        <div class="test-title">🍷 The Godfather</div>
+        <div class="test-desc">Nino Rota theme</div>
+        <span class="test-badge">YouTube</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM SECTION -->
   <div class="bottom-section" id="bottomSection">
     <div class="library" id="library" style="flex:1;">
       <div class="lib-head">
@@ -430,21 +365,6 @@
 </div>
 
 <footer>Drivs av TMDB API. Spelare via vidsrc mirrors &amp; VidAPI. Lista sparas lokalt.</footer>
-
-<!-- SITE SEARCH OVERLAY (kept for completeness, but no sites) -->
-<div class="site-search-overlay" id="siteSearchOverlay">
-  <div class="site-search-box" onclick="event.stopPropagation();">
-    <h3 id="siteSearchTitle">Sök på webbplats</h3>
-    <p id="siteSearchDesc">Skriv ditt sökord med tangentbordet nedan</p>
-    <div class="site-search-field">
-      <input type="text" id="siteSearchInput" placeholder="Skriv sökord..." autocomplete="off" tabindex="0">
-    </div>
-    <div class="site-search-btns">
-      <button class="go-btn" id="siteSearchGoBtn">Sök</button>
-      <button class="ghost-btn" id="siteSearchCancelBtn">Avbryt</button>
-    </div>
-  </div>
-</div>
 
 <!-- MUSIC PLAYER -->
 <div class="music-player paused" id="musicPlayer">
@@ -537,233 +457,19 @@
   loginBtn.addEventListener('click',doLogin);
   loginPass.addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
 
-  // === VIRTUAL KEYBOARD ===
-  var VKB_LAYOUTS = {
-    en: [
-      ['1','2','3','4','5','6','7','8','9','0'],
-      ['q','w','e','r','t','y','u','i','o','p'],
-      ['a','s','d','f','g','h','j','k','l'],
-      ['z','x','c','v','b','n','m'],
-      ['@','.','_','-','SPACE','BACK','ENTER']
-    ],
-    fa: [
-      ['۱','۲','۳','۴','۵','۶','۷','۸','۹','۰'],
-      ['ض','ص','ث','ق','ف','غ','ع','ه','خ','ح','ج','چ'],
-      ['ش','س','ی','ب','ل','ا','ت','ن','م','ک','گ'],
-      ['ظ','ط','ز','ر','ذ','د','پ','و','.','ژ','ئ'],
-      ['SPACE','BACK','ENTER']
-    ],
-    ckb: [
-      ['١','٢','٣','٤','٥','٦','٧','٨','٩','٠'],
-      ['ق','و','ە','ر','ت','ی','ئ','ع','ح','ه‍','پ','چ'],
-      ['ا','س','ش','د','ف','گ','ه','ژ','ک','ل','ڵ'],
-      ['ز','خ','ج','ڤ','ب','ن','م','ۆ','ێ','.','ڕ'],
-      ['SPACE','BACK','ENTER']
-    ],
-    ar: [
-      ['١','٢','٣','٤','٥','٦','٧','٨','٩','٠'],
-      ['ض','ص','ث','ق','ف','غ','ع','ه','خ','ح','ج','د'],
-      ['ش','س','ي','ب','ل','ا','ت','ن','م','ك','ط'],
-      ['ئ','ء','ؤ','ر','لا','ى','ة','و','ز','ظ','ذ'],
-      ['SPACE','BACK','ENTER']
-    ]
-  };
-
-  var vkbWrap = document.getElementById('vkbWrap');
-  var vkbPanel = document.getElementById('vkbPanel');
-  var vkbHandle = document.getElementById('vkbHandle');
-  var vkbClose = document.getElementById('vkbClose');
-  var vkbModeBtn = document.getElementById('vkbModeBtn');
-  var vkbRows = document.getElementById('vkbRows');
-  var vkbLangs = document.getElementById('vkbLangs');
-  var vkbSuggestions = document.getElementById('vkbSuggestions');
-  var queryInput = document.getElementById('query');
-  var googleQueryInput = document.getElementById('googleQuery');
-  var activeInput = queryInput;
-  var currentLang = 'en';
-  var vkbOpen = false;
-  var vkbLightMode = localStorage.getItem('kuribaxi_vkb_light') === 'true';
-
-  function applyVkbMode(){
-    if(vkbLightMode){
-      vkbWrap.classList.add('light');
-      vkbModeBtn.innerHTML = '&#9790; MÖRK';
-    }else{
-      vkbWrap.classList.remove('light');
-      vkbModeBtn.innerHTML = '&#9788; LJUS';
-    }
+  // === KLOCKA ===
+  function updateClock(){
+    var now=new Date();
+    var timeStr=now.toLocaleTimeString('sv-SE',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    var dateStr=now.toLocaleDateString('sv-SE',{weekday:'long',day:'numeric',month:'long'});
+    document.getElementById('clockTime').textContent=timeStr;
+    document.getElementById('clockDate').textContent=dateStr;
   }
-  function toggleVkbMode(){
-    vkbLightMode = !vkbLightMode;
-    localStorage.setItem('kuribaxi_vkb_light', vkbLightMode ? 'true' : 'false');
-    applyVkbMode();
+  function startClock(){
+    updateClock();
+    setInterval(updateClock,1000);
   }
-  vkbModeBtn.addEventListener('click', function(e){e.stopPropagation();toggleVkbMode();});
-
-  function getSuggestions(prefix, lang){
-    var dict = {
-      en: ['the','movie','film','series','watch','online','stream','episode','season','action','comedy','drama','horror','thriller','animation','documentary','romance','sci-fi','fantasy','adventure','crime','mystery','family','music','war','western','history','biography','sport','short','news','reality','talk','game','show'],
-      fa: ['فیلم','سریال','قسمت','فصل','اکشن','کمدی','درام','ترسناک','هیجان','انیمیشن','مستند','عاشقانه','علمی','تخیلی','ماجراجویی','جنایی','معمایی','خانوادگی','موسیقی','جنگی','وسترن','تاریخی','زندگی','ورزشی','کوتاه','خبری','واقعیت','گفتگو','بازی','نمایش'],
-      ckb: ['فیلم','زنجیرە','بەش','وەرز','ئاکشن','کۆمێدی','دراما','ترسناک','هیجان','ئەنیمەیشن','بەڵگەنامەیی','ڕۆمانسی','زانستی','خەیاڵی','سەرکێشی','تاوان','نھێنی','خێزانی','مۆسیقا','شەڕی','وێسترن','مێژوویی','ژیاننامە','وەرزشی','کورت','هەواڵ','ڕاستی','وتووێژ','یاری','پیشانگا'],
-      ar: ['فيلم','مسلسل','حلقة','موسم','اكشن','كوميدي','دراما','رعب','اثارة','انمي','وثائقي','رومانسي','خيال','علمي','مغامرة','جريمة','غموض','عائلي','موسيقى','حرب','غربي','تاريخي','سيرة','رياضة','قصير','اخبار','واقع','حوار','لعبة','عرض']
-    };
-    var words = dict[lang] || dict['en'];
-    var lower = prefix.toLowerCase();
-    return words.filter(function(w){ return w.toLowerCase().startsWith(lower) && w.toLowerCase() !== lower; }).slice(0,6);
-  }
-
-  function showSuggestions(letter){
-    var val = activeInput.value;
-    var lastSpace = val.lastIndexOf(' ');
-    var prefix = lastSpace >= 0 ? val.slice(lastSpace+1) + letter : val + letter;
-    if(prefix.length < 2){
-      vkbSuggestions.classList.remove('show');
-      return;
-    }
-    var suggestions = getSuggestions(prefix, currentLang);
-    vkbSuggestions.innerHTML = '<span class="vkb-suggestions-label">Förslag</span>';
-    if(suggestions.length===0){
-      vkbSuggestions.classList.remove('show');
-      return;
-    }
-    suggestions.forEach(function(word){
-      var chip = document.createElement('span');
-      chip.className = 'vkb-suggestion-chip';
-      chip.textContent = word;
-      chip.addEventListener('click', function(e){
-        e.stopPropagation();
-        var before = val.lastIndexOf(' ') >= 0 ? val.slice(0, val.lastIndexOf(' ')+1) : '';
-        activeInput.value = before + word + ' ';
-        activeInput.focus();
-        vkbSuggestions.classList.remove('show');
-      });
-      vkbSuggestions.appendChild(chip);
-    });
-    vkbSuggestions.classList.add('show');
-  }
-
-  function hideSuggestions(){
-    vkbSuggestions.classList.remove('show');
-  }
-
-function renderVkb(lang){
-    currentLang = lang;
-    var layout = VKB_LAYOUTS[lang];
-    vkbRows.innerHTML = '';
-    layout.forEach(function(row){
-      var rowDiv = document.createElement('div');
-      rowDiv.className = 'vkb-row';
-      row.forEach(function(key){
-        var btn = document.createElement('div');
-        btn.className = 'vkb-key';
-        if(key==='SPACE'){btn.className+=' space wide';btn.textContent='␣';}
-        else if(key==='BACK'){btn.className+=' back wide';btn.textContent='⌫';}
-        else if(key==='ENTER'){btn.className+=' enter wide';btn.textContent='↵';}
-        else{btn.textContent = key;}
-        btn.addEventListener('click',function(e){e.stopPropagation();hideSuggestions();vkbPress(key);});
-        if(key.length===1 && /[a-zA-Z؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿ء-يٮ-ٯٱ-ۓەۮ-ۯۺ-ۼۿݐ-ݿࢠࢢ-ࢬࣤ-ࣥࣧ-ࣩﭐ-ﮱﯓ-ﴽﵐ-ﶏﶒ-ﷇﷰ-ﷻﹰ-ﹴﹶ-ﻼ]/.test(key)){
-          btn.addEventListener('mouseenter',function(){showSuggestions(key);});
-          btn.addEventListener('mouseleave',function(){hideSuggestions();});
-        }
-        rowDiv.appendChild(btn);
-      });
-      vkbRows.appendChild(rowDiv);
-    });
-    vkbLangs.querySelectorAll('.vkb-lang').forEach(function(b){b.classList.toggle('active',b.dataset.lang===lang);});
-  }
-
-  function vkbPress(key){
-    hideSuggestions();
-    var start = activeInput.selectionStart || activeInput.value.length;
-    var end = activeInput.selectionEnd || activeInput.value.length;
-    var val = activeInput.value;
-    if(key==='SPACE'){
-      activeInput.value = val.slice(0,start)+' '+val.slice(end);
-      activeInput.selectionStart = activeInput.selectionEnd = start+1;
-    }else if(key==='BACK'){
-      if(start===end && start>0){
-        activeInput.value = val.slice(0,start-1)+val.slice(end);
-        activeInput.selectionStart = activeInput.selectionEnd = start-1;
-      }else if(start!==end){
-        activeInput.value = val.slice(0,start)+val.slice(end);
-        activeInput.selectionStart = activeInput.selectionEnd = start;
-      }
-    }else if(key==='ENTER'){
-      if(activeInput === queryInput) searchTMDB();
-      else if(activeInput === googleQueryInput) searchGoogle();
-      return;
-    }else{
-      activeInput.value = val.slice(0,start)+key+val.slice(end);
-      activeInput.selectionStart = activeInput.selectionEnd = start+key.length;
-    }
-    activeInput.focus();
-  }
-
-  function openVkb(){vkbOpen=true;vkbWrap.style.display='block';vkbWrap.classList.add('open');}
-  function closeVkb(){vkbOpen=false;vkbWrap.style.display='none';vkbWrap.classList.remove('open');}
-  function toggleVkb(){vkbOpen?closeVkb():openVkb();}
-
-  vkbHandle.addEventListener('click',function(e){e.stopPropagation();toggleVkb();});
-  vkbClose.addEventListener('click',function(e){e.stopPropagation();closeVkb();});
-  vkbLangs.addEventListener('click',function(e){
-    var btn=e.target.closest('.vkb-lang');if(!btn)return;
-    renderVkb(btn.dataset.lang);
-  });
-
-  // Keyboard mode management
-  var keyboardMode = localStorage.getItem('kuribaxi_kb_mode') || 'computer';
-  var keyboardModeToggle = document.getElementById('keyboardModeToggle');
-  var kbModeHint = document.getElementById('kbModeHint');
-
-  function applyKeyboardMode(){
-    var isTv = keyboardMode === 'tv';
-    keyboardModeToggle.querySelectorAll('button').forEach(function(b){b.classList.toggle('active',b.dataset.kbmode===keyboardMode);});
-    kbModeHint.textContent = isTv ? 'Virtuellt tangentbord aktivt – klicka i ett fält för att skriva' : 'Vanligt tangentbord aktivt – skriv direkt i fälten';
-    var inputs = [queryInput, googleQueryInput];
-    if(typeof siteSearchInput !== 'undefined'){inputs.push(siteSearchInput);}
-    inputs.forEach(function(inp){
-      if(isTv){
-        inp.setAttribute('readonly','readonly');
-        inp.setAttribute('inputmode','none');
-      }else{
-        inp.removeAttribute('readonly');
-        inp.removeAttribute('inputmode');
-      }
-    });
-    if(!isTv){closeVkb();}
-  }
-
-  keyboardModeToggle.addEventListener('click',function(e){
-    var btn = e.target.closest('button');
-    if(!btn) return;
-    keyboardMode = btn.dataset.kbmode;
-    localStorage.setItem('kuribaxi_kb_mode', keyboardMode);
-    applyKeyboardMode();
-  });
-
-  function onInputFocus(input){
-    if(keyboardMode !== 'tv') return;
-    activeInput = input;
-    openVkb();
-  }
-
-  queryInput.addEventListener('click',function(e){onInputFocus(queryInput);});
-  googleQueryInput.addEventListener('click',function(e){onInputFocus(googleQueryInput);});
-  queryInput.addEventListener('focus',function(e){onInputFocus(queryInput);});
-  googleQueryInput.addEventListener('focus',function(e){onInputFocus(googleQueryInput);});
-  queryInput.addEventListener('touchstart',function(e){onInputFocus(queryInput);});
-  googleQueryInput.addEventListener('touchstart',function(e){onInputFocus(googleQueryInput);});
-
-
-  document.addEventListener('click',function(e){
-    if(keyboardMode !== 'tv') return;
-    var isSearchInput = e.target===queryInput || e.target===googleQueryInput || e.target===siteSearchInput;
-    var isOverlay = siteSearchOverlay.contains(e.target);
-    if(!vkbWrap.contains(e.target) && !isSearchInput && !isOverlay){closeVkb();}
-  });
-
-  applyKeyboardMode();
-  renderVkb('en');
+  startClock();
 
   // === GLODLAMPOR ===
   var bulbsEl = document.getElementById('bulbs');
@@ -826,25 +532,6 @@ function renderVkb(lang){
     watchMap.series[id]={id:id,tmdbId:detail.id,title:detail.title||detail.name,poster:detail.poster_path,year:(detail.first_air_date||'').slice(0,4),type:'tv',season:Math.max(1,parseInt(season)||1),episode:Math.max(1,parseInt(episode)||1),imdbId:detail.imdb_id||currentImdbId||(existing&&existing.imdbId)||null,lastWatched:Date.now()};
     saveWatchMap(watchMap);
   }
-
-  // === KLOCKA ===
-  function updateClock(){
-    var now=new Date();
-    var timeStr=now.toLocaleTimeString('sv-SE',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-    var dateStr=now.toLocaleDateString('sv-SE',{weekday:'long',day:'numeric',month:'long'});
-    document.getElementById('clockTime').textContent=timeStr;
-    document.getElementById('clockDate').textContent=dateStr;
-  }
-  function startClock(){
-    updateClock();
-    var now=new Date();
-    var msToNext=1000-now.getMilliseconds();
-    setTimeout(function(){
-      updateClock();
-      setInterval(updateClock,1000);
-    },msToNext);
-  }
-  startClock();
 
   // === MUSIC PLAYER ===
   var MUSIC_STATIONS = [
@@ -962,13 +649,6 @@ function renderVkb(lang){
     }
   }
 
-  function resumeAfterVideo(){
-    if(wasPlayingBeforeVideo){
-      wasPlayingBeforeVideo = false;
-      togglePlay();
-    }
-  }
-
   musicPlayBtn.addEventListener('click',togglePlay);
   musicStationSelect.addEventListener('change',function(){loadStation(parseInt(this.value));if(isPlaying)togglePlay();});
   musicVolume.addEventListener('input',function(){setVolume(parseInt(this.value));});
@@ -1052,77 +732,6 @@ function renderVkb(lang){
     saveWatchMap(watchMap);
   });
 
-  // === SITE SEARCH OVERLAY (no sites, but keep for completeness) ===
-  var siteSearchOverlay = document.getElementById('siteSearchOverlay');
-  var siteSearchInput = document.getElementById('siteSearchInput');
-  var siteSearchGoBtn = document.getElementById('siteSearchGoBtn');
-
-  // Register siteSearchInput virtual keyboard listeners
-  siteSearchInput.addEventListener('click',function(e){onInputFocus(siteSearchInput);});
-  siteSearchInput.addEventListener('focus',function(e){onInputFocus(siteSearchInput);});
-  // Re-apply keyboard mode now that siteSearchInput exists
-  applyKeyboardMode();
-  var siteSearchCancelBtn = document.getElementById('siteSearchCancelBtn');
-  var siteSearchTitle = document.getElementById('siteSearchTitle');
-  var siteSearchDesc = document.getElementById('siteSearchDesc');
-  var pendingSite = null;
-
-  function openSiteSearch(site){
-    pendingSite = site;
-    siteSearchTitle.textContent = 'Sök på webbplats';
-    siteSearchDesc.textContent = 'Skriv ditt sökord med tangentbordet nedan';
-    siteSearchInput.value = '';
-    siteSearchOverlay.classList.add('show');
-    activeInput = siteSearchInput;
-    openVkb();
-  }
-  function closeSiteSearch(){
-    siteSearchOverlay.classList.remove('show');
-    pendingSite = null;
-  }
-  function doSiteSearch(){
-    if(!pendingSite) return;
-    var q = siteSearchInput.value.trim();
-    var url;
-    if(q){
-      var cleanQ = q.replace(/[^a-zA-Z0-9\s]/g, ' ').trim().replace(/\s+/g, '+');
-      url = pendingSite.searchTpl.replace('{q}', cleanQ);
-    } else {
-      url = pendingSite.url;
-    }
-    var siteName = pendingSite.name;
-    var openInNew = pendingSite.openInNewTab;
-    closeSiteSearch();
-    if(openInNew){
-      window.open(url, '_blank', 'noopener,noreferrer');
-    } else {
-      loadInPlayer(url, siteName);
-    }
-  }
-  siteSearchGoBtn.addEventListener('click', function(e){e.stopPropagation();doSiteSearch();});
-  siteSearchCancelBtn.addEventListener('click', function(e){e.stopPropagation();closeSiteSearch();});
-  siteSearchOverlay.addEventListener('click', function(e){e.stopPropagation();});
-
-  siteSearchInput.addEventListener('keydown', function(e){ if(e.key === 'Enter') doSiteSearch(); });
-
-  // No websites list – this version has no streaming websites section
-  function loadInPlayer(url,name){
-    var frame=document.getElementById('vidsrcFrame');
-    var playerFrame=document.getElementById('playerFrame');
-    var browserFrame=document.getElementById('browserFrame');
-    var meta=document.getElementById('playerMeta');
-    document.getElementById('ticket').classList.add('show');
-    document.getElementById('sourcePicker').style.display='none';
-    document.getElementById('epControls').style.display='none';
-    document.getElementById('playerHeading').textContent=name+(currentTitle?' \u2014 '+currentTitle:'');
-    frame.src=url;
-    playerFrame.style.display='block';
-    browserFrame.classList.remove('show');
-    meta.innerHTML='<span class="tag">Extern</span><span class="tag active">'+escapeHtml(name)+'</span><a href="'+url+'" target="_blank" rel="noopener" style="background:var(--green);color:#fff;padding:5px 14px;border-radius:20px;text-decoration:none;font-size:12px;font-weight:700;">&#8599; Öppna i ny flik</a>';
-    document.getElementById('ticket').scrollIntoView({behavior:'smooth',block:'start'});
-    pauseForVideo();
-  }
-
   // === SÖK ===
   var searchMode='title';
   var typeToggle=document.getElementById('typeToggle');
@@ -1143,7 +752,7 @@ function renderVkb(lang){
   async function searchTMDB(){
     var key=getApiKey();
     if(!key){showStatus('Ange en TMDB API-nyckel först.','error');return;}
-    var q=queryInput.value.trim();
+    var q=document.getElementById('query').value.trim();
     if(!q){showStatus('Skriv något att söka efter.','warn');return;}
     hideStatus();resultsList.innerHTML='';goBtn.disabled=true;showStatus('Söker...','info');
     try{
@@ -1193,7 +802,7 @@ function renderVkb(lang){
     goBtn.disabled=false;
   }
   goBtn.addEventListener('click',searchTMDB);
-  queryInput.addEventListener('keydown',function(e){if(e.key==='Enter')searchTMDB();});
+  document.getElementById('query').addEventListener('keydown',function(e){if(e.key==='Enter')searchTMDB();});
 
   // === GOOGLE SEARCH ===
   var googleQuery = document.getElementById('googleQuery');
@@ -1206,6 +815,32 @@ function renderVkb(lang){
   }
   googleBtn.addEventListener('click', searchGoogle);
   googleQuery.addEventListener('keydown', function(e){if(e.key==='Enter')searchGoogle();});
+
+  // === VIDEO TEST ===
+  document.getElementById('videoTestGrid').addEventListener('click', function(e){
+    var item = e.target.closest('.video-test-item');
+    if(!item) return;
+    var url = item.dataset.url;
+    var title = item.dataset.title || 'Testvideo';
+    if(!url) return;
+    
+    var frame = document.getElementById('vidsrcFrame');
+    var playerFrame = document.getElementById('playerFrame');
+    var browserFrame = document.getElementById('browserFrame');
+    var meta = document.getElementById('playerMeta');
+    var ticket = document.getElementById('ticket');
+    
+    ticket.classList.add('show');
+    document.getElementById('sourcePicker').style.display='none';
+    document.getElementById('epControls').style.display='none';
+    document.getElementById('playerHeading').textContent = '🎬 ' + title;
+    frame.src = url;
+    playerFrame.style.display='block';
+    browserFrame.classList.remove('show');
+    meta.innerHTML = '<span class="tag">Test</span><span class="tag active">YouTube</span><a href="'+url+'" target="_blank" rel="noopener" style="background:var(--green);color:#fff;padding:5px 14px;border-radius:20px;text-decoration:none;font-size:12px;font-weight:700;">&#8599; Öppna i ny flik</a>';
+    ticket.scrollIntoView({behavior:'smooth',block:'start'});
+    pauseForVideo();
+  });
 
   // === LADDA DETALJER ===
   async function loadDetail(id,type,prefillSeason,prefillEpisode){
