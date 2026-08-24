@@ -3,40 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Kuribaxi Player — Login</title>
+<title>Kuribaxi Player — Streaming</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,900&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root{--bg:#0b1220;--bg-alt:#0f1830;--panel:#121b2e;--panel-line:rgba(212,175,55,0.16);--gold:#c9a227;--gold-bright:#e8c766;--cream:#f3ecdd;--cream-dim:#a9a290;--teal:#35c6b4;--amber:#e0a458;--error:#e2574c;--green:#2f8f7f;--green-light:#4ec9b0;--blue:#3b82f6;--blue-light:#60a5fa;--radius:14px;}
   *{box-sizing:border-box;margin:0;padding:0}
   body{background:radial-gradient(700px 400px at 15% -10%,rgba(201,162,39,0.10),transparent),radial-gradient(900px 500px at 90% 10%,rgba(53,198,180,0.06),transparent),var(--bg);color:var(--cream);font-family:'Manrope',sans-serif;min-height:100vh;padding:0 0 140px;}
-
-  /* === LOGIN OVERLAY === */
-  #loginOverlay{position:fixed;inset:0;z-index:100000;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:18px;}
-  .login-box{background:var(--panel);border:1px solid var(--panel-line);border-radius:var(--radius);padding:36px 32px;max-width:340px;width:90%;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,0.5);}
-  .login-box h1{font-family:'Fraunces',serif;font-weight:900;font-size:28px;color:var(--gold-bright);margin-bottom:6px;}
-  .login-box p{font-size:12px;color:var(--cream-dim);margin-bottom:22px;}
-  .login-field{display:flex;flex-direction:column;gap:6px;text-align:left;margin-bottom:14px;}
-  .login-field label{font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--gold-bright);font-weight:700;}
-  .login-field input{background:rgba(255,255,255,0.04);border:1px solid var(--panel-line);color:var(--cream);border-radius:8px;padding:12px 14px;font-size:14px;font-family:'Manrope',sans-serif;outline:none;transition:border-color .15s;width:100%;}
-  .login-field input:focus{border-color:var(--gold);}
-  .login-field input::placeholder{color:var(--cream-dim);}
-  .login-btn{background:var(--gold);color:#1a1305;border:none;font-weight:700;font-size:14px;padding:12px 0;width:100%;border-radius:8px;cursor:pointer;transition:background .15s,transform .1s;margin-top:4px;}
-  .login-btn:hover{background:var(--gold-bright);}
-  .login-btn:active{transform:scale(0.98);}
-  .login-error{color:var(--error);font-size:12px;margin-top:10px;display:none;}
-  .login-error.show{display:block;}
-  .login-avatar{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--teal));display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 16px;box-shadow:0 0 20px rgba(201,162,39,0.2);}
-
+  .wrap{max-width:1200px;margin:0 auto;padding:0 20px;}
   .marquee{padding:32px 20px 22px;text-align:center;position:relative;border-bottom:1px solid var(--panel-line);background:linear-gradient(180deg,rgba(201,162,39,0.06),transparent);}
+  .marquee h1{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(26px,5vw,42px);letter-spacing:-0.01em;color:var(--cream);}
+  .marquee h1 span{color:var(--gold-bright);}
+  .marquee p{margin-top:8px;font-size:13px;color:var(--cream-dim);max-width:520px;margin-left:auto;margin-right:auto;line-height:1.5;}
   .bulbs{display:flex;justify-content:center;gap:7px;margin-bottom:14px;}
   .bulb{width:6px;height:6px;border-radius:50%;background:var(--gold-bright);box-shadow:0 0 6px 1px rgba(232,199,102,0.6);animation:flicker 3.2s ease-in-out infinite;}
   .bulb:nth-child(3n){animation-delay:.4s}.bulb:nth-child(5n){animation-delay:.9s}.bulb:nth-child(7n){animation-delay:1.4s}
   @keyframes flicker{0%,100%{opacity:1}50%{opacity:.35}}
-  .marquee h1{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(26px,5vw,42px);letter-spacing:-0.01em;color:var(--cream);}
-  .marquee h1 span{color:var(--gold-bright);}
-  .marquee p{margin-top:8px;font-size:13px;color:var(--cream-dim);max-width:520px;margin-left:auto;margin-right:auto;line-height:1.5;}
-  .wrap{max-width:1200px;margin:0 auto;padding:0 20px;}
   .config{margin-top:22px;background:var(--panel);border:1px solid var(--panel-line);border-radius:var(--radius);padding:16px 20px;}
   .field{display:flex;flex-direction:column;gap:6px;}
   .field label{font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:var(--gold-bright);font-weight:600;}
@@ -48,10 +30,8 @@
   .google-search-label{font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--gold-bright);text-transform:uppercase;letter-spacing:0.06em;font-weight:700;white-space:nowrap;}
   .google-search input{flex:1;min-width:200px;font-size:14px;padding:10px 12px;background:rgba(255,255,255,0.04);border:1px solid var(--panel-line);color:var(--cream);border-radius:8px;outline:none;transition:border-color .15s;font-family:'Manrope',sans-serif;}
   .google-search input:focus{border-color:var(--gold);}
-  .google-search input::placeholder{color:var(--cream-dim);}
   .google-btn{background:var(--blue);color:#fff;border:none;font-weight:700;font-size:13px;padding:10px 20px;border-radius:8px;cursor:pointer;transition:background .15s,transform .1s;font-family:'Manrope',sans-serif;}
   .google-btn:hover{background:var(--blue-light);}
-  .google-btn:active{transform:scale(0.98);}
   .type-toggle{display:flex;border:1px solid var(--panel-line);border-radius:8px;overflow:hidden;}
   .type-toggle button{background:transparent;border:none;color:var(--cream-dim);font-size:12px;font-weight:600;padding:0 14px;cursor:pointer;font-family:'JetBrains Mono',monospace;letter-spacing:0.03em;}
   .type-toggle button.active{background:var(--gold);color:#1a1305;}
@@ -110,26 +90,6 @@
   .player-meta .tag.active{color:#0a1a17;background:var(--teal);border-color:var(--teal);}
   .bottom-section{margin-top:22px;display:flex;gap:16px;align-items:flex-start;}
   @media(max-width:900px){.bottom-section{flex-direction:column;}}
-  .websites-section{width:260px;flex-shrink:0;background:var(--panel);border:1px solid var(--panel-line);border-radius:var(--radius);padding:14px;}
-  @media(max-width:900px){.websites-section{width:100%;}}
-  .websites-head{margin-bottom:12px;}
-  .websites-head h3{font-family:'Fraunces',serif;font-size:15px;font-weight:700;}
-  .websites-head p{font-size:11px;color:var(--cream-dim);margin-top:4px;}
-  .site-list{display:flex;flex-direction:column;gap:4px;max-height:600px;overflow-y:auto;}
-  .site-item{display:flex;align-items:center;gap:7px;padding:5px 9px;background:linear-gradient(135deg,#1e4d45,#2a5e52);border:1px solid rgba(78,201,176,0.12);border-radius:10px;cursor:pointer;transition:all .15s;}
-  .site-item:hover{border-color:rgba(78,201,176,0.4);box-shadow:0 2px 8px rgba(47,143,127,.2);transform:translateX(3px);}
-  .site-item.blue{background:linear-gradient(135deg,#1e3a5f,#2a4d7a);border:1px solid rgba(96,165,250,0.15);}
-  .site-item.blue:hover{border-color:rgba(96,165,250,0.4);box-shadow:0 2px 8px rgba(59,130,246,.2);}
-  .site-item.persian{background:linear-gradient(135deg,#5a1a1a,#7a2222);border:1px solid rgba(220,80,80,0.25);}
-  .site-item.persian:hover{border-color:rgba(220,80,80,0.5);box-shadow:0 2px 8px rgba(180,50,50,.25);}
-  .site-item .site-icon{font-size:15px;flex-shrink:0;width:22px;text-align:center;}
-  .site-item .site-name{font-size:11px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;}
-  .site-item.blue .site-name{color:#e0f2fe;}
-  .site-item.persian .site-name{color:#ffd6d6;}
-  .site-item .site-arrow{font-size:10px;color:var(--green-light);opacity:0;transition:opacity .15s;}
-  .site-item:hover .site-arrow{opacity:1;}
-  .site-item.blue .site-arrow{color:var(--blue-light);}
-  .site-item.persian .site-arrow{color:#ff9999;}
   .library{flex:1;background:var(--panel);border:1px solid var(--panel-line);border-radius:var(--radius);padding:16px 16px 14px;min-width:0;}
   .lib-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px;}
   .lib-head h3{font-family:'Fraunces',serif;font-size:18px;font-weight:700;}
@@ -156,10 +116,7 @@
   @keyframes blink{0%,100%{opacity:1}50%{opacity:0.35}}
   @media(max-width:600px){.clock-badge{top:14px;left:12px;right:auto;bottom:auto;padding:7px 10px;min-width:102px;}.clock-time{font-size:13.5px}.clock-date{font-size:9.5px}}
   footer{max-width:1200px;margin:32px auto 0;padding:0 20px;text-align:center;font-size:11px;color:var(--cream-dim);opacity:0.6;}
-
-  /* === VIRTUAL KEYBOARD === */
-  /* Desktop: keyboard appears under search fields */
-    /* === VIRTUAL KEYBOARD === */
+  /* VIRTUAL KEYBOARD */
   .vkb-wrap{display:none;position:relative;width:100%;max-width:1200px;margin:10px auto 0;padding:0 20px;z-index:99991;}
   .vkb-wrap.open{display:block;}
   .vkb-wrap .vkb-handle{display:none;}
@@ -198,7 +155,6 @@
   .vkb-key.hide-key{background:linear-gradient(180deg,#6a5d3a 0%,#5a4d2a 100%);border-color:#8a7d4a;color:#e8d78a;box-shadow:0 4px 0 #3a3010,0 6px 12px rgba(0,0,0,0.3);}
   .vkb-key.hide-key:hover{background:linear-gradient(180deg,#8a7d4a 0%,#6a5d3a 100%);border-color:#aa9d5a;}
   .vkb-key.hide-key:active{box-shadow:0 1px 0 #3a3010,0 2px 4px rgba(0,0,0,0.3);}
-  /* Light mode */
   .vkb-wrap.light .vkb-panel{background:#d4d6da;border-color:#b4b6ba;box-shadow:0 20px 60px rgba(0,0,0,0.2),inset 0 1px 0 rgba(255,255,255,0.8);}
   .vkb-wrap.light .vkb-key{background:linear-gradient(180deg,#f0f0f4 0%,#d8d8dc 100%);border-color:#c0c0c8;color:#2a2d32;box-shadow:0 4px 0 #b4b6ba,0 6px 12px rgba(0,0,0,0.15);text-shadow:none;}
   .vkb-wrap.light .vkb-key::before{background:linear-gradient(180deg,rgba(255,255,255,0.6),transparent);}
@@ -214,7 +170,6 @@
   .vkb-wrap.light .vkb-close{background:#c0c0c8;border-color:#b0b0b8;color:#2a2d32;}
   .vkb-wrap.light .vkb-close:hover{background:var(--error);color:#fff;border-color:var(--error);}
   .vkb-wrap.light .vkb-suggestion-chip{background:#c0c0c8;border-color:#b0b0b8;color:#2a2d32;}
-  /* Mobile: sliding panel */
   @media(max-width:900px){
     .vkb-wrap{display:block;position:fixed;top:50%;right:0;transform:translateY(-50%) translateX(calc(100% - 5px));z-index:99991;transition:transform .35s cubic-bezier(.4,0,.2,1);max-width:none;margin:0;padding:0;}
     .vkb-wrap.open{transform:translateY(-50%) translateX(0);display:block;}
@@ -243,19 +198,7 @@
     .vkb-panel{width:240px;padding:10px;}
     .vkb-key{min-width:19px;height:19px;font-size:12px;padding:0 4px;}
   }
-  /* === SITE SEARCH OVERLAY === */
-  .site-search-overlay{position:fixed;inset:0;z-index:99990;background:rgba(11,18,32,0.92);backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;flex-direction:column;gap:18px;padding:20px;}
-  .site-search-overlay.show{display:flex;}
-  .site-search-box{background:var(--panel);border:1px solid var(--panel-line);border-radius:var(--radius);padding:28px 24px;max-width:480px;width:100%;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,0.5);}
-  .site-search-box h3{font-family:'Fraunces',serif;font-weight:700;font-size:18px;color:var(--gold-bright);margin-bottom:4px;}
-  .site-search-box p{font-size:12px;color:var(--cream-dim);margin-bottom:18px;}
-  .site-search-field{display:flex;gap:10px;margin-bottom:14px;}
-  .site-search-field input{flex:1;font-size:14px;padding:12px 14px;background:rgba(255,255,255,0.04);border:1px solid var(--panel-line);color:var(--cream);border-radius:8px;outline:none;font-family:'Manrope',sans-serif;}
-  .site-search-field input:focus{border-color:var(--gold);}
-  .site-search-btns{display:flex;gap:10px;justify-content:center;}
-  .site-search-btns .go-btn{padding:10px 24px;font-size:13px;}
-  .site-search-btns .ghost-btn{padding:10px 20px;font-size:13px;}
-
+  /* MUSIC PLAYER */
   .music-player{position:fixed;bottom:0;left:0;right:0;z-index:9998;background:rgba(11,18,32,0.97);border-top:1px solid var(--panel-line);backdrop-filter:blur(16px);box-shadow:0 -8px 32px rgba(0,0,0,0.4);padding:10px 20px;display:flex;align-items:center;gap:14px;transition:transform .3s ease,opacity .3s ease;}
   .music-player.hidden-player{transform:translateY(100%);opacity:0;pointer-events:none;}
   .music-player-left{display:flex;align-items:center;gap:10px;flex-shrink:0;}
@@ -300,12 +243,34 @@
     .music-volume input[type=range]{width:50px;}
     .music-station-select{max-width:120px;}
   }
+  /* LOGIN OVERLAY */
+  #loginOverlay{position:fixed;inset:0;z-index:100000;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:18px;}
+  .login-box{background:var(--panel);border:1px solid var(--panel-line);border-radius:var(--radius);padding:36px 32px;max-width:340px;width:90%;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,0.5);}
+  .login-box h1{font-family:'Fraunces',serif;font-weight:900;font-size:28px;color:var(--gold-bright);margin-bottom:6px;}
+  .login-box p{font-size:12px;color:var(--cream-dim);margin-bottom:22px;}
+  .login-field{display:flex;flex-direction:column;gap:6px;text-align:left;margin-bottom:14px;}
+  .login-field label{font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--gold-bright);font-weight:700;}
+  .login-field input{background:rgba(255,255,255,0.04);border:1px solid var(--panel-line);color:var(--cream);border-radius:8px;padding:12px 14px;font-size:14px;font-family:'Manrope',sans-serif;outline:none;transition:border-color .15s;width:100%;}
+  .login-field input:focus{border-color:var(--gold);}
+  .login-field input::placeholder{color:var(--cream-dim);}
+  .login-btn{background:var(--gold);color:#1a1305;border:none;font-weight:700;font-size:14px;padding:12px 0;width:100%;border-radius:8px;cursor:pointer;transition:background .15s,transform .1s;margin-top:4px;}
+  .login-btn:hover{background:var(--gold-bright);}
+  .login-btn:active{transform:scale(0.98);}
+  .login-error{color:var(--error);font-size:12px;margin-top:10px;display:none;}
+  .login-error.show{display:block;}
+  .login-avatar{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--teal));display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 16px;box-shadow:0 0 20px rgba(201,162,39,0.2);}
+  .site-search-overlay{position:fixed;inset:0;z-index:99990;background:rgba(11,18,32,0.92);backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;flex-direction:column;gap:18px;padding:20px;}
+  .site-search-overlay.show{display:flex;}
+  .site-search-box{background:var(--panel);border:1px solid var(--panel-line);border-radius:var(--radius);padding:28px 24px;max-width:480px;width:100%;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,0.5);}
+  .site-search-box h3{font-family:'Fraunces',serif;font-weight:700;font-size:18px;color:var(--gold-bright);margin-bottom:4px;}
+  .site-search-box p{font-size:12px;color:var(--cream-dim);margin-bottom:18px;}
+  .site-search-field{display:flex;gap:10px;margin-bottom:14px;}
+  .site-search-field input{flex:1;font-size:14px;padding:12px 14px;background:rgba(255,255,255,0.04);border:1px solid var(--panel-line);color:var(--cream);border-radius:8px;outline:none;font-family:'Manrope',sans-serif;}
+  .site-search-field input:focus{border-color:var(--gold);}
+  .site-search-btns{display:flex;gap:10px;justify-content:center;}
+  .site-search-btns .go-btn{padding:10px 24px;font-size:13px;}
+  .site-search-btns .ghost-btn{padding:10px 20px;font-size:13px;}
 </style>
-<base target="_blank">
-<base target="_blank">
-<base target="_blank">
-<base target="_blank">
-<base target="_blank">
 <base target="_blank">
 <base target="_blank">
 </head>
@@ -338,7 +303,7 @@
 <div class="marquee">
   <div class="bulbs" id="bulbs"></div>
   <h1>Var kan jag <span>se</span> den?</h1>
-  <p>Sok pa titel, TMDB-id eller IMDb-id. Spelaren laddas direkt under biljetten.</p>
+  <p>Sök på titel, TMDB-id eller IMDb-id. Spelaren laddas direkt under biljetten.</p>
 </div>
 
 <div class="wrap">
@@ -346,7 +311,7 @@
   <div class="config">
     <div class="field">
       <label for="apikey">TMDB API-nyckel (v3)</label>
-      <input type="password" id="apikey" placeholder="klistra in din nyckel har" value="31efe739e595ccb0a3337a0dc8b4e76f">
+      <input type="password" id="apikey" placeholder="klistra in din nyckel här" value="31efe739e595ccb0a3337a0dc8b4e76f">
     </div>
   </div>
 
@@ -360,15 +325,25 @@
       <button data-type="movie" class="active">FILM</button>
       <button data-type="tv">SERIE</button>
     </div>
-    <input type="text" id="query" placeholder="t.ex. Dune, 693134, eller tt15239678" autocomplete="off" readonly inputmode="none">
-    <button class="go-btn" id="goBtn">Sok</button>
+    <input type="text" id="query" placeholder="t.ex. Dune, 693134, eller tt15239678" autocomplete="off">
+    <button class="go-btn" id="goBtn">Sök</button>
+  </div>
+
+  <!-- KEYBOARD MODE TOGGLE -->
+  <div style="margin-top:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+    <span style="font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--gold-bright);text-transform:uppercase;letter-spacing:0.06em;font-weight:700;">Tangentbord:</span>
+    <div class="type-toggle" id="keyboardModeToggle">
+      <button data-kbmode="computer" class="active">&#9000; DATOR</button>
+      <button data-kbmode="tv">&#128250; TV (Virtuellt)</button>
+    </div>
+    <span id="kbModeHint" style="font-size:11px;color:var(--cream-dim);">Vanligt tangentbord aktivt</span>
   </div>
 
   <!-- Google Search -->
   <div class="google-search">
     <span class="google-search-label">&#128269; Google</span>
-    <input type="text" id="googleQuery" placeholder="Sok pa Google..." autocomplete="off" readonly inputmode="none">
-    <button class="google-btn" id="googleBtn">Sok pa Google</button>
+    <input type="text" id="googleQuery" placeholder="Sök på Google..." autocomplete="off">
+    <button class="google-btn" id="googleBtn">Sök på Google</button>
   </div>
 
   <!-- VIRTUAL KEYBOARD -->
@@ -419,7 +394,7 @@
       <h3 id="playerHeading">Spelare</h3>
       <div class="source-picker" id="sourcePicker"></div>
       <div class="ep-controls" id="epControls">
-        <label>Sasong <input type="number" id="seasonInput" min="1" value="1"></label>
+        <label>Säsong <input type="number" id="seasonInput" min="1" value="1"></label>
         <label>Avsnitt <input type="number" id="episodeInput" min="1" value="1"></label>
         <button class="go-btn" id="epGoBtn" style="padding:8px 14px;font-size:12px;">Spela</button>
       </div>
@@ -428,25 +403,18 @@
       </div>
       <div class="browser-frame" id="browserFrame">
         <div class="browser-icon">&#127760;</div>
-        <p>Den har kallan oppnas i webblasaren.<br><strong>Klicka knappen nedan for att spela upp.</strong></p>
+        <p>Den här källan öppnas i webbläsaren.<br><strong>Klicka knappen nedan för att spela upp.</strong></p>
         <a class="open-browser-btn" id="openBrowserBtn" href="#" target="_blank" rel="noopener">Spela upp i ny flik &#8594;</a>
       </div>
       <div class="player-meta" id="playerMeta"></div>
     </div>
   </div>
 
-  <!-- BOTTOM -->
+  <!-- BOTTOM SECTION (only library, no websites) -->
   <div class="bottom-section" id="bottomSection">
-    <div class="websites-section" id="websitesSection">
-      <div class="websites-head">
-        <h3>&#127760; Streaming-webbplatser</h3>
-        <p>&#128994; = Spelare &nbsp; &#128308; = Ny flik</p>
-      </div>
-      <div class="site-list" id="siteList"></div>
-    </div>
-    <div class="library" id="library">
+    <div class="library" id="library" style="flex:1;">
       <div class="lib-head">
-        <h3>Min fortsattningslista</h3>
+        <h3>Min fortsättningslista</h3>
         <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
           <div class="lib-tabs" id="libTabs">
             <button data-tab="series" class="active">SERIER</button>
@@ -463,22 +431,20 @@
 
 <footer>Drivs av TMDB API. Spelare via vidsrc mirrors &amp; VidAPI. Lista sparas lokalt.</footer>
 
-<!-- SITE SEARCH OVERLAY -->
+<!-- SITE SEARCH OVERLAY (kept for completeness, but no sites) -->
 <div class="site-search-overlay" id="siteSearchOverlay">
   <div class="site-search-box" onclick="event.stopPropagation();">
-    <h3 id="siteSearchTitle">Sok pa webbplats</h3>
-    <p id="siteSearchDesc">Skriv ditt sokord med tangentbordet nedan</p>
+    <h3 id="siteSearchTitle">Sök på webbplats</h3>
+    <p id="siteSearchDesc">Skriv ditt sökord med tangentbordet nedan</p>
     <div class="site-search-field">
-      <input type="text" id="siteSearchInput" placeholder="Skriv sokord..." autocomplete="off" tabindex="0">
+      <input type="text" id="siteSearchInput" placeholder="Skriv sökord..." autocomplete="off" tabindex="0">
     </div>
     <div class="site-search-btns">
-      <button class="go-btn" id="siteSearchGoBtn">Sok</button>
+      <button class="go-btn" id="siteSearchGoBtn">Sök</button>
       <button class="ghost-btn" id="siteSearchCancelBtn">Avbryt</button>
     </div>
   </div>
 </div>
-
-
 
 <!-- MUSIC PLAYER -->
 <div class="music-player paused" id="musicPlayer">
@@ -538,7 +504,7 @@
   </div>
   <div class="music-player-right">
     <button class="music-mute-btn" id="musicMuteBtn">LJUD AV</button>
-    <button class="music-close-btn" id="musicCloseBtn">STANG</button>
+    <button class="music-close-btn" id="musicCloseBtn">STÄNG</button>
   </div>
   <audio id="musicAudio" crossorigin="anonymous"></audio>
 </div>
@@ -634,8 +600,6 @@
   }
   vkbModeBtn.addEventListener('click', function(e){e.stopPropagation();toggleVkbMode();});
 
-
-  
   function getSuggestions(prefix, lang){
     var dict = {
       en: ['the','movie','film','series','watch','online','stream','episode','season','action','comedy','drama','horror','thriller','animation','documentary','romance','sci-fi','fantasy','adventure','crime','mystery','family','music','war','western','history','biography','sport','short','news','reality','talk','game','show'],
@@ -697,7 +661,6 @@ function renderVkb(lang){
         else if(key==='ENTER'){btn.className+=' enter wide';btn.textContent='↵';}
         else{btn.textContent = key;}
         btn.addEventListener('click',function(e){e.stopPropagation();hideSuggestions();vkbPress(key);});
-        // Hover suggestion for letter keys
         if(key.length===1 && /[a-zA-Z؀-ۿݐ-ݿࢠ-ࣿﭐ-﷿ﹰ-﻿ء-يٮ-ٯٱ-ۓەۮ-ۯۺ-ۼۿݐ-ݿࢠࢢ-ࢬࣤ-ࣥࣧ-ࣩﭐ-ﮱﯓ-ﴽﵐ-ﶏﶒ-ﷇﷰ-ﷻﹰ-ﹴﹶ-ﻼ]/.test(key)){
           btn.addEventListener('mouseenter',function(){showSuggestions(key);});
           btn.addEventListener('mouseleave',function(){hideSuggestions();});
@@ -747,31 +710,73 @@ function renderVkb(lang){
     renderVkb(btn.dataset.lang);
   });
 
-  // Show keyboard when clicking on search inputs (readonly prevents system keyboard)
-  queryInput.addEventListener('click',function(e){activeInput=queryInput;openVkb();});
-  googleQueryInput.addEventListener('click',function(e){activeInput=googleQueryInput;openVkb();});
+  // Keyboard mode management
+  var keyboardMode = localStorage.getItem('kuribaxi_kb_mode') || 'computer';
+  var keyboardModeToggle = document.getElementById('keyboardModeToggle');
+  var kbModeHint = document.getElementById('kbModeHint');
 
-  // Also handle focus for TV remote navigation
-  queryInput.addEventListener('focus',function(e){activeInput=queryInput;openVkb();});
-  googleQueryInput.addEventListener('focus',function(e){activeInput=googleQueryInput;openVkb();});
+  function applyKeyboardMode(){
+    var isTv = keyboardMode === 'tv';
+    // Update toggle UI
+    keyboardModeToggle.querySelectorAll('button').forEach(function(b){b.classList.toggle('active',b.dataset.kbmode===keyboardMode);});
+    kbModeHint.textContent = isTv ? 'Virtuellt tangentbord aktivt – klicka i ett fält för att skriva' : 'Vanligt tangentbord aktivt – skriv direkt i fälten';
 
-  // Prevent system keyboard on mobile/TV
-  queryInput.addEventListener('touchstart',function(e){activeInput=queryInput;openVkb();});
-  googleQueryInput.addEventListener('touchstart',function(e){activeInput=googleQueryInput;openVkb();});
+    // Set input attributes based on mode
+    var inputs = [queryInput, googleQueryInput, siteSearchInput];
+    inputs.forEach(function(inp){
+      if(isTv){
+        inp.setAttribute('readonly','readonly');
+        inp.setAttribute('inputmode','none');
+      }else{
+        inp.removeAttribute('readonly');
+        inp.removeAttribute('inputmode');
+      }
+    });
 
-  // Close keyboard when clicking outside search inputs and keyboard
+    // If switching to computer mode, close virtual keyboard
+    if(!isTv){
+      closeVkb();
+    }
+  }
+
+  keyboardModeToggle.addEventListener('click',function(e){
+    var btn = e.target.closest('button');
+    if(!btn) return;
+    keyboardMode = btn.dataset.kbmode;
+    localStorage.setItem('kuribaxi_kb_mode', keyboardMode);
+    applyKeyboardMode();
+  });
+
+  function onInputFocus(input, e){
+    if(keyboardMode !== 'tv') return;
+    activeInput = input;
+    openVkb();
+  }
+
+  queryInput.addEventListener('click',function(e){onInputFocus(queryInput, e);});
+  googleQueryInput.addEventListener('click',function(e){onInputFocus(googleQueryInput, e);});
+  queryInput.addEventListener('focus',function(e){onInputFocus(queryInput, e);});
+  googleQueryInput.addEventListener('focus',function(e){onInputFocus(googleQueryInput, e);});
+  queryInput.addEventListener('touchstart',function(e){onInputFocus(queryInput, e);});
+  googleQueryInput.addEventListener('touchstart',function(e){onInputFocus(googleQueryInput, e);});
+  siteSearchInput.addEventListener('click',function(e){onInputFocus(siteSearchInput, e);});
+  siteSearchInput.addEventListener('focus',function(e){onInputFocus(siteSearchInput, e);});
+
   document.addEventListener('click',function(e){
+    if(keyboardMode !== 'tv') return;
     var isSearchInput = e.target===queryInput || e.target===googleQueryInput || e.target===siteSearchInput;
     var isOverlay = siteSearchOverlay.contains(e.target);
     if(!vkbWrap.contains(e.target) && !isSearchInput && !isOverlay){closeVkb();}
   });
+
+  applyKeyboardMode();
   renderVkb('en');
 
   // === GLODLAMPOR ===
   var bulbsEl = document.getElementById('bulbs');
   for(var i=0;i<26;i++){var b=document.createElement('div');b.className='bulb';bulbsEl.appendChild(b);}
 
-  // === KALLOR ===
+  // === KÄLLOR ===
   var SOURCES = [
     {key:'vidsrc2',name:'vidsrc2.ru',base:'https://vidsrc2.ru/embed'},
     {key:'vidsrc_ir',name:'vidsrc.ir',base:'https://vidsrc.ir/embed'},
@@ -783,44 +788,6 @@ function renderVkb(lang){
     {key:'vsrc_su',name:'vsrc.su',base:'https://vsrc.su/embed'},
     {key:'vidapi_embed',name:'VidAPI (Player)',base:'https://streamimdb.ru',needsImdb:true,isVidApi:true,openInBrowser:false},
     {key:'vidapi_tab',name:'VidAPI (Ny flik)',base:'https://streamimdb.ru',needsImdb:true,isVidApi:true,openInBrowser:true},
-  ];
-
-  var WEBSITES = [
-    // --- Player (grön) ---
-    {name:'YesMovies',url:'https://ww2.yesmovies.ag',icon:'&#127909;',searchTpl:'https://ww2.yesmovies.ag/search/{q}',openInNewTab:false,isPersian:false},
-    {name:'Archive.org',url:'https://archive.org',icon:'&#128451;',searchTpl:'https://archive.org/search?query={q}',openInNewTab:false,isPersian:false},
-    {name:'WCO.tv',url:'https://www.wcofun.net',icon:'&#127912;',searchTpl:'https://www.wcofun.net/search?keyword={q}',openInNewTab:false,isPersian:false},
-    {name:'Solarmovie',url:'https://vvw2.solarmovie.ma/home',icon:'&#127909;',searchTpl:'https://vvw2.solarmovie.ma/search/{q}',openInNewTab:false,isPersian:false},
-    {name:'WatchSeries',url:'https://watchseries.bar/home',icon:'&#128250;',searchTpl:'https://watchseries.bar/search?keyword={q}',openInNewTab:false,isPersian:false},
-    {name:'NitesTV',url:'https://nitestv.org/',icon:'&#127769;',searchTpl:'https://nitestv.org/search/{q}',openInNewTab:false,isPersian:false},
-    {name:'StreamM4U',url:'https://streamm4u.vip/',icon:'&#127916;',searchTpl:'https://streamm4u.vip/search/{q}',openInNewTab:false,isPersian:false},
-    {name:'FlixWave',url:'https://flixwave.online/?category=Popular&page=1',icon:'&#127754;',searchTpl:'https://flixwave.online/search?keyword={q}',openInNewTab:false,isPersian:false},
-    {name:'NostalgikTV',url:'https://nostalgiktv.org/',icon:'&#128247;',searchTpl:'https://nostalgiktv.org/search/{q}',openInNewTab:false,isPersian:false},
-    {name:'MDBMax',url:'https://mdbmax.com/',icon:'&#127916;',searchTpl:'https://mdbmax.com/search?keyword={q}',openInNewTab:false,isPersian:false},
-    // --- Ny flik (blå) ---
-    {name:'YouTube',url:'https://www.youtube.com',icon:'&#9654;',searchTpl:'https://www.youtube.com/results?search_query={q}',openInNewTab:true,isPersian:false},
-    {name:'Dailymotion',url:'https://www.dailymotion.com',icon:'&#9654;',searchTpl:'https://www.dailymotion.com/search/{q}',openInNewTab:true,isPersian:false},
-    {name:'Odysee',url:'https://odysee.com',icon:'&#128302;',searchTpl:'https://odysee.com/$/search?q={q}',openInNewTab:true,isPersian:false},
-    {name:'Twitch',url:'https://www.twitch.tv',icon:'&#128250;',searchTpl:'https://www.twitch.tv/search?term={q}',openInNewTab:true,isPersian:false},
-    {name:'Soap2Day',url:'https://soap2days.help/home/',icon:'&#127853;',searchTpl:'https://soap2days.help/search?keyword={q}',openInNewTab:true,isPersian:false},
-    {name:'AniWatch',url:'https://aniwatch.co.at/',icon:'&#127912;',searchTpl:'https://aniwatch.co.at/search?keyword={q}',openInNewTab:true,isPersian:false},
-    {name:'GIA TV',url:'https://gia.tv/live.php',icon:'&#127988;',searchTpl:'https://gia.tv/live.php',openInNewTab:true,isPersian:false},
-    {name:'FreeClassicMovies',url:'https://freeclassicmovies.tv/',icon:'&#127909;',searchTpl:'https://freeclassicmovies.tv/?s={q}',openInNewTab:true,isPersian:false},
-    {name:'Aparat Playlist',url:'https://www.aparat.com/playlist/9976833/%D8%A2%D8%B3%D9%85%D8%A7%D9%86_%D8%A2%D8%A8%DB%8C_%D8%B1%D9%88%D9%85%D8%A6%D9%88',icon:'&#127988;',searchTpl:'https://www.aparat.com/playlist/9976833/%D8%A2%D8%B3%D9%85%D8%A7%D9%86_%D8%A2%D8%A8%DB%8C_%D8%B1%D9%88%D9%85%D8%A6%D9%88',openInNewTab:true,isPersian:false},
-    {name:'Nostalgik-TV',url:'https://nostalgik-tv.com/',icon:'&#128247;',searchTpl:'https://nostalgik-tv.com/search/{q}',openInNewTab:true,isPersian:false},
-    {name:'DIY Movies',url:'https://www.diycraftsguide.com/movies.html',icon:'&#127916;',searchTpl:'https://www.diycraftsguide.com/movies.html',openInNewTab:true,isPersian:false},
-    // --- Persiska (mörkröd) ---
-    {name:'Farsiland',url:'https://farsiland.com',icon:'&#127988;',searchTpl:'https://farsiland.com/?s={q}',openInNewTab:true,isPersian:true},
-    {name:'Farsiplex',url:'https://farsiplex.com',icon:'&#127988;',searchTpl:'https://farsiplex.com/?s={q}',openInNewTab:true,isPersian:true},
-    {name:'Namakade',url:'https://namakade.com/',icon:'&#127988;',searchTpl:'https://namakade.com/?s={q}',openInNewTab:true,isPersian:true},
-    {name:'Farsi4HD',url:'https://www.farsi4hd.com/',icon:'&#127988;',searchTpl:'https://www.farsi4hd.com/?s={q}',openInNewTab:true,isPersian:true},
-    {name:'IMVBox',url:'https://www.imvbox.com/en',icon:'&#127988;',searchTpl:'https://www.imvbox.com/en/search?q={q}',openInNewTab:true,isPersian:true},
-    {name:'Kurdbin',url:'https://kurdbin.kurdsat.tv/',icon:'&#127988;',searchTpl:'https://kurdbin.kurdsat.tv/',openInNewTab:true,isPersian:true},
-    {name:'Enama',url:'https://enama.ir/',icon:'&#127988;',searchTpl:'https://enama.ir/?s={q}',openInNewTab:true,isPersian:true},
-    {name:'PersianHive',url:'https://persianhive.com/home17/',icon:'&#127988;',searchTpl:'https://persianhive.com/home17/?s={q}',openInNewTab:true,isPersian:true},
-    {name:'IspanChannel',url:'https://ispanechannel.it.com/',icon:'&#127988;',searchTpl:'https://ispanechannel.it.com/',openInNewTab:true,isPersian:true},
-    {name:'Y-Drama',url:'https://www.y-drama.net/',icon:'&#127988;',searchTpl:'https://www.y-drama.net/?s={q}',openInNewTab:true,isPersian:true},
-    {name:'Farshub',url:'https://monclerjakkejacket.com/farshub-2/',icon:'&#127988;',searchTpl:'https://monclerjakkejacket.com/farshub-2/',openInNewTab:true,isPersian:true},
   ];
 
   var activeSource = localStorage.getItem('kuribaxi_active_source') || SOURCES[0].key;
@@ -875,8 +842,17 @@ function renderVkb(lang){
     document.getElementById('clockTime').textContent=timeStr;
     document.getElementById('clockDate').textContent=dateStr;
   }
-  updateClock();
-  setInterval(updateClock,1000);
+  // Sync to nearest second for smooth updates
+  function startClock(){
+    updateClock();
+    var now = new Date();
+    var msToNext = 1000 - now.getMilliseconds();
+    setTimeout(function(){
+      updateClock();
+      setInterval(updateClock, 1000);
+    }, msToNext);
+  }
+  startClock();
 
   // === MUSIC PLAYER ===
   var MUSIC_STATIONS = [
@@ -1022,13 +998,11 @@ function renderVkb(lang){
     musicTrackStation.textContent = MUSIC_STATIONS[currentStation].desc;
   });
 
-  // Init music
   loadStation(currentStation);
   musicVolume.value = parseInt(localStorage.getItem('kuribaxi_music_vol')||'70');
   setVolume(parseInt(musicVolume.value));
   musicVolume.addEventListener('input',function(){localStorage.setItem('kuribaxi_music_vol',this.value);});
 
-  // Show hint to click play (browsers block autoplay with sound)
   setTimeout(function(){
     if(!isPlaying){
       musicUnmuteHint.classList.add('show');
@@ -1044,7 +1018,7 @@ function renderVkb(lang){
     var items=Object.values(dict).sort(function(a,b){return b.lastWatched-a.lastWatched;});
     var libContent=document.getElementById('libContent');
     if(items.length===0){
-      libContent.innerHTML='<div class="lib-empty">Inga '+(isMovies?'filmer':'serier')+' sparade an. Sok och spela nagot sa hamnar det har automatiskt.</div>';
+      libContent.innerHTML='<div class="lib-empty">Inga '+(isMovies?'filmer':'serier')+' sparade än. Sök och spela något så hamnar det här automatiskt.</div>';
       return;
     }
     libContent.innerHTML='<div class="lib-grid">'+items.map(function(it){
@@ -1086,9 +1060,7 @@ function renderVkb(lang){
     saveWatchMap(watchMap);
   });
 
-  // === WEBBPLATSER ===
-
-  // === SITE SEARCH OVERLAY ===
+  // === SITE SEARCH OVERLAY (no sites, but keep for completeness) ===
   var siteSearchOverlay = document.getElementById('siteSearchOverlay');
   var siteSearchInput = document.getElementById('siteSearchInput');
   var siteSearchGoBtn = document.getElementById('siteSearchGoBtn');
@@ -1099,8 +1071,8 @@ function renderVkb(lang){
 
   function openSiteSearch(site){
     pendingSite = site;
-    siteSearchTitle.textContent = 'Sok pa ' + site.name;
-    siteSearchDesc.textContent = 'Skriv ditt sokord med tangentbordet nedan';
+    siteSearchTitle.textContent = 'Sök på webbplats';
+    siteSearchDesc.textContent = 'Skriv ditt sökord med tangentbordet nedan';
     siteSearchInput.value = '';
     siteSearchOverlay.classList.add('show');
     activeInput = siteSearchInput;
@@ -1132,36 +1104,10 @@ function renderVkb(lang){
   siteSearchGoBtn.addEventListener('click', function(e){e.stopPropagation();doSiteSearch();});
   siteSearchCancelBtn.addEventListener('click', function(e){e.stopPropagation();closeSiteSearch();});
   siteSearchOverlay.addEventListener('click', function(e){e.stopPropagation();});
-  siteSearchInput.addEventListener('click', function(e){ activeInput = siteSearchInput; openVkb(); });
-  siteSearchInput.addEventListener('focus', function(e){ activeInput = siteSearchInput; openVkb(); });
+
   siteSearchInput.addEventListener('keydown', function(e){ if(e.key === 'Enter') doSiteSearch(); });
 
-  function renderWebsites(){
-    var list=document.getElementById('siteList');
-    var sorted=WEBSITES.slice().sort(function(a,b){
-      if(a.isPersian && !b.isPersian) return 1;
-      if(!a.isPersian && b.isPersian) return -1;
-      return (a.openInNewTab?1:0)-(b.openInNewTab?1:0);
-    });
-    list.innerHTML=sorted.map(function(site){
-      var cls='site-item';
-      if(site.isPersian) cls+=' persian';
-      else if(site.openInNewTab) cls+=' blue';
-      return '<div class="'+cls+'">'+
-        '<span class="site-icon">'+site.icon+'</span>'+
-        '<span class="site-name">'+escapeHtml(site.name)+'</span>'+
-        '<span class="site-arrow">'+(site.openInNewTab?'&#8599;':'&#9654;')+'</span>'+
-      '</div>';
-    }).join('');
-    list.querySelectorAll('.site-item').forEach(function(item,index){
-      item.addEventListener('click',function(e){
-        e.preventDefault();
-        e.stopPropagation();
-        var site=sorted[index];
-        openSiteSearch(site);
-      });
-    });
-  }
+  // No websites list – this version has no streaming websites section
   function loadInPlayer(url,name){
     var frame=document.getElementById('vidsrcFrame');
     var playerFrame=document.getElementById('playerFrame');
@@ -1174,12 +1120,12 @@ function renderVkb(lang){
     frame.src=url;
     playerFrame.style.display='block';
     browserFrame.classList.remove('show');
-    meta.innerHTML='<span class="tag">Extern</span><span class="tag active">'+escapeHtml(name)+'</span><a href="'+url+'" target="_blank" rel="noopener" style="background:var(--green);color:#fff;padding:5px 14px;border-radius:20px;text-decoration:none;font-size:12px;font-weight:700;">&#8599; Oppna i ny flik</a>';
+    meta.innerHTML='<span class="tag">Extern</span><span class="tag active">'+escapeHtml(name)+'</span><a href="'+url+'" target="_blank" rel="noopener" style="background:var(--green);color:#fff;padding:5px 14px;border-radius:20px;text-decoration:none;font-size:12px;font-weight:700;">&#8599; Öppna i ny flik</a>';
     document.getElementById('ticket').scrollIntoView({behavior:'smooth',block:'start'});
     pauseForVideo();
   }
 
-  // === SOK ===
+  // === SÖK ===
   var searchMode='title';
   var typeToggle=document.getElementById('typeToggle');
   var mediaTypeToggle=document.getElementById('mediaTypeToggle');
@@ -1198,10 +1144,10 @@ function renderVkb(lang){
 
   async function searchTMDB(){
     var key=getApiKey();
-    if(!key){showStatus('Ange en TMDB API-nyckel forst.','error');return;}
+    if(!key){showStatus('Ange en TMDB API-nyckel först.','error');return;}
     var q=queryInput.value.trim();
-    if(!q){showStatus('Skriv nagot att soka efter.','warn');return;}
-    hideStatus();resultsList.innerHTML='';goBtn.disabled=true;showStatus('Soker...','info');
+    if(!q){showStatus('Skriv något att söka efter.','warn');return;}
+    hideStatus();resultsList.innerHTML='';goBtn.disabled=true;showStatus('Söker...','info');
     try{
       var url;
       if(searchMode==='title'){
@@ -1256,7 +1202,7 @@ function renderVkb(lang){
   var googleBtn = document.getElementById('googleBtn');
   function searchGoogle(){
     var q = googleQuery.value.trim();
-    if(!q){showStatus('Skriv nagot att soka efter pa Google.','warn');return;}
+    if(!q){showStatus('Skriv något att söka efter på Google.','warn');return;}
     var url = 'https://www.google.com/search?q=' + encodeURIComponent(q);
     window.open(url, '_blank', 'noopener,noreferrer');
   }
@@ -1266,7 +1212,7 @@ function renderVkb(lang){
   // === LADDA DETALJER ===
   async function loadDetail(id,type,prefillSeason,prefillEpisode){
     var key=getApiKey();
-    if(!key){showStatus('Ange en TMDB API-nyckel forst.','error');return;}
+    if(!key){showStatus('Ange en TMDB API-nyckel först.','error');return;}
     hideStatus();showStatus('Laddar detaljer...','info');
     document.getElementById('ticket').classList.remove('show');
     document.getElementById('resultsList').innerHTML='';
@@ -1282,7 +1228,7 @@ function renderVkb(lang){
       var year=(detail.release_date||detail.first_air_date||'').slice(0,4);
       var runtime=detail.runtime?' &#183; '+detail.runtime+' min':(detail.episode_run_time&&detail.episode_run_time[0]?' &#183; '+detail.episode_run_time[0]+' min/avsn':'');
       document.getElementById('subText').innerHTML=year+runtime+' &#183; '+(detail.vote_average||0).toFixed(1)+'/10';
-      document.getElementById('overviewText').textContent=detail.overview||'Ingen beskrivning tillganglig.';
+      document.getElementById('overviewText').textContent=detail.overview||'Ingen beskrivning tillgänglig.';
       document.getElementById('posterImg').src=detail.poster_path?'https://image.tmdb.org/t/p/w300'+detail.poster_path:'';
       document.getElementById('genreTags').innerHTML=(detail.genres||[]).map(function(g){return '<span class="genre-tag">'+escapeHtml(g.name)+'</span>';}).join('');
       var epControls=document.getElementById('epControls');
@@ -1304,7 +1250,7 @@ function renderVkb(lang){
   }
   function handleError(err){
     console.error(err);
-    showStatus('Fel: '+(err.message||'Nagot gick fel'),'error');
+    showStatus('Fel: '+(err.message||'Något gick fel'),'error');
     document.getElementById('goBtn').disabled=false;
   }
 
@@ -1328,7 +1274,7 @@ function renderVkb(lang){
     var meta=document.getElementById('playerMeta');
     var url;
     if(source.isVidApi){
-      if(!currentImdbId){showStatus('VidAPI kraver IMDb-ID. Sok med IMDb-ID eller valj en annan kalla.','warn');frame.src='';playerFrame.style.display='none';browserFrame.classList.add('show');return;}
+      if(!currentImdbId){showStatus('VidAPI kräver IMDb-ID. Sök med IMDb-ID eller välj en annan källa.','warn');frame.src='';playerFrame.style.display='none';browserFrame.classList.add('show');return;}
       var s=currentType==='tv'?(document.getElementById('seasonInput').value||1):'';
       var e=currentType==='tv'?(document.getElementById('episodeInput').value||1):'';
       if(currentType==='tv')url=source.base+'/'+currentImdbId+'/'+s+'/'+e;
@@ -1344,7 +1290,7 @@ function renderVkb(lang){
     }
     if(currentType==='movie')upsertFilm(currentDetail);
     else{var s=document.getElementById('seasonInput').value||1;var e=document.getElementById('episodeInput').value||1;upsertSeries(currentDetail,s,e);}
-    meta.innerHTML='<span class="tag">'+(currentType==='movie'?'Film':'Serie')+'</span><span class="tag active">TMDB: '+currentId+'</span>'+(currentImdbId?'<span class="tag">IMDb: '+currentImdbId+'</span>':'')+'<a href="https://www.themoviedb.org/'+currentType+'/'+currentId+'" target="_blank" rel="noopener">Oppna pa TMDB &#8599;</a>'+(currentImdbId?'<a href="https://www.imdb.com/title/'+currentImdbId+'/" target="_blank" rel="noopener">Oppna pa IMDb &#8599;</a>':'');
+    meta.innerHTML='<span class="tag">'+(currentType==='movie'?'Film':'Serie')+'</span><span class="tag active">TMDB: '+currentId+'</span>'+(currentImdbId?'<span class="tag">IMDb: '+currentImdbId+'</span>':'')+'<a href="https://www.themoviedb.org/'+currentType+'/'+currentId+'" target="_blank" rel="noopener">Öppna på TMDB &#8599;</a>'+(currentImdbId?'<a href="https://www.imdb.com/title/'+currentImdbId+'/" target="_blank" rel="noopener">Öppna på IMDb &#8599;</a>':'');
     pauseForVideo();
   }
   document.getElementById('epGoBtn').addEventListener('click',function(){
@@ -1354,7 +1300,6 @@ function renderVkb(lang){
 
   // === INIT ===
   renderLibrary();
-  renderWebsites();
 })();
 </script>
 
