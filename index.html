@@ -465,11 +465,11 @@
 
 <!-- SITE SEARCH OVERLAY -->
 <div class="site-search-overlay" id="siteSearchOverlay">
-  <div class="site-search-box">
+  <div class="site-search-box" onclick="event.stopPropagation();">
     <h3 id="siteSearchTitle">Sok pa webbplats</h3>
     <p id="siteSearchDesc">Skriv ditt sokord med tangentbordet nedan</p>
     <div class="site-search-field">
-      <input type="text" id="siteSearchInput" placeholder="Skriv sokord..." autocomplete="off" readonly inputmode="none">
+      <input type="text" id="siteSearchInput" placeholder="Skriv sokord..." autocomplete="off" tabindex="0">
     </div>
     <div class="site-search-btns">
       <button class="go-btn" id="siteSearchGoBtn">Sok</button>
@@ -736,8 +736,8 @@ function renderVkb(lang){
     activeInput.focus();
   }
 
-  function openVkb(){vkbOpen=true;vkbWrap.classList.add('open');}
-  function closeVkb(){vkbOpen=false;vkbWrap.classList.remove('open');}
+  function openVkb(){vkbOpen=true;vkbWrap.style.display='block';vkbWrap.classList.add('open');}
+  function closeVkb(){vkbOpen=false;vkbWrap.style.display='none';vkbWrap.classList.remove('open');}
   function toggleVkb(){vkbOpen?closeVkb():openVkb();}
 
   vkbHandle.addEventListener('click',function(e){e.stopPropagation();toggleVkb();});
@@ -1105,11 +1105,9 @@ function renderVkb(lang){
     siteSearchOverlay.classList.add('show');
     activeInput = siteSearchInput;
     openVkb();
-    setTimeout(function(){siteSearchInput.focus();},50);
   }
   function closeSiteSearch(){
     siteSearchOverlay.classList.remove('show');
-    closeVkb();
     pendingSite = null;
   }
   function doSiteSearch(){
@@ -1131,8 +1129,9 @@ function renderVkb(lang){
       loadInPlayer(url, siteName);
     }
   }
-  siteSearchGoBtn.addEventListener('click', doSiteSearch);
-  siteSearchCancelBtn.addEventListener('click', closeSiteSearch);
+  siteSearchGoBtn.addEventListener('click', function(e){e.stopPropagation();doSiteSearch();});
+  siteSearchCancelBtn.addEventListener('click', function(e){e.stopPropagation();closeSiteSearch();});
+  siteSearchOverlay.addEventListener('click', function(e){e.stopPropagation();});
   siteSearchInput.addEventListener('click', function(e){ activeInput = siteSearchInput; openVkb(); });
   siteSearchInput.addEventListener('focus', function(e){ activeInput = siteSearchInput; openVkb(); });
   siteSearchInput.addEventListener('keydown', function(e){ if(e.key === 'Enter') doSiteSearch(); });
@@ -1156,6 +1155,7 @@ function renderVkb(lang){
     }).join('');
     list.querySelectorAll('.site-item').forEach(function(item,index){
       item.addEventListener('click',function(e){
+        e.preventDefault();
         e.stopPropagation();
         var site=sorted[index];
         openSiteSearch(site);
