@@ -3,202 +3,430 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Kuribaxi Player — Streaming</title>
+<title>Var kan jag se den? — Kuribaxi Player</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,900&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  :root{--bg:#0b1220;--bg-alt:#0f1830;--panel:#121b2e;--panel-line:rgba(212,175,55,0.16);--gold:#c9a227;--gold-bright:#e8c766;--cream:#f3ecdd;--cream-dim:#a9a290;--teal:#35c6b4;--amber:#e0a458;--error:#e2574c;--green:#2f8f7f;--green-light:#4ec9b0;--blue:#3b82f6;--blue-light:#60a5fa;--radius:14px;}
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{background:radial-gradient(700px 400px at 15% -10%,rgba(201,162,39,0.10),transparent),radial-gradient(900px 500px at 90% 10%,rgba(53,198,180,0.06),transparent),var(--bg);color:var(--cream);font-family:'Manrope',sans-serif;min-height:100vh;padding:0 0 140px;}
-  .wrap{max-width:1200px;margin:0 auto;padding:0 20px;}
-  .marquee{padding:32px 20px 22px;text-align:center;position:relative;border-bottom:1px solid var(--panel-line);background:linear-gradient(180deg,rgba(201,162,39,0.06),transparent);}
-  .marquee h1{font-family:'Fraunces',serif;font-weight:900;font-size:clamp(26px,5vw,42px);letter-spacing:-0.01em;color:var(--cream);}
+  :root{
+    --bg:#0b1220;
+    --bg-alt:#0f1830;
+    --panel:#121b2e;
+    --panel-line:rgba(212,175,55,0.16);
+    --gold:#c9a227;
+    --gold-bright:#e8c766;
+    --cream:#f3ecdd;
+    --cream-dim:#a9a290;
+    --teal:#35c6b4;
+    --amber:#e0a458;
+    --error:#e2574c;
+    --radius:14px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:
+      radial-gradient(700px 400px at 15% -10%, rgba(201,162,39,0.10), transparent),
+      radial-gradient(900px 500px at 90% 10%, rgba(53,198,180,0.06), transparent),
+      var(--bg);
+    color:var(--cream);
+    font-family:'Manrope', sans-serif;
+    min-height:100vh;
+    padding:0 0 40px;
+  }
+  .mono{font-family:'JetBrains Mono', monospace;}
+
+  .marquee{
+    padding:32px 20px 22px;
+    text-align:center;
+    position:relative;
+    border-bottom:1px solid var(--panel-line);
+    background:linear-gradient(180deg, rgba(201,162,39,0.06), transparent);
+  }
+  .bulbs{
+    display:flex; justify-content:center; gap:7px; margin-bottom:14px;
+  }
+  .bulb{
+    width:6px; height:6px; border-radius:50%;
+    background:var(--gold-bright);
+    box-shadow:0 0 6px 1px rgba(232,199,102,0.6);
+    animation:flicker 3.2s ease-in-out infinite;
+  }
+  .bulb:nth-child(3n){animation-delay:.4s}
+  .bulb:nth-child(5n){animation-delay:.9s}
+  .bulb:nth-child(7n){animation-delay:1.4s}
+  @media (prefers-reduced-motion: reduce){ .bulb{animation:none} }
+  @keyframes flicker{
+    0%,100%{opacity:1}
+    50%{opacity:.35}
+  }
+  .marquee h1{
+    font-family:'Fraunces', serif;
+    font-weight:900;
+    font-size:clamp(26px, 5vw, 42px);
+    letter-spacing:-0.01em;
+    color:var(--cream);
+  }
   .marquee h1 span{color:var(--gold-bright);}
-  .marquee p{margin-top:8px;font-size:13px;color:var(--cream-dim);max-width:520px;margin-left:auto;margin-right:auto;line-height:1.5;}
-  .bulbs{display:flex;justify-content:center;gap:7px;margin-bottom:14px;}
-  .bulb{width:6px;height:6px;border-radius:50%;background:var(--gold-bright);box-shadow:0 0 6px 1px rgba(232,199,102,0.6);animation:flicker 3.2s ease-in-out infinite;}
-  .bulb:nth-child(3n){animation-delay:.4s}.bulb:nth-child(5n){animation-delay:.9s}.bulb:nth-child(7n){animation-delay:1.4s}
-  @keyframes flicker{0%,100%{opacity:1}50%{opacity:.35}}
-  .config{margin-top:22px;background:var(--panel);border:1px solid var(--panel-line);border-radius:var(--radius);padding:16px 20px;}
-  .field{display:flex;flex-direction:column;gap:6px;}
-  .field label{font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:var(--gold-bright);font-weight:600;}
-  input[type=text],input[type=password],select,input[type=number]{background:rgba(255,255,255,0.04);border:1px solid var(--panel-line);color:var(--cream);border-radius:8px;padding:10px 12px;font-size:13.5px;font-family:'Manrope',sans-serif;outline:none;transition:border-color .15s;}
-  input:focus,select:focus{border-color:var(--gold);}input::placeholder{color:var(--cream-dim);}
-  .search{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;}
-  .search input{flex:1;min-width:220px;font-size:14.5px;padding:12px 14px;}
-  .google-search{margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;background:var(--panel);border:1px solid var(--panel-line);border-radius:var(--radius);padding:12px 16px;}
-  .google-search-label{font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--gold-bright);text-transform:uppercase;letter-spacing:0.06em;font-weight:700;white-space:nowrap;}
-  .google-search input{flex:1;min-width:200px;font-size:14px;padding:10px 12px;background:rgba(255,255,255,0.04);border:1px solid var(--panel-line);color:var(--cream);border-radius:8px;outline:none;transition:border-color .15s;font-family:'Manrope',sans-serif;}
-  .google-search input:focus{border-color:var(--gold);}
-  .google-btn{background:var(--blue);color:#fff;border:none;font-weight:700;font-size:13px;padding:10px 20px;border-radius:8px;cursor:pointer;transition:background .15s,transform .1s;font-family:'Manrope',sans-serif;}
-  .google-btn:hover{background:var(--blue-light);}
-  .type-toggle{display:flex;border:1px solid var(--panel-line);border-radius:8px;overflow:hidden;}
-  .type-toggle button{background:transparent;border:none;color:var(--cream-dim);font-size:12px;font-weight:600;padding:0 14px;cursor:pointer;font-family:'JetBrains Mono',monospace;letter-spacing:0.03em;}
-  .type-toggle button.active{background:var(--gold);color:#1a1305;}
-  .go-btn{background:var(--gold);color:#1a1305;border:none;font-weight:700;font-size:13.5px;padding:0 22px;border-radius:8px;cursor:pointer;transition:background .15s,transform .1s;}
-  .go-btn:hover{background:var(--gold-bright);}.go-btn:active{transform:scale(0.98);}.go-btn:disabled{opacity:0.5;cursor:default;}
-  .status{margin-top:12px;font-size:13px;padding:10px 14px;border-radius:8px;display:none;}
+  .marquee p{
+    margin-top:8px;
+    font-size:13px;
+    color:var(--cream-dim);
+    max-width:520px;
+    margin-left:auto; margin-right:auto;
+    line-height:1.5;
+  }
+
+  .wrap{max-width:980px; margin:0 auto; padding:0 20px;}
+
+  .config{
+    margin-top:22px;
+    background:var(--panel);
+    border:1px solid var(--panel-line);
+    border-radius:var(--radius);
+    padding:16px 20px;
+  }
+  .config-row{
+    display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end;
+  }
+  .field{display:flex; flex-direction:column; gap:6px; flex:1; min-width:180px;}
+  .field label{
+    font-size:11px; text-transform:uppercase; letter-spacing:0.06em;
+    color:var(--gold-bright); font-weight:600;
+  }
+  input[type=text], input[type=password], select{
+    background:rgba(255,255,255,0.04);
+    border:1px solid var(--panel-line);
+    color:var(--cream);
+    border-radius:8px;
+    padding:10px 12px;
+    font-size:13.5px;
+    font-family:'Manrope', sans-serif;
+    outline:none;
+    transition:border-color .15s;
+  }
+  input:focus, select:focus{border-color:var(--gold);}
+  input::placeholder{color:var(--cream-dim);}
+  select{cursor:pointer;}
+
+  .search{
+    margin-top:14px;
+    display:flex; gap:10px; flex-wrap:wrap;
+  }
+  .search input{flex:1; min-width:220px; font-size:14.5px; padding:12px 14px;}
+  .type-toggle{
+    display:flex; border:1px solid var(--panel-line); border-radius:8px; overflow:hidden;
+  }
+  .type-toggle button{
+    background:transparent; border:none; color:var(--cream-dim);
+    font-size:12px; font-weight:600; padding:0 14px;
+    cursor:pointer; font-family:'JetBrains Mono', monospace;
+    letter-spacing:0.03em;
+  }
+  .type-toggle button.active{background:var(--gold); color:#1a1305;}
+  .go-btn{
+    background:var(--gold); color:#1a1305; border:none;
+    font-weight:700; font-size:13.5px; padding:0 22px; border-radius:8px;
+    cursor:pointer; transition:background .15s, transform .1s;
+  }
+  .go-btn:hover{background:var(--gold-bright);}
+  .go-btn:active{transform:scale(0.98);}
+  .go-btn:disabled{opacity:0.5; cursor:default;}
+
+  .status{
+    margin-top:12px; font-size:13px; padding:10px 14px; border-radius:8px;
+    display:none;
+  }
   .status.show{display:block;}
-  .status.error{background:rgba(226,87,76,0.1);border:1px solid rgba(226,87,76,0.3);color:#f0938a;}
-  .status.info{background:rgba(53,198,180,0.08);border:1px solid rgba(53,198,180,0.25);color:var(--teal);}
-  .status.warn{background:rgba(224,164,88,0.10);border:1px solid rgba(224,164,88,0.30);color:var(--amber);}
-  .results-list{margin-top:14px;display:flex;flex-direction:column;gap:8px;}
-  .result-row{display:flex;gap:12px;align-items:center;background:var(--panel);border:1px solid var(--panel-line);border-radius:10px;padding:8px 12px;cursor:pointer;transition:border-color .15s,background .15s;}
-  .result-row:hover{border-color:var(--gold);background:rgba(201,162,39,0.06);}
-  .result-row img{width:36px;height:54px;object-fit:cover;border-radius:4px;background:#1a2436;flex-shrink:0;}
-  .result-row .rtitle{font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .result-row .ryear{font-size:11px;color:var(--cream-dim);font-family:'JetBrains Mono',monospace;}
-  .result-row .rtype{margin-left:auto;font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--gold-bright);border:1px solid var(--panel-line);padding:3px 7px;border-radius:20px;flex-shrink:0;}
-  .ticket{margin-top:18px;display:none;background:var(--panel);border:1px solid var(--panel-line);border-radius:var(--radius);overflow:hidden;box-shadow:0 20px 60px -20px rgba(0,0,0,0.6);}
+  .status.error{background:rgba(226,87,76,0.1); border:1px solid rgba(226,87,76,0.3); color:#f0938a;}
+  .status.info{background:rgba(53,198,180,0.08); border:1px solid rgba(53,198,180,0.25); color:var(--teal);}
+  .status.warn{background:rgba(224,164,88,0.10); border:1px solid rgba(224,164,88,0.30); color:var(--amber);}
+
+  .results-list{margin-top:14px; display:flex; flex-direction:column; gap:8px;}
+  .result-row{
+    display:flex; gap:12px; align-items:center;
+    background:var(--panel); border:1px solid var(--panel-line);
+    border-radius:10px; padding:8px 12px; cursor:pointer;
+    transition:border-color .15s, background .15s;
+  }
+  .result-row:hover{border-color:var(--gold); background:rgba(201,162,39,0.06);}
+  .result-row img{width:36px; height:54px; object-fit:cover; border-radius:4px; background:#1a2436; flex-shrink:0;}
+  .result-row .rmeta{min-width:0;}
+  .result-row .rtitle{font-size:13.5px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .result-row .ryear{font-size:11px; color:var(--cream-dim); font-family:'JetBrains Mono', monospace;}
+  .result-row .rtype{
+    margin-left:auto; font-size:10px; font-family:'JetBrains Mono', monospace;
+    color:var(--gold-bright); border:1px solid var(--panel-line); padding:3px 7px; border-radius:20px;
+    flex-shrink:0;
+  }
+
+  .ticket{
+    margin-top:18px;
+    display:none;
+    background:var(--panel);
+    border:1px solid var(--panel-line);
+    border-radius:var(--radius);
+    overflow:hidden;
+    box-shadow:0 20px 60px -20px rgba(0,0,0,0.6);
+  }
   .ticket.show{display:block;}
-  .ticket-main{display:flex;gap:0;}
-  .sprockets{width:22px;flex-shrink:0;background:repeating-linear-gradient(180deg,var(--bg-alt) 0 14px,var(--panel) 14px 22px);position:relative;}
-  .sprockets::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle at 11px 11px,var(--bg) 4px,transparent 4.5px);background-size:100% 22px;}
-  .ticket-body{flex:1;padding:18px 20px;display:flex;gap:16px;}
-  .poster{width:90px;flex-shrink:0;border-radius:8px;overflow:hidden;background:#1a2436;aspect-ratio:2/3;}
-  .poster img{width:100%;height:100%;object-fit:cover;display:block;}
+  .ticket-main{
+    display:flex; gap:0;
+  }
+  .sprockets{
+    width:22px; flex-shrink:0;
+    background:repeating-linear-gradient(180deg, var(--bg-alt) 0 14px, var(--panel) 14px 22px);
+    position:relative;
+  }
+  .sprockets::before{
+    content:'';
+    position:absolute; inset:0;
+    background-image:radial-gradient(circle at 11px 11px, var(--bg) 4px, transparent 4.5px);
+    background-size:100% 22px;
+  }
+  .ticket-body{flex:1; padding:18px 20px; display:flex; gap:16px;}
+  .poster{
+    width:90px; flex-shrink:0; border-radius:8px; overflow:hidden;
+    background:#1a2436; aspect-ratio:2/3;
+  }
+  .poster img{width:100%; height:100%; object-fit:cover; display:block;}
   .ticket-info{min-width:0;}
-  .ticket-info h2{font-family:'Fraunces',serif;font-weight:700;font-size:20px;line-height:1.15;color:var(--cream);}
-  .ticket-info .sub{margin-top:4px;font-size:11px;color:var(--gold-bright);font-family:'JetBrains Mono',monospace;letter-spacing:0.02em;}
-  .ticket-info .overview{margin-top:8px;font-size:12px;line-height:1.5;color:var(--cream-dim);}
-  .genres{margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;}
-  .genre-tag{font-size:10px;padding:3px 9px;border-radius:20px;border:1px solid var(--panel-line);color:var(--cream-dim);}
-  .perf{position:relative;border-top:1px dashed var(--panel-line);margin:0 20px;}
-  .perf::before,.perf::after{content:'';position:absolute;top:-8px;width:16px;height:16px;background:var(--bg);border-radius:50%;}
-  .perf::before{left:-28px;}.perf::after{right:-28px;}
+  .ticket-info h2{
+    font-family:'Fraunces', serif; font-weight:700; font-size:20px;
+    line-height:1.15; color:var(--cream);
+  }
+  .ticket-info .sub{
+    margin-top:4px; font-size:11px; color:var(--gold-bright);
+    font-family:'JetBrains Mono', monospace; letter-spacing:0.02em;
+  }
+  .ticket-info .overview{
+    margin-top:8px; font-size:12px; line-height:1.5; color:var(--cream-dim);
+  }
+  .genres{margin-top:8px; display:flex; gap:6px; flex-wrap:wrap;}
+  .genre-tag{
+    font-size:10px; padding:3px 9px; border-radius:20px;
+    border:1px solid var(--panel-line); color:var(--cream-dim);
+  }
+
+  .perf{
+    position:relative;
+    border-top:1px dashed var(--panel-line);
+    margin:0 20px;
+  }
+  .perf::before, .perf::after{
+    content:''; position:absolute; top:-8px; width:16px; height:16px;
+    background:var(--bg); border-radius:50%;
+  }
+  .perf::before{left:-28px;}
+  .perf::after{right:-28px;}
+
   .player-box{padding:18px 20px 20px;}
-  .player-box h3{font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:var(--cream-dim);margin-bottom:12px;font-weight:700;}
-  .player-frame{position:relative;width:100%;aspect-ratio:16/9;background:#000;border-radius:10px;overflow:hidden;border:1px solid var(--panel-line);}
-  .player-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:none;}
-  .ep-controls{display:none;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px;background:rgba(255,255,255,0.03);border:1px solid var(--panel-line);padding:10px 12px;border-radius:10px;}
-  .ep-controls.show{display:flex;}
-  .ep-controls label{font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--gold-bright);}
-  .ep-controls input{width:90px;}
-  .browser-frame{display:none;align-items:center;justify-content:center;flex-direction:column;gap:16px;background:var(--bg-alt);aspect-ratio:16/9;border-radius:10px;border:1px solid var(--panel-line);text-align:center;padding:24px;}
-  .browser-frame.show{display:flex;}
-  .browser-frame .browser-icon{width:56px;height:56px;border-radius:14px;background:rgba(201,162,39,0.10);border:1px solid var(--panel-line);display:flex;align-items:center;justify-content:center;font-size:24px;}
-  .browser-frame p{font-size:13px;color:var(--cream-dim);max-width:380px;line-height:1.5;}
-  .open-browser-btn{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#1a1305;border:none;font-weight:700;font-size:14px;padding:12px 28px;border-radius:10px;cursor:pointer;transition:background .15s,transform .1s;text-decoration:none;}
+  .player-box h3{
+    font-size:11px; text-transform:uppercase; letter-spacing:0.08em;
+    color:var(--cream-dim); margin-bottom:12px; font-weight:700;
+  }
+  .player-frame{
+    position:relative;
+    width:100%;
+    aspect-ratio:16/9;
+    background:#000;
+    border-radius:10px;
+    overflow:hidden;
+    border:1px solid var(--panel-line);
+  }
+  .player-frame iframe{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    border:none;
+  }
+
+    .browser-frame{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    gap:16px;
+    background:var(--bg-alt);
+    aspect-ratio:16/9;
+    border-radius:10px;
+    border:1px solid var(--panel-line);
+    text-align:center;
+    padding:24px;
+  }
+  .browser-frame .browser-icon{
+    width:56px; height:56px;
+    border-radius:14px;
+    background:rgba(201,162,39,0.10);
+    border:1px solid var(--panel-line);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:24px;
+  }
+  .browser-frame p{
+    font-size:13px;
+    color:var(--cream-dim);
+    max-width:380px;
+    line-height:1.5;
+  }
+  .browser-frame p strong{
+    color:var(--cream);
+  }
+  .open-browser-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    background:var(--gold);
+    color:#1a1305;
+    border:none;
+    font-weight:700;
+    font-size:14px;
+    padding:12px 28px;
+    border-radius:10px;
+    cursor:pointer;
+    transition:background .15s, transform .1s;
+    text-decoration:none;
+  }
   .open-browser-btn:hover{background:var(--gold-bright);}
-  .source-picker{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
-  .source-btn{font-size:11px;font-family:'JetBrains Mono',monospace;padding:5px 12px;border-radius:20px;border:1px solid var(--panel-line);background:transparent;color:var(--cream-dim);cursor:pointer;transition:all .15s;}
-  .source-btn:hover{border-color:var(--gold);color:var(--gold-bright);}
-  .source-btn.active{background:var(--gold);color:#1a1305;border-color:var(--gold);font-weight:600;}
-  .player-meta{margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
-  .player-meta a{color:var(--gold-bright);text-decoration:none;border-bottom:1px dotted var(--gold);font-size:12px;}
-  .player-meta .tag{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--cream-dim);border:1px solid var(--panel-line);padding:3px 10px;border-radius:20px;}
-  .player-meta .tag.active{color:#0a1a17;background:var(--teal);border-color:var(--teal);}
-  .bottom-section{margin-top:22px;display:flex;gap:16px;align-items:flex-start;}
-  @media(max-width:900px){.bottom-section{flex-direction:column;}}
-  .library{flex:1;background:var(--panel);border:1px solid var(--panel-line);border-radius:var(--radius);padding:16px 16px 14px;min-width:0;}
-  .lib-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px;}
-  .lib-head h3{font-family:'Fraunces',serif;font-size:18px;font-weight:700;}
-  .lib-tabs{display:flex;border:1px solid var(--panel-line);border-radius:8px;overflow:hidden;}
-  .lib-tabs button{background:transparent;border:none;color:var(--cream-dim);font-size:11px;font-weight:700;padding:7px 14px;cursor:pointer;font-family:'JetBrains Mono',monospace;}
-  .lib-tabs button.active{background:var(--gold);color:#1a1305;}
-  .ghost-btn{font-size:11px;font-family:'JetBrains Mono',monospace;background:transparent;border:1px solid var(--panel-line);color:var(--cream-dim);padding:6px 10px;border-radius:8px;cursor:pointer;}
-  .ghost-btn:hover{border-color:var(--error);color:#f0938a;}
-  .lib-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;}
-  .lib-card{position:relative;background:rgba(255,255,255,0.03);border:1px solid var(--panel-line);border-radius:10px;overflow:hidden;cursor:pointer;transition:border-color .15s;}
-  .lib-card:hover{border-color:var(--gold);}
-  .lib-card .del-btn{position:absolute;top:6px;right:6px;width:26px;height:26px;border-radius:50%;background:rgba(11,18,32,0.85);border:1px solid rgba(226,87,76,0.35);color:#f0938a;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;cursor:pointer;z-index:2;backdrop-filter:blur(6px);}
-  .lib-card .del-btn:hover{background:var(--error);color:#fff;border-color:var(--error);}
-  .lib-card img{width:100%;aspect-ratio:2/3;object-fit:cover;display:block;background:#1a2436;}
-  .lib-card-body{padding:8px 9px;}
-  .lib-card-title{font-size:12px;font-weight:600;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .lib-card-sub{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--cream-dim);margin-top:3px;}
-  .lib-card-progress{margin-top:6px;font-size:10px;color:var(--teal);font-family:'JetBrains Mono',monospace;background:rgba(53,198,180,0.1);border:1px solid rgba(53,198,180,0.2);padding:2px 6px;border-radius:20px;display:inline-block;}
-  .lib-empty{font-size:12px;color:var(--cream-dim);padding:18px;text-align:center;border:1px dashed var(--panel-line);border-radius:10px;}
-  .clock-badge{position:fixed;top:14px;right:14px;z-index:9999;background:rgba(18,27,46,0.92);border:1px solid var(--panel-line);border-radius:12px;padding:8px 12px;backdrop-filter:blur(10px);box-shadow:0 8px 24px rgba(0,0,0,0.35),0 0 0 1px rgba(201,162,39,0.08) inset;pointer-events:none;text-align:right;min-width:118px;}
-  .clock-time{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:var(--gold-bright);line-height:1;letter-spacing:0.02em;}
-  .clock-date{font-family:'Manrope',sans-serif;font-size:10.5px;color:var(--cream-dim);margin-top:3px;text-transform:capitalize;line-height:1.2;}
-  .clock-dot{width:6px;height:6px;border-radius:50%;background:var(--teal);display:inline-block;margin-right:6px;box-shadow:0 0 6px var(--teal);animation:blink 1.5s infinite;}
-  @keyframes blink{0%,100%{opacity:1}50%{opacity:0.35}}
-  @media(max-width:600px){.clock-badge{top:14px;left:12px;right:auto;bottom:auto;padding:7px 10px;min-width:102px;}.clock-time{font-size:13.5px}.clock-date{font-size:9.5px}}
-  footer{max-width:1200px;margin:32px auto 0;padding:0 20px;text-align:center;font-size:11px;color:var(--cream-dim);opacity:0.6;}
-  /* VIRTUAL KEYBOARD */
-  .vkb-wrap{display:none;position:relative;width:100%;max-width:1200px;margin:10px auto 0;padding:0 20px;z-index:99991;}
-  .vkb-wrap.open{display:block;}
-  .vkb-wrap .vkb-handle{display:none;}
-  .vkb-panel{width:100%;background:#3a3d42;border:2px solid #4a4d52;border-radius:16px;padding:18px 21px 21px;box-shadow:0 20px 60px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.06);}
-  .vkb-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
-  .vkb-title{font-size:13px;font-family:'JetBrains Mono',monospace;color:var(--gold-bright);text-transform:uppercase;letter-spacing:0.08em;font-weight:700;}
-  .vkb-head-right{display:flex;gap:10px;align-items:center;}
-  .vkb-mode-btn{font-size:11px;font-family:'JetBrains Mono',monospace;padding:5px 10px;border-radius:8px;border:2px solid #4a4d52;background:#4a4d52;color:#e0e0e5;cursor:pointer;transition:all .15s;font-weight:600;}
-  .vkb-mode-btn:hover{background:#5a5d62;color:#fff;}
-  .vkb-close{width:24px;height:24px;border-radius:8px;background:#4a4d52;border:2px solid #5a5d62;color:#e0e0e5;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;font-weight:700;transition:all .15s;}
-  .vkb-close:hover{background:var(--error);color:#fff;border-color:var(--error);}
-  .vkb-suggestions{display:none;flex-wrap:wrap;gap:6px;margin-bottom:10px;padding:7px 10px;background:rgba(201,162,39,0.08);border:1px solid rgba(201,162,39,0.2);border-radius:10px;min-height:44px;align-items:center;}
-  .vkb-suggestions.show{display:flex;}
-  .vkb-suggestions-label{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--gold-bright);text-transform:uppercase;letter-spacing:0.06em;font-weight:700;margin-right:6px;white-space:nowrap;}
-  .vkb-suggestion-chip{font-size:15px;font-weight:600;padding:5px 12px;border-radius:20px;border:1px solid #4a4d52;background:#4a4d52;color:#fff;cursor:pointer;transition:all .15s;white-space:nowrap;}
-  .vkb-suggestion-chip:hover{background:var(--gold);color:#1a1305;border-color:var(--gold);}
-  .vkb-suggestion-chip:active{transform:scale(0.96);}
-  .vkb-langs{display:flex;gap:4px;margin-bottom:10px;}
-  .vkb-lang{font-size:12px;font-family:'JetBrains Mono',monospace;padding:5px 12px;border-radius:10px;border:2px solid #4a4d52;background:#4a4d52;color:#e0e0e5;cursor:pointer;transition:all .15s;font-weight:600;}
-  .vkb-lang:hover{background:#5a5d62;color:#fff;border-color:#6a6d72;}
-  .vkb-lang.active{background:var(--gold);color:#1a1305;border-color:var(--gold);font-weight:700;}
-  .vkb-rows{display:flex;flex-direction:column;gap:7px;}
-  .vkb-row{display:flex;gap:7px;justify-content:center;}
-  .vkb-key{min-width:51px;height:36px;padding:0 7px;background:linear-gradient(180deg,#5a5d62 0%,#4a4d52 100%);border:2px solid #6a6d72;border-radius:10px;color:#fff;font-size:22px;font-weight:700;font-family:'Manrope',sans-serif;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s,border-color .15s;user-select:none;flex:1;box-shadow:0 4px 0 #3a3d42,0 6px 12px rgba(0,0,0,0.3);text-shadow:0 1px 2px rgba(0,0,0,0.4);position:relative;overflow:hidden;}
-  .vkb-key::before{content:'';position:absolute;top:0;left:0;right:0;height:35%;background:linear-gradient(180deg,rgba(255,255,255,0.1),transparent);border-radius:8px 8px 0 0;pointer-events:none;}
-  .vkb-key:hover{background:linear-gradient(180deg,#6a6d72 0%,#5a5d62 100%);border-color:#8a8d92;}
-  .vkb-key:active{transform:translateY(2px);box-shadow:0 1px 0 #3a3d42,0 2px 4px rgba(0,0,0,0.3);}
-  .vkb-key.wide{min-width:75px;flex:1.5;font-size:14px;font-family:'JetBrains Mono',monospace;}
-  .vkb-key.space{flex:5;}
-  .vkb-key.enter{background:linear-gradient(180deg,#3cb371 0%,#2e8b57 100%);border-color:#4cd581;color:#fff;box-shadow:0 4px 0 #1e6b3a,0 6px 12px rgba(0,0,0,0.3);}
-  .vkb-key.enter:hover{background:linear-gradient(180deg,#4cd581 0%,#3cb371 100%);border-color:#5ce591;}
-  .vkb-key.enter:active{box-shadow:0 1px 0 #1e6b3a,0 2px 4px rgba(0,0,0,0.3);}
-  .vkb-key.back{background:linear-gradient(180deg,#c44 0%,#a33 100%);border-color:#d55;color:#fff;box-shadow:0 4px 0 #822,0 6px 12px rgba(0,0,0,0.3);}
-  .vkb-key.back:hover{background:linear-gradient(180deg,#d55 0%,#c44 100%);border-color:#e66;}
-  .vkb-key.back:active{box-shadow:0 1px 0 #822,0 2px 4px rgba(0,0,0,0.3);}
-  .vkb-key.hide-key{background:linear-gradient(180deg,#6a5d3a 0%,#5a4d2a 100%);border-color:#8a7d4a;color:#e8d78a;box-shadow:0 4px 0 #3a3010,0 6px 12px rgba(0,0,0,0.3);}
-  .vkb-key.hide-key:hover{background:linear-gradient(180deg,#8a7d4a 0%,#6a5d3a 100%);border-color:#aa9d5a;}
-  .vkb-key.hide-key:active{box-shadow:0 1px 0 #3a3010,0 2px 4px rgba(0,0,0,0.3);}
-  .vkb-wrap.light .vkb-panel{background:#d4d6da;border-color:#b4b6ba;box-shadow:0 20px 60px rgba(0,0,0,0.2),inset 0 1px 0 rgba(255,255,255,0.8);}
-  .vkb-wrap.light .vkb-key{background:linear-gradient(180deg,#f0f0f4 0%,#d8d8dc 100%);border-color:#c0c0c8;color:#2a2d32;box-shadow:0 4px 0 #b4b6ba,0 6px 12px rgba(0,0,0,0.15);text-shadow:none;}
-  .vkb-wrap.light .vkb-key::before{background:linear-gradient(180deg,rgba(255,255,255,0.6),transparent);}
-  .vkb-wrap.light .vkb-key:hover{background:linear-gradient(180deg,#fff 0%,#e8e8ec 100%);border-color:#a0a0a8;}
-  .vkb-wrap.light .vkb-key:active{box-shadow:0 1px 0 #b4b6ba,0 2px 4px rgba(0,0,0,0.15);}
-  .vkb-wrap.light .vkb-key.enter{background:linear-gradient(180deg,#3cb371 0%,#2e8b57 100%);border-color:#4cd581;color:#fff;box-shadow:0 4px 0 #1e6b3a,0 6px 12px rgba(0,0,0,0.2);}
-  .vkb-wrap.light .vkb-key.back{background:linear-gradient(180deg,#c44 0%,#a33 100%);border-color:#d55;color:#fff;box-shadow:0 4px 0 #822,0 6px 12px rgba(0,0,0,0.2);}
-  .vkb-wrap.light .vkb-key.hide-key{background:linear-gradient(180deg,#e8d78a 0%,#d4c46a 100%);border-color:#c4b45a;color:#3a3010;box-shadow:0 4px 0 #a49440,0 6px 12px rgba(0,0,0,0.15);}
-  .vkb-wrap.light .vkb-lang{background:#c0c0c8;border-color:#b0b0b8;color:#2a2d32;}
-  .vkb-wrap.light .vkb-lang:hover{background:#d0d0d8;border-color:#a0a0a8;}
-  .vkb-wrap.light .vkb-mode-btn{background:#c0c0c8;border-color:#b0b0b8;color:#2a2d32;}
-  .vkb-wrap.light .vkb-mode-btn:hover{background:#d0d0d8;}
-  .vkb-wrap.light .vkb-close{background:#c0c0c8;border-color:#b0b0b8;color:#2a2d32;}
-  .vkb-wrap.light .vkb-close:hover{background:var(--error);color:#fff;border-color:var(--error);}
-  .vkb-wrap.light .vkb-suggestion-chip{background:#c0c0c8;border-color:#b0b0b8;color:#2a2d32;}
-  @media(max-width:900px){
-    .vkb-wrap{display:block;position:fixed;top:50%;right:0;transform:translateY(-50%) translateX(calc(100% - 5px));z-index:99991;transition:transform .35s cubic-bezier(.4,0,.2,1);max-width:none;margin:0;padding:0;}
-    .vkb-wrap.open{transform:translateY(-50%) translateX(0);display:block;}
-    .vkb-wrap .vkb-handle{position:absolute;left:-14px;top:50%;transform:translateY(-50%);width:14px;height:68px;background:#3a3d42;border:2px solid #4a4d52;border-right:none;border-radius:8px 0 0 8px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:-4px 0 12px rgba(0,0,0,0.3);transition:background .2s;}
-    .vkb-wrap .vkb-handle:hover{background:#4a4d52;}
-    .vkb-handle-line{width:3px;height:27px;border-radius:2px;background:var(--gold-bright);opacity:.7;}
-    .vkb-panel{width:260px;background:#3a3d42;border:2px solid #4a4d52;border-radius:16px 0 0 16px;padding:10px 12px 12px;box-shadow:-12px 0 40px rgba(0,0,0,0.45);}
-    .vkb-key{min-width:21px;height:20px;padding:0 4px;font-size:13px;border-radius:8px;}
-    .vkb-key.wide{min-width:36px;flex:1.4;font-size:11px;}
-    .vkb-key.space{flex:3;}
-    .vkb-row{gap:4px;}
-    .vkb-rows{gap:4px;}
-    .vkb-suggestions{margin-bottom:7px;padding:6px 8px;min-height:28px;}
-    .vkb-suggestion-chip{font-size:12px;padding:4px 9px;}
-    .vkb-langs{margin-bottom:7px;}
-    .vkb-lang{padding:4px 9px;font-size:11px;}
-    .vkb-head{margin-bottom:7px;}
-    .vkb-title{font-size:11px;}
-    .vkb-close{width:20px;height:20px;font-size:14px;}
+  .open-browser-btn:active{transform:scale(0.98);}
+
+  .source-picker{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-bottom:12px;
   }
+  .source-btn{
+    font-size:11px;
+    font-family:'JetBrains Mono', monospace;
+    padding:5px 12px;
+    border-radius:20px;
+    border:1px solid var(--panel-line);
+    background:transparent;
+    color:var(--cream-dim);
+    cursor:pointer;
+    transition:all .15s;
+  }
+  .source-btn:hover{border-color:var(--gold); color:var(--gold-bright);}
+  .source-btn.active{
+    background:var(--gold);
+    color:#1a1305;
+    border-color:var(--gold);
+    font-weight:600;
+  }
+
+  .player-meta{
+    margin-top:10px;
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    align-items:center;
+  }
+  .player-meta a{
+    color:var(--gold-bright);
+    text-decoration:none;
+    border-bottom:1px dotted var(--gold);
+    font-size:12px;
+  }
+  .player-meta a:hover{color:var(--gold);}
+  .player-meta .tag{
+    font-size:10px;
+    font-family:'JetBrains Mono', monospace;
+    color:var(--cream-dim);
+    border:1px solid var(--panel-line);
+    padding:3px 10px;
+    border-radius:20px;
+  }
+  .player-meta .tag.active{
+    color:#0a1a17;
+    background:var(--teal);
+    border-color:var(--teal);
+  }
+
+  .notice{
+    margin-top:10px;
+    font-size:11.5px;
+    color:var(--cream-dim);
+    line-height:1.5;
+    padding:10px 14px;
+    background:rgba(224,164,88,0.06);
+    border:1px solid rgba(224,164,88,0.15);
+    border-radius:8px;
+  }
+  .notice strong{color:var(--amber);}
+  .notice code{
+    background:rgba(255,255,255,0.06);
+    padding:2px 6px;
+    border-radius:4px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+  }
+
+.verify-box{
+    margin-top:12px;
+    padding:14px 16px;
+    background:rgba(53,198,180,0.06);
+    border:1px solid rgba(53,198,180,0.2);
+    border-radius:10px;
+  }
+  .verify-box h4{
+    font-size:12px;
+    color:var(--teal);
+    margin-bottom:8px;
+    font-weight:700;
+  }
+  .verify-box ol{
+    margin-left:18px;
+    font-size:12px;
+    color:var(--cream-dim);
+    line-height:1.7;
+  }
+  .verify-box li{margin-bottom:4px;}
+  .verify-box code{
+    background:rgba(255,255,255,0.06);
+    padding:2px 6px;
+    border-radius:4px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    color:var(--gold-bright);
+  }
+  .verify-box a{color:var(--gold-bright); text-decoration:none; border-bottom:1px dotted var(--gold);}
+  .verify-box a:hover{color:var(--gold);}
+
+  footer{
+    max-width:980px; margin:32px auto 0; padding:0 20px;
+    text-align:center; font-size:11px; color:var(--cream-dim); opacity:0.6;
+  }
+
+  .clock-badge{
+    position:fixed; top:14px; right:14px; z-index:9999;
+    background:rgba(18,27,46,0.92); border:1px solid var(--panel-line);
+    border-radius:12px; padding:8px 12px;
+    backdrop-filter:blur(10px);
+    box-shadow:0 8px 24px rgba(0,0,0,0.35), 0 0 0 1px rgba(201,162,39,0.08) inset;
+    pointer-events:none; text-align:right; min-width:118px;
+  }
+  .clock-time{
+    font-family:'JetBrains Mono',monospace; font-size:15px; font-weight:700;
+    color:var(--gold-bright); line-height:1; letter-spacing:0.02em;
+  }
+  .clock-date{
+    font-family:'Manrope',sans-serif; font-size:10.5px; color:var(--cream-dim);
+    margin-top:3px; text-transform:capitalize; line-height:1.2;
+  }
+  .clock-dot{
+    width:6px; height:6px; border-radius:50%; background:var(--teal);
+    display:inline-block; margin-right:6px;
+    box-shadow:0 0 6px var(--teal); animation:blink 1.5s infinite;
+  }
+  @keyframes blink{0%,100%{opacity:1} 50%{opacity:0.35}}
   @media(max-width:600px){
-    .vkb-panel{width:220px;padding:9px;}
-    .vkb-key{min-width:16px;height:18px;font-size:12px;padding:0 3px;}
+    .clock-badge{top:14px; left:12px; right:auto; padding:7px 10px; min-width:102px;}
+    .clock-time{font-size:13.5px}
+    .clock-date{font-size:9.5px}
   }
-  @media(max-width:900px) and (min-width:601px){
-    .vkb-panel{width:240px;padding:10px;}
-    .vkb-key{min-width:19px;height:19px;font-size:12px;padding:0 4px;}
-  }
-  /* MUSIC PLAYER */
+
+/* MUSIC PLAYER */
   .music-player{position:fixed;bottom:0;left:0;right:0;z-index:9998;background:rgba(11,18,32,0.97);border-top:1px solid var(--panel-line);backdrop-filter:blur(16px);box-shadow:0 -8px 32px rgba(0,0,0,0.4);padding:10px 20px;display:flex;align-items:center;gap:14px;transition:transform .3s ease,opacity .3s ease;}
   .music-player.hidden-player{transform:translateY(100%);opacity:0;pointer-events:none;}
   .music-player-left{display:flex;align-items:center;gap:10px;flex-shrink:0;}
@@ -243,208 +471,518 @@
     .music-volume input[type=range]{width:50px;}
     .music-station-select{max-width:120px;}
   }
-  /* LOGIN OVERLAY */
-  #loginOverlay{position:fixed;inset:0;z-index:100000;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:18px;}
-  .login-box{background:var(--panel);border:1px solid var(--panel-line);border-radius:var(--radius);padding:36px 32px;max-width:340px;width:90%;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,0.5);}
-  .login-box h1{font-family:'Fraunces',serif;font-weight:900;font-size:28px;color:var(--gold-bright);margin-bottom:6px;}
-  .login-box p{font-size:12px;color:var(--cream-dim);margin-bottom:22px;}
-  .login-field{display:flex;flex-direction:column;gap:6px;text-align:left;margin-bottom:14px;}
-  .login-field label{font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--gold-bright);font-weight:700;}
-  .login-field input{background:rgba(255,255,255,0.04);border:1px solid var(--panel-line);color:var(--cream);border-radius:8px;padding:12px 14px;font-size:14px;font-family:'Manrope',sans-serif;outline:none;transition:border-color .15s;width:100%;}
-  .login-field input:focus{border-color:var(--gold);}
-  .login-field input::placeholder{color:var(--cream-dim);}
-  .login-btn{background:var(--gold);color:#1a1305;border:none;font-weight:700;font-size:14px;padding:12px 0;width:100%;border-radius:8px;cursor:pointer;transition:background .15s,transform .1s;margin-top:4px;}
-  .login-btn:hover{background:var(--gold-bright);}
-  .login-btn:active{transform:scale(0.98);}
-  .login-error{color:var(--error);font-size:12px;margin-top:10px;display:none;}
-  .login-error.show{display:block;}
-  .login-avatar{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--teal));display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 16px;box-shadow:0 0 20px rgba(201,162,39,0.2);}
-  .site-search-overlay{position:fixed;inset:0;z-index:99990;background:rgba(11,18,32,0.92);backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;flex-direction:column;gap:18px;padding:20px;}
-  .site-search-overlay.show{display:flex;}
-  .site-search-box{background:var(--panel);border:1px solid var(--panel-line);border-radius:var(--radius);padding:28px 24px;max-width:480px;width:100%;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,0.5);}
-  .site-search-box h3{font-family:'Fraunces',serif;font-weight:700;font-size:18px;color:var(--gold-bright);margin-bottom:4px;}
-  .site-search-box p{font-size:12px;color:var(--cream-dim);margin-bottom:18px;}
-  .site-search-field{display:flex;gap:10px;margin-bottom:14px;}
-  .site-search-field input{flex:1;font-size:14px;padding:12px 14px;background:rgba(255,255,255,0.04);border:1px solid var(--panel-line);color:var(--cream);border-radius:8px;outline:none;font-family:'Manrope',sans-serif;}
-  .site-search-field input:focus{border-color:var(--gold);}
-  .site-search-btns{display:flex;gap:10px;justify-content:center;}
-  .site-search-btns .go-btn{padding:10px 24px;font-size:13px;}
-  .site-search-btns .ghost-btn{padding:10px 20px;font-size:13px;}
-</style>
+  </style>
+<base target="_blank">
 <base target="_blank">
 <base target="_blank">
 </head>
 <body>
 
-<!-- LOGIN OVERLAY -->
-<div id="loginOverlay">
-  <div class="login-box">
-    <div class="login-avatar">&#127909;</div>
-    <h1>Kuribaxi</h1>
-    <p>Ange ditt lösenord för att komma åt spelaren</p>
-    <div class="login-field">
-      <label>Användarnamn</label>
-      <input type="text" id="loginUser" value="kuribaxi" readonly style="opacity:0.6;cursor:not-allowed;">
-    </div>
-    <div class="login-field">
-      <label>Lösenord</label>
-      <input type="password" id="loginPass" placeholder="Skriv lösenord..." autofocus>
-    </div>
-    <button class="login-btn" id="loginBtn">Logga in</button>
-    <div class="login-error" id="loginError">Fel lösenord. Försök igen.</div>
-  </div>
-</div>
-
-<div class="clock-badge" id="clockBadge">
+  <div class="clock-badge" id="clockBadge">
   <div class="clock-time"><span class="clock-dot"></span><span id="clockTime">--:--:--</span></div>
   <div class="clock-date" id="clockDate">laddar...</div>
 </div>
 
 <div class="marquee">
-  <div class="bulbs" id="bulbs"></div>
-  <h1>Var kan jag <span>se</span> den?</h1>
-  <p>Sök på titel, TMDB-id eller IMDb-id. Spelaren laddas direkt under biljetten.</p>
-</div>
-
-<div class="wrap">
-
-  <div class="config">
-    <div class="field">
-      <label for="apikey">TMDB API-nyckel (v3)</label>
-      <input type="password" id="apikey" placeholder="klistra in din nyckel här" value="31efe739e595ccb0a3337a0dc8b4e76f">
-    </div>
+    <div class="bulbs" id="bulbs"></div>
+    <h1>Var kan jag <span>se</span> den?</h1>
+    <p>Sok pa titel, TMDB-id eller IMDb-id. Spelaren laddas direkt under biljetten.</p>
   </div>
 
-  <div class="search">
-    <div class="type-toggle" id="typeToggle">
-      <button data-mode="title" class="active">TITEL</button>
-      <button data-mode="tmdb">TMDB-ID</button>
-      <button data-mode="imdb">IMDB-ID</button>
-    </div>
-    <div class="type-toggle" id="mediaTypeToggle" style="display:none;">
-      <button data-type="movie" class="active">FILM</button>
-      <button data-type="tv">SERIE</button>
-    </div>
-    <input type="text" id="query" placeholder="t.ex. Dune, 693134, eller tt15239678" autocomplete="off">
-    <button class="go-btn" id="goBtn">Sök</button>
-  </div>
+  <div class="wrap">
 
-  <!-- KEYBOARD MODE TOGGLE -->
-  <div style="margin-top:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-    <span style="font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--gold-bright);text-transform:uppercase;letter-spacing:0.06em;font-weight:700;">Tangentbord:</span>
-    <div class="type-toggle" id="keyboardModeToggle">
-      <button data-kbmode="computer" class="active">&#9000; DATOR</button>
-      <button data-kbmode="tv">&#128250; TV (Virtuellt)</button>
-    </div>
-    <span id="kbModeHint" style="font-size:11px;color:var(--cream-dim);">Vanligt tangentbord aktivt</span>
-  </div>
-
-  <!-- Google Search -->
-  <div class="google-search">
-    <span class="google-search-label">&#128269; Google</span>
-    <input type="text" id="googleQuery" placeholder="Sök på Google..." autocomplete="off">
-    <button class="google-btn" id="googleBtn">Sök på Google</button>
-  </div>
-
-  <!-- VIRTUAL KEYBOARD -->
-  <div class="vkb-wrap" id="vkbWrap">
-    <div class="vkb-handle" id="vkbHandle" title="Virtuellt tangentbord">
-      <div class="vkb-handle-line"></div>
-    </div>
-    <div class="vkb-panel" id="vkbPanel">
-      <div class="vkb-head">
-        <div class="vkb-title">Tangentbord</div>
-        <div class="vkb-head-right">
-          <button class="vkb-mode-btn" id="vkbModeBtn" title="Växla ljust/mörkt läge">&#9788; LJUS</button>
-          <div class="vkb-close" id="vkbClose" title="Stäng">&#215;</div>
-        </div>
-      </div>
-      <div class="vkb-suggestions" id="vkbSuggestions">
-        <span class="vkb-suggestions-label">Förslag</span>
-      </div>
-      <div class="vkb-langs" id="vkbLangs">
-        <button class="vkb-lang active" data-lang="en">EN</button>
-        <button class="vkb-lang" data-lang="fa">FA</button>
-        <button class="vkb-lang" data-lang="ckb">CKB</button>
-        <button class="vkb-lang" data-lang="ar">AR</button>
-      </div>
-      <div class="vkb-rows" id="vkbRows"></div>
-    </div>
-  </div>
-
-  <div class="status" id="status"></div>
-  <div class="results-list" id="resultsList"></div>
-
-  <!-- TICKET / PLAYER -->
-  <div class="ticket" id="ticket">
-    <div class="ticket-main">
-      <div class="sprockets"></div>
-      <div class="ticket-body">
-        <div class="poster"><img id="posterImg" alt=""></div>
-        <div class="ticket-info">
-          <h2 id="titleText"></h2>
-          <div class="sub" id="subText"></div>
-          <div class="genres" id="genreTags"></div>
-          <p class="overview" id="overviewText"></p>
+    <div class="config">
+      <div class="config-row">
+        <div class="field">
+          <label for="apikey">TMDB API-nyckel (v3)</label>
+          <input type="password" id="apikey" placeholder="klistra in din nyckel har" value="31efe739e595ccb0a3337a0dc8b4e76f">
         </div>
       </div>
     </div>
-    <div class="perf"></div>
-    <div class="player-box" id="playerBox">
-      <h3 id="playerHeading">Spelare</h3>
-      <div class="source-picker" id="sourcePicker"></div>
-      <div class="ep-controls" id="epControls">
-        <label>Säsong <input type="number" id="seasonInput" min="1" value="1"></label>
-        <label>Avsnitt <input type="number" id="episodeInput" min="1" value="1"></label>
-        <button class="go-btn" id="epGoBtn" style="padding:8px 14px;font-size:12px;">Spela</button>
-      </div>
-      <div class="player-frame" id="playerFrame">
-        <iframe id="vidsrcFrame" allowfullscreen referrerpolicy="origin"></iframe>
-      </div>
-      <div class="browser-frame" id="browserFrame">
-        <div class="browser-icon">&#127760;</div>
-        <p>Den här källan öppnas i webbläsaren.<br><strong>Klicka knappen nedan för att spela upp.</strong></p>
-        <a class="open-browser-btn" id="openBrowserBtn" href="#" target="_blank" rel="noopener">Spela upp i ny flik &#8594;</a>
-      </div>
-      <div class="player-meta" id="playerMeta"></div>
-    </div>
-  </div>
 
-  <!-- BOTTOM SECTION (only library, no websites) -->
-  <div class="bottom-section" id="bottomSection">
-    <div class="library" id="library" style="flex:1;">
-      <div class="lib-head">
-        <h3>Min fortsättningslista</h3>
-        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-          <div class="lib-tabs" id="libTabs">
-            <button data-tab="series" class="active">SERIER</button>
-            <button data-tab="movies">FILMER</button>
+    <div class="search">
+      <div class="type-toggle" id="typeToggle">
+        <button data-mode="title" class="active">TITEL</button>
+        <button data-mode="tmdb">TMDB-ID</button>
+        <button data-mode="imdb">IMDB-ID</button>
+      </div>
+      <div class="type-toggle" id="mediaTypeToggle" style="display:none;">
+        <button data-type="movie" class="active">FILM</button>
+        <button data-type="tv">SERIE</button>
+      </div>
+      <input type="text" id="query" placeholder="t.ex. Dune, 693134, eller tt15239678">
+      <button class="go-btn" id="goBtn">Sok</button>
+    </div>
+    
+    <!-- KEYBOARD MODE TOGGLE -->
+    <div style="margin-top:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <span style="font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--gold-bright);text-transform:uppercase;letter-spacing:0.06em;font-weight:700;">Tangentbord:</span>
+      <div class="type-toggle" id="keyboardModeToggle">
+        <button data-kbmode="computer" class="active">&#9000; DATOR</button>
+        <button data-kbmode="tv">&#128250; TV (Virtuellt)</button>
+      </div>
+      <span id="kbModeHint" style="font-size:11px;color:var(--cream-dim);">Vanligt tangentbord aktivt</span>
+    </div>
+
+    <div class="status" id="status"></div>
+    <div class="results-list" id="resultsList"></div>
+
+    <div class="ticket" id="ticket">
+      <div class="ticket-main">
+        <div class="sprockets"></div>
+        <div class="ticket-body">
+          <div class="poster"><img id="posterImg" alt=""></div>
+          <div class="ticket-info">
+            <h2 id="titleText"></h2>
+            <div class="sub" id="subText"></div>
+            <div class="genres" id="genreTags"></div>
+            <p class="overview" id="overviewText"></p>
           </div>
-          <button class="ghost-btn" id="clearLibBtn">Rensa</button>
         </div>
       </div>
-      <div id="libContent"></div>
+      <div class="perf"></div>
+      <div class="player-box" id="playerBox">
+        <h3 id="playerHeading">Spelare</h3>
+        <div class="source-picker" id="sourcePicker"></div>
+        <div class="player-frame" id="playerFrame" style="position:relative;">
+          <iframe id="vidsrcFrame" allowfullscreen referrerpolicy="origin"></iframe>
+          
+        </div>
+        <div class="browser-frame" id="browserFrame" style="display:none;">
+          <div class="browser-icon">&#127760;</div>
+          <p id="browserFrameText">Den har kallan oppnas i webblasaren.<br><strong>Klicka knappen nedan for att spela upp.</strong></p>
+          <a class="open-browser-btn" id="openBrowserBtn" href="#" target="_blank" rel="noopener">Spela upp i ny flik &#8594;</a>
+        </div>
+        <div class="player-meta" id="playerMeta"></div>
+
+        
+
+        <div class="notice" id="playerNotice" style="display:none;"></div>
+      </div>
     </div>
+
   </div>
 
-</div>
+  <footer>
+    Drivs av TMDB API. Spelare via vidsrc mirrors &amp; VidAPI.
+  </footer>
 
-<footer>Drivs av TMDB API. Spelare via vidsrc mirrors &amp; VidAPI. Lista sparas lokalt.</footer>
+<script>
+(function(){
+  const bulbsEl = document.getElementById('bulbs');
+  for(let i=0;i<26;i++){const b=document.createElement('div');b.className='bulb';bulbsEl.appendChild(b);}
 
-<!-- SITE SEARCH OVERLAY (kept for completeness, but no sites) -->
-<div class="site-search-overlay" id="siteSearchOverlay">
-  <div class="site-search-box" onclick="event.stopPropagation();">
-    <h3 id="siteSearchTitle">Sök på webbplats</h3>
-    <p id="siteSearchDesc">Skriv ditt sökord med tangentbordet nedan</p>
-    <div class="site-search-field">
-      <input type="text" id="siteSearchInput" placeholder="Skriv sökord..." autocomplete="off" tabindex="0">
-    </div>
-    <div class="site-search-btns">
-      <button class="go-btn" id="siteSearchGoBtn">Sök</button>
-      <button class="ghost-btn" id="siteSearchCancelBtn">Avbryt</button>
-    </div>
-  </div>
-</div>
+  const SOURCES = [
+    {key:'vidsrc2',        name:'vidsrc2.ru',        base:'https://vidsrc2.ru/embed'},
+    {key:'vidsrc_ir',      name:'vidsrc.ir',         base:'https://vidsrc.ir/embed'},
+    {key:'vidsrcme_ru',    name:'vidsrcme.ru',       base:'https://vidsrcme.ru/embed'},
+    {key:'vidsrcme_su',    name:'vidsrcme.su',       base:'https://vidsrcme.su/embed'},
+    {key:'vidsrc_me_ru',   name:'vidsrc-me.ru',      base:'https://vidsrc-me.ru/embed'},
+    {key:'vidsrc_embed_ru',name:'vidsrc-embed.ru',   base:'https://vidsrc-embed.ru/embed'},
+    {key:'vidsrc_embed_su',name:'vidsrc-embed.su',   base:'https://vidsrc-embed.su/embed'},
+    {key:'vsrc_su',        name:'vsrc.su',           base:'https://vsrc.su/embed'},
+    {key:'vidapi_embed',  name:'VidAPI (Player)',   base:'https://vaplayer.ru/embed', needsImdb:true, isVidApi:true, openInBrowser:false},
+    {key:'vidapi_tab',    name:'VidAPI (Ny flik)',  base:'https://vaplayer.ru/embed', needsImdb:true, isVidApi:true, openInBrowser:true},
+  ];
+  let activeSource = SOURCES[0].key;
+  let currentType = 'movie';
+  let currentId = null;
+  let currentImdbId = null;
+
+  let mode = 'title';
+  let mediaType = 'movie';
+  const mediaTypeToggle = document.getElementById('mediaTypeToggle');
+
+  document.getElementById('typeToggle').addEventListener('click', (e)=>{
+    const btn = e.target.closest('button'); if(!btn) return;
+    document.querySelectorAll('#typeToggle button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    mode = btn.dataset.mode;
+    const q = document.getElementById('query');
+    q.placeholder = mode==='title' ? 't.ex. Dune' : mode==='tmdb' ? 't.ex. 693134' : 't.ex. tt15239678';
+    if(mode === 'title'){
+      mediaTypeToggle.style.display = 'none';
+    } else {
+      mediaTypeToggle.style.display = 'flex';
+    }
+  });
+
+  mediaTypeToggle.addEventListener('click', (e)=>{
+    const btn = e.target.closest('button'); if(!btn) return;
+    document.querySelectorAll('#mediaTypeToggle button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    mediaType = btn.dataset.type;
+  });
+
+  const statusEl = document.getElementById('status');
+  function setStatus(msg, type){
+    statusEl.textContent = msg;
+    statusEl.className = 'status show ' + (type||'info');
+  }
+  function clearStatus(){ statusEl.className = 'status'; }
+
+  const resultsList = document.getElementById('resultsList');
+  const ticket = document.getElementById('ticket');
+
+  const IMG = 'https://image.tmdb.org/t/p/w200';
+
+  function apiKey(){ return document.getElementById('apikey').value.trim(); }
+
+  async function tmdb(path){
+    const key = apiKey();
+    if(!key){ throw new Error('NEEDKEY'); }
+    const sep = path.includes('?') ? '&' : '?';
+    const res = await fetch('https://api.themoviedb.org/3' + path + sep + 'api_key=' + encodeURIComponent(key) + '&language=sv-SE');
+    if(!res.ok){
+      if(res.status===401) throw new Error('BADKEY');
+      throw new Error('HTTP_'+res.status);
+    }
+    return res.json();
+  }
+
+  document.getElementById('goBtn').addEventListener('click', runSearch);
+  document.getElementById('query').addEventListener('keydown', (e)=>{ if(e.key==='Enter') runSearch(); });
+
+  async function runSearch(){
+    clearStatus();
+    resultsList.innerHTML = '';
+    ticket.classList.remove('show');
+    const q = document.getElementById('query').value.trim();
+    if(!q){ setStatus('Skriv in en titel eller ett id forst.', 'error'); return; }
+    if(!apiKey()){ setStatus('Lagg in din TMDB API-nyckel ovan forst.', 'error'); return; }
+
+    const btn = document.getElementById('goBtn');
+    btn.disabled = true; btn.textContent = 'Soker...';
+
+    try{
+      if(mode==='title'){
+        const data = await tmdb('/search/multi?query=' + encodeURIComponent(q));
+        const items = (data.results||[]).filter(r=>r.media_type==='movie'||r.media_type==='tv');
+        if(items.length===0){ setStatus('Inga traffar. Kolla stavningen eller prova pa engelska.', 'error'); }
+        else if(items.length===1){ await loadDetail(items[0].id, items[0].media_type); }
+        else { renderResultList(items.slice(0,8)); }
+      } else if(mode==='tmdb'){
+        // Try selected type first, then fallback to the other type
+        let detail = null;
+        let foundType = null;
+        try {
+          detail = await tmdb('/' + mediaType + '/' + encodeURIComponent(q));
+          foundType = mediaType;
+        } catch(e) {
+          const otherType = mediaType === 'movie' ? 'tv' : 'movie';
+          try {
+            detail = await tmdb('/' + otherType + '/' + encodeURIComponent(q));
+            foundType = otherType;
+          } catch(e2) {}
+        }
+        if(!detail){
+          setStatus('Hittade ingen titel med det TMDB-ID:t.', 'error');
+        } else {
+          await loadDetail(q, foundType);
+        }
+      } else {
+        const data = await tmdb('/find/' + encodeURIComponent(q) + '?external_source=imdb_id');
+        let results = mediaType === 'movie' ? data.movie_results : data.tv_results;
+        let foundType = mediaType;
+        if(!results || !results.length){
+          // Try the other type
+          const otherType = mediaType === 'movie' ? 'tv' : 'movie';
+          results = otherType === 'movie' ? data.movie_results : data.tv_results;
+          foundType = otherType;
+        }
+        if(results && results.length){ await loadDetail(results[0].id, foundType); }
+        else { setStatus('Hittade ingen film eller serie for det IMDb-id:t.', 'error'); }
+      }
+    } catch(err){
+      handleError(err);
+    } finally {
+      btn.disabled = false; btn.textContent = 'Sok';
+    }
+  }
+
+  function renderResultList(items){
+    resultsList.innerHTML = '';
+    items.forEach(item=>{
+      const title = item.title || item.name;
+      const date = item.release_date || item.first_air_date || '';
+      const year = date ? date.slice(0,4) : '&#8212;';
+      const row = document.createElement('div');
+      row.className = 'result-row';
+      row.innerHTML = '<img src="' + (item.poster_path ? IMG+item.poster_path : '') + '" alt=""><div class="rmeta"><div class="rtitle">' + escapeHtml(title) + '</div><div class="ryear">' + year + '</div></div><div class="ryear rid mono">TMDB #' + item.id + '</div><div class="rtype">' + (item.media_type==='tv' ? 'SERIE' : 'FILM') + '</div>';
+      row.addEventListener('click', ()=>{
+        loadDetail(item.id, item.media_type).catch(handleError);
+      });
+      resultsList.appendChild(row);
+    });
+  }
+
+  async function loadDetail(id, type){
+    clearStatus();
+    const detail = await tmdb('/' + type + '/' + id);
+    let imdbId = detail.imdb_id || null;
+    if(!imdbId && type === 'tv'){
+      try{
+        const ext = await tmdb('/tv/' + id + '/external_ids');
+        imdbId = ext.imdb_id || null;
+      } catch(e){}
+    }
+    resultsList.innerHTML = '';
+    renderTicket(detail, type, id, imdbId);
+  }
+
+  function buildUrl(source, type, id, imdbId){
+    if(source.isVidApi){
+      if(type === 'movie'){
+        const useId = imdbId || id;
+        return source.base + '/movie/' + useId;
+      } else {
+        return source.base + '/tv/' + id + '/1/1';
+      }
+    }
+    return source.base + '/' + type + '/' + id;
+  }
+
+  function renderSourcePicker(){
+    const picker = document.getElementById('sourcePicker');
+    picker.innerHTML = '';
+    SOURCES.forEach(src=>{
+      const btn = document.createElement('button');
+      btn.className = 'source-btn' + (src.key===activeSource ? ' active' : '');
+      btn.textContent = src.name;
+      btn.addEventListener('click', ()=>{
+        activeSource = src.key;
+        renderSourcePicker();
+        if(currentId) loadPlayer(currentType, currentId, currentImdbId);
+      });
+      picker.appendChild(btn);
+    });
+  }
+
+  function loadPlayer(type, id, imdbId){
+    currentType = type;
+    currentId = id;
+    currentImdbId = imdbId;
+    const src = SOURCES.find(s=>s.key===activeSource);
+    const url = buildUrl(src, type, id, imdbId);
+    const iframe = document.getElementById('vidsrcFrame');
+    const playerFrame = document.getElementById('playerFrame');
+    const browserFrame = document.getElementById('browserFrame');
+    const openBtn = document.getElementById('openBrowserBtn');
+    const browserFrameText = document.getElementById('browserFrameText');
+    if(src.openInBrowser){
+      playerFrame.style.display = 'none';
+      browserFrame.style.display = 'flex';
+      openBtn.href = url;
+      iframe.src = '';
+      browserFrameText.innerHTML = 'Den har kallan oppnas i webblasaren.<br><strong>Klicka knappen nedan for att spela upp.</strong>';
+      openBtn.textContent = 'Spela upp i ny flik \u2192';
+    } else {
+      playerFrame.style.display = 'block';
+      browserFrame.style.display = 'none';
+      iframe.src = url;
+    }
+    const meta = document.getElementById('playerMeta');
+    meta.innerHTML = '';
+    const tag = document.createElement('span');
+    tag.className = 'tag active';
+    const displayId = (src.isVidApi && type === 'movie' && imdbId) ? imdbId : id;
+    tag.textContent = src.name + ' / ' + type + ' / ' + displayId;
+    meta.appendChild(tag);
+    const a = document.createElement('a');
+    a.href = url;
+    a.target = '_blank';
+    a.rel = 'noopener';
+    a.textContent = 'Oppna i eget fonster \u2192';
+    meta.appendChild(a);
+    document.getElementById('playerNotice').style.display = 'none';
+  }
+
+  function renderTicket(d, type, id, imdbId){
+    const title = d.title || d.name;
+    const date = d.release_date || d.first_air_date || '';
+    const year = date ? date.slice(0,4) : '&#8212;';
+    const runtime = d.runtime ? d.runtime + ' min' : (d.episode_run_time && d.episode_run_time[0] ? d.episode_run_time[0] + ' min/avsnitt' : '');
+    document.getElementById('posterImg').src = d.poster_path ? IMG+d.poster_path : '';
+    document.getElementById('titleText').textContent = title;
+    document.getElementById('subText').textContent = [type==='tv' ? 'SERIE' : 'FILM', year, runtime, 'TMDB #' + d.id].filter(Boolean).join('  \u00b7  ');
+    document.getElementById('overviewText').textContent = d.overview || 'Ingen beskrivning tillganglig.';
+    const genreBox = document.getElementById('genreTags');
+    genreBox.innerHTML = '';
+    (d.genres||[]).forEach(g=>{
+      const tag = document.createElement('span');
+      tag.className = 'genre-tag'; tag.textContent = g.name;
+      genreBox.appendChild(tag);
+    });
+    renderSourcePicker();
+    loadPlayer(type, id, imdbId);
+    document.getElementById('playerHeading').textContent = 'Spelare \u2014 ' + (type==='tv' ? 'Serie' : 'Film');
+    ticket.classList.add('show');
+    ticket.scrollIntoView({behavior:'smooth', block:'nearest'});
+  }
+
+  function handleError(err){
+    if(err.message==='NEEDKEY') setStatus('Lagg in din TMDB API-nyckel ovan forst.', 'error');
+    else if(err.message==='BADKEY') setStatus('TMDB avvisade nyckeln. Dubbelkolla att du kopierat "API Key (v3 auth)" korrekt.', 'error');
+    else setStatus('Kunde inte hamta data just nu (' + err.message + '). Prova igen om en stund.', 'error');
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+
+
+  // === KLOCKA ===
+  function updateClock(){
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString('sv-SE', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+    const dateStr = now.toLocaleDateString('sv-SE', {weekday:'long', day:'numeric', month:'long'});
+    document.getElementById('clockTime').textContent = timeStr;
+    document.getElementById('clockDate').textContent = dateStr;
+  }
+  function startClock(){
+    updateClock();
+    const now = new Date();
+    const msToNext = 1000 - now.getMilliseconds();
+    setTimeout(function(){
+      updateClock();
+      setInterval(updateClock, 1000);
+    }, msToNext);
+  }
+  startClock();
+
+  // === KEYBOARD MODE ===
+  const queryInput = document.getElementById('query');
+  let keyboardMode = localStorage.getItem('kuribaxi_kb_mode') || 'computer';
+  const keyboardModeToggle = document.getElementById('keyboardModeToggle');
+  const kbModeHint = document.getElementById('kbModeHint');
+
+  function applyKeyboardMode(){
+    const isTv = keyboardMode === 'tv';
+    keyboardModeToggle.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.kbmode === keyboardMode));
+    kbModeHint.textContent = isTv ? 'Virtuellt tangentbord aktivt – klicka i ett falt for att skriva' : 'Vanligt tangentbord aktivt – skriv direkt i falten';
+    if(isTv){
+      queryInput.setAttribute('readonly', 'readonly');
+      queryInput.setAttribute('inputmode', 'none');
+    } else {
+      queryInput.removeAttribute('readonly');
+      queryInput.removeAttribute('inputmode');
+    }
+    if(!isTv) closeVkb();
+  }
+
+  keyboardModeToggle.addEventListener('click', (e)=>{
+    const btn = e.target.closest('button');
+    if(!btn) return;
+    keyboardMode = btn.dataset.kbmode;
+    localStorage.setItem('kuribaxi_kb_mode', keyboardMode);
+    applyKeyboardMode();
+  });
+
+  // === VIRTUAL KEYBOARD (minimal) ===
+  let vkbOpen = false;
+  const vkbWrap = document.createElement('div');
+  vkbWrap.id = 'vkbWrap';
+  vkbWrap.style.cssText = 'display:none; position:fixed; bottom:20px; left:50%; transform:translateX(-50%); z-index:9999; background:#1a1a2e; border:1px solid var(--panel-line); border-radius:12px; padding:12px; box-shadow:0 10px 40px rgba(0,0,0,0.5);';
+
+  const vkbRows = document.createElement('div');
+  vkbRows.style.cssText = 'display:flex; flex-direction:column; gap:5px;';
+
+  const rows = [
+    ['1','2','3','4','5','6','7','8','9','0'],
+    ['q','w','e','r','t','y','u','i','o','p'],
+    ['a','s','d','f','g','h','j','k','l'],
+    ['z','x','c','v','b','n','m'],
+  ];
+
+  function vkbPress(key){
+    const start = queryInput.selectionStart || queryInput.value.length;
+    const end = queryInput.selectionEnd || queryInput.value.length;
+    const val = queryInput.value;
+    if(key === 'BACK'){
+      if(start === end && start > 0){
+        queryInput.value = val.slice(0, start-1) + val.slice(end);
+        queryInput.selectionStart = queryInput.selectionEnd = start-1;
+      } else if(start !== end){
+        queryInput.value = val.slice(0, start) + val.slice(end);
+        queryInput.selectionStart = queryInput.selectionEnd = start;
+      }
+    } else if(key === 'SPACE'){
+      queryInput.value = val.slice(0, start) + ' ' + val.slice(end);
+      queryInput.selectionStart = queryInput.selectionEnd = start+1;
+    } else if(key === 'ENTER'){
+      runSearch();
+      return;
+    } else {
+      queryInput.value = val.slice(0, start) + key + val.slice(end);
+      queryInput.selectionStart = queryInput.selectionEnd = start + key.length;
+    }
+    queryInput.focus();
+  }
+
+  rows.forEach(row=>{
+    const rowDiv = document.createElement('div');
+    rowDiv.style.cssText = 'display:flex; gap:4px; justify-content:center;';
+    row.forEach(key=>{
+      const btn = document.createElement('button');
+      btn.textContent = key;
+      btn.style.cssText = 'min-width:28px; height:32px; padding:0 6px; background:#2a2a3e; border:1px solid #3a3a4e; border-radius:6px; color:#fff; font-size:14px; font-weight:600; cursor:pointer;';
+      btn.addEventListener('click', (e)=>{ e.stopPropagation(); vkbPress(key); });
+      rowDiv.appendChild(btn);
+    });
+    vkbRows.appendChild(rowDiv);
+  });
+
+  // Bottom row with special keys
+  const bottomRow = document.createElement('div');
+  bottomRow.style.cssText = 'display:flex; gap:4px; justify-content:center;';
+
+  const spaceBtn = document.createElement('button');
+  spaceBtn.textContent = '␣';
+  spaceBtn.style.cssText = 'flex:3; height:32px; background:#2a2a3e; border:1px solid #3a3a4e; border-radius:6px; color:#fff; font-size:14px; cursor:pointer;';
+  spaceBtn.addEventListener('click', (e)=>{ e.stopPropagation(); vkbPress('SPACE'); });
+
+  const backBtn = document.createElement('button');
+  backBtn.textContent = '⌫';
+  backBtn.style.cssText = 'flex:1.5; height:32px; background:#3a1a1a; border:1px solid #5a2a2a; border-radius:6px; color:#e08080; font-size:14px; cursor:pointer;';
+  backBtn.addEventListener('click', (e)=>{ e.stopPropagation(); vkbPress('BACK'); });
+
+  const enterBtn = document.createElement('button');
+  enterBtn.textContent = '↵ Sök';
+  enterBtn.style.cssText = 'flex:2; height:32px; background:var(--gold); border:1px solid var(--gold-bright); border-radius:6px; color:#1a1305; font-size:12px; font-weight:700; cursor:pointer;';
+  enterBtn.addEventListener('click', (e)=>{ e.stopPropagation(); vkbPress('ENTER'); });
+
+  const closeBtn = document.createElement('button');
+  closeBtn.textContent = '✕';
+  closeBtn.style.cssText = 'flex:1; height:32px; background:#1a1a2e; border:1px solid #3a3a4e; border-radius:6px; color:var(--cream-dim); font-size:12px; cursor:pointer;';
+  closeBtn.addEventListener('click', (e)=>{ e.stopPropagation(); closeVkb(); });
+
+  bottomRow.appendChild(backBtn);
+  bottomRow.appendChild(spaceBtn);
+  bottomRow.appendChild(enterBtn);
+  bottomRow.appendChild(closeBtn);
+  vkbRows.appendChild(bottomRow);
+
+  vkbWrap.appendChild(vkbRows);
+  document.body.appendChild(vkbWrap);
+
+  function openVkb(){ vkbOpen = true; vkbWrap.style.display = 'block'; }
+  function closeVkb(){ vkbOpen = false; vkbWrap.style.display = 'none'; }
+
+  queryInput.addEventListener('click', ()=>{ if(keyboardMode === 'tv') openVkb(); });
+  queryInput.addEventListener('focus', ()=>{ if(keyboardMode === 'tv') openVkb(); });
+  queryInput.addEventListener('touchstart', ()=>{ if(keyboardMode === 'tv') openVkb(); });
+
+  document.addEventListener('click', (e)=>{
+    if(keyboardMode !== 'tv') return;
+    if(!vkbWrap.contains(e.target) && e.target !== queryInput){ closeVkb(); }
+  });
+
+  applyKeyboardMode();
+
+})();
+</script>
+
 
 <!-- MUSIC PLAYER -->
 <div class="music-player paused" id="musicPlayer">
@@ -710,66 +1248,18 @@ function renderVkb(lang){
     renderVkb(btn.dataset.lang);
   });
 
-  // Keyboard mode management
-  var keyboardMode = localStorage.getItem('kuribaxi_kb_mode') || 'computer';
-  var keyboardModeToggle = document.getElementById('keyboardModeToggle');
-  var kbModeHint = document.getElementById('kbModeHint');
-
-  function applyKeyboardMode(){
-    var isTv = keyboardMode === 'tv';
-    // Update toggle UI
-    keyboardModeToggle.querySelectorAll('button').forEach(function(b){b.classList.toggle('active',b.dataset.kbmode===keyboardMode);});
-    kbModeHint.textContent = isTv ? 'Virtuellt tangentbord aktivt – klicka i ett fält för att skriva' : 'Vanligt tangentbord aktivt – skriv direkt i fälten';
-
-    // Set input attributes based on mode
-    var inputs = [queryInput, googleQueryInput, siteSearchInput];
-    inputs.forEach(function(inp){
-      if(isTv){
-        inp.setAttribute('readonly','readonly');
-        inp.setAttribute('inputmode','none');
-      }else{
-        inp.removeAttribute('readonly');
-        inp.removeAttribute('inputmode');
-      }
-    });
-
-    // If switching to computer mode, close virtual keyboard
-    if(!isTv){
-      closeVkb();
-    }
-  }
-
-  keyboardModeToggle.addEventListener('click',function(e){
-    var btn = e.target.closest('button');
-    if(!btn) return;
-    keyboardMode = btn.dataset.kbmode;
-    localStorage.setItem('kuribaxi_kb_mode', keyboardMode);
-    applyKeyboardMode();
-  });
-
-  function onInputFocus(input, e){
-    if(keyboardMode !== 'tv') return;
-    activeInput = input;
-    openVkb();
-  }
-
-  queryInput.addEventListener('click',function(e){onInputFocus(queryInput, e);});
-  googleQueryInput.addEventListener('click',function(e){onInputFocus(googleQueryInput, e);});
-  queryInput.addEventListener('focus',function(e){onInputFocus(queryInput, e);});
-  googleQueryInput.addEventListener('focus',function(e){onInputFocus(googleQueryInput, e);});
-  queryInput.addEventListener('touchstart',function(e){onInputFocus(queryInput, e);});
-  googleQueryInput.addEventListener('touchstart',function(e){onInputFocus(googleQueryInput, e);});
-  siteSearchInput.addEventListener('click',function(e){onInputFocus(siteSearchInput, e);});
-  siteSearchInput.addEventListener('focus',function(e){onInputFocus(siteSearchInput, e);});
+  queryInput.addEventListener('click',function(e){activeInput=queryInput;openVkb();});
+  googleQueryInput.addEventListener('click',function(e){activeInput=googleQueryInput;openVkb();});
+  queryInput.addEventListener('focus',function(e){activeInput=queryInput;openVkb();});
+  googleQueryInput.addEventListener('focus',function(e){activeInput=googleQueryInput;openVkb();});
+  queryInput.addEventListener('touchstart',function(e){activeInput=queryInput;openVkb();});
+  googleQueryInput.addEventListener('touchstart',function(e){activeInput=googleQueryInput;openVkb();});
 
   document.addEventListener('click',function(e){
-    if(keyboardMode !== 'tv') return;
     var isSearchInput = e.target===queryInput || e.target===googleQueryInput || e.target===siteSearchInput;
     var isOverlay = siteSearchOverlay.contains(e.target);
     if(!vkbWrap.contains(e.target) && !isSearchInput && !isOverlay){closeVkb();}
   });
-
-  applyKeyboardMode();
   renderVkb('en');
 
   // === GLODLAMPOR ===
@@ -842,17 +1332,8 @@ function renderVkb(lang){
     document.getElementById('clockTime').textContent=timeStr;
     document.getElementById('clockDate').textContent=dateStr;
   }
-  // Sync to nearest second for smooth updates
-  function startClock(){
-    updateClock();
-    var now = new Date();
-    var msToNext = 1000 - now.getMilliseconds();
-    setTimeout(function(){
-      updateClock();
-      setInterval(updateClock, 1000);
-    }, msToNext);
-  }
-  startClock();
+  updateClock();
+  setInterval(updateClock,1000);
 
   // === MUSIC PLAYER ===
   var MUSIC_STATIONS = [
@@ -1104,7 +1585,8 @@ function renderVkb(lang){
   siteSearchGoBtn.addEventListener('click', function(e){e.stopPropagation();doSiteSearch();});
   siteSearchCancelBtn.addEventListener('click', function(e){e.stopPropagation();closeSiteSearch();});
   siteSearchOverlay.addEventListener('click', function(e){e.stopPropagation();});
-
+  siteSearchInput.addEventListener('click', function(e){ activeInput = siteSearchInput; openVkb(); });
+  siteSearchInput.addEventListener('focus', function(e){ activeInput = siteSearchInput; openVkb(); });
   siteSearchInput.addEventListener('keydown', function(e){ if(e.key === 'Enter') doSiteSearch(); });
 
   // No websites list – this version has no streaming websites section
@@ -1300,6 +1782,452 @@ function renderVkb(lang){
 
   // === INIT ===
   renderLibrary();
+
+  // === MUSIC PLAYER ===
+  var MUSIC_STATIONS = [
+    {name:'Radio Swiss Classic',url:'https://stream.srg-ssr.ch/m/rsc_de/mp3_128',desc:'Schweizisk klassisk radio'},
+    {name:'Public Domain Classical',url:'http://relay.publicdomainradio.org/classical.mp3',desc:'Offentlig doman klassisk musik'},
+    {name:'Classic FM UK',url:'http://vis.media-ice.musicradio.com/ClassicFMMP3',desc:'Storbritanniens favorit'},
+    {name:'Adagio.FM',url:'http://hi5.adagio.fm/;',desc:'Lugn klassisk musik'},
+    {name:'DR P2 Klassik',url:'http://live-icy.gss.dr.dk:8000/A/A04L.mp3',desc:'Dansk klassisk radio'},
+    {name:'NPO Radio 4',url:'https://icecast.omroep.nl/radio4-bb-mp3',desc:'Nederlandsk klassisk'},
+    {name:'Venice Classic Radio',url:'https://uk2.streamingpulse.com/ssl/vcr2',desc:'Italiensk barock & klassisk'},
+    {name:'Radio Caprice Cello',url:'http://79.120.12.130:8002/cello',desc:'Cellomusik nonstop'},
+    {name:'Baroque Sonatas',url:'https://stream.laut.fm/baroque_sonatas_radio',desc:'Barocksonater'},
+    {name:'WQXR Classical',url:'https://stream.wqxr.org/wqxr-web',desc:'New York klassisk'},
+    {name:'Colorado Public Radio',url:'https://stream1.cprnetwork.org/cpr2_lo',desc:'Colorado klassisk'},
+    {name:'WWFM Classical',url:'https://wwfm.streamguys1.com/live',desc:'New Jersey klassisk'},
+    {name:'Classic Praha',url:'http://icecast8.play.cz/classic128.mp3',desc:'Tjeckisk klassisk & film'},
+    {name:'Radio Paradise Mellow',url:'https://stream.radioparadise.com/mellow-320',desc:'Lugn varldsmusik'},
+    {name:'Linn Classical',url:'http://89.16.185.174:8004/stream',desc:'Skotsk Hi-Fi klassisk'},
+    {name:'YourClassical Relax',url:'https://relax.stream.publicradio.org/relax.aac',desc:'Avslappnande klassisk'},
+    {name:'BBC Radio 3',url:'https://stream.live.vc.bbcmedia.co.uk/bbc_radio_three',desc:'BBC klassisk & kultur'},
+    {name:'France Musique',url:'https://direct.francemusique.fr/live/francemusique-midfi.mp3',desc:'Fransk klassisk radio'},
+    {name:'Klassik Radio',url:'https://live.streams.klassikradio.de/klassikradio-deutschland',desc:'Tysk klassisk radio'},
+    {name:'Sonatica',url:'http://148.251.43.231:8742/160;.mp3',desc:'Klassisk musik 24/7'},
+    {name:'CMBF Radio Musical',url:'https://icecast.teveo.cu/Nbtz7HT3',desc:'Kubansk kultur & klassisk'},
+    {name:'Maine Public Classical',url:'https://playerservices.streamtheworld.com/api/livestream-redirect/WMEA_CLASSICAL.mp3',desc:'Maine klassisk'},
+    {name:'Vermont Public Classical',url:'https://vprclassical.streamguys1.com/vprclassical-web',desc:'Vermont klassisk'},
+    {name:'Yellowstone Classical',url:'https://ypr.streamguys1.com/live-2',desc:'Montana klassisk'},
+    {name:'Northwest Public Classical',url:'https://streams.nwpr.org:8443/NWPRCLASSICAL',desc:'Washington klassisk'},
+    {name:'Minnesota Public Choral',url:'https://choral.stream.publicradio.org/choral.aac',desc:'Kormusik'},
+    {name:'WFCC Cape Classical',url:'https://ice7.securenetsystems.net/WFCC',desc:'Cape Cod klassisk'},
+    {name:'KANO Hawaii Classical',url:'https://khpr-ice.streamguys1.com/kipo2',desc:'Hawaii klassisk'},
+    {name:'Classical 89 BYU',url:'https://radio.byub.org/classical89/classical89_aac',desc:'Utah klassisk'},
+    {name:'ClassicalNH',url:'https://nhpr.streamguys1.com/classical',desc:'New Hampshire klassisk'},
+  ];
+
+  var musicAudio = document.getElementById('musicAudio');
+  var musicPlayBtn = document.getElementById('musicPlayBtn');
+  var musicStationSelect = document.getElementById('musicStationSelect');
+  var musicVolume = document.getElementById('musicVolume');
+  var musicMuteBtn = document.getElementById('musicMuteBtn');
+  var musicCloseBtn = document.getElementById('musicCloseBtn');
+  var musicReopenBtn = document.getElementById('musicReopenBtn');
+  var musicPlayer = document.getElementById('musicPlayer');
+  var musicTrackTitle = document.getElementById('musicTrackTitle');
+  var musicTrackStation = document.getElementById('musicTrackStation');
+  var musicUnmuteHint = document.getElementById('musicUnmuteHint');
+  var currentStation = parseInt(localStorage.getItem('kuribaxi_music_station')||'0');
+  var isPlaying = false;
+  var isMuted = false;
+  var wasPlayingBeforeVideo = false;
+
+  function loadStation(index){
+    var st = MUSIC_STATIONS[index];
+    if(!st)return;
+    musicAudio.src = st.url;
+    musicTrackTitle.textContent = st.name;
+    musicTrackStation.textContent = st.desc;
+    musicStationSelect.value = String(index);
+    localStorage.setItem('kuribaxi_music_station',String(index));
+    if(isPlaying){
+      musicAudio.play().catch(function(e){console.log('Play error',e);});
+    }
+  }
+
+  function togglePlay(){
+    if(musicAudio.paused){
+      musicAudio.play().then(function(){
+        isPlaying = true;
+        musicPlayBtn.innerHTML = '&#10074;&#10074;';
+        musicPlayer.classList.remove('paused');
+        musicUnmuteHint.classList.remove('show');
+      }).catch(function(err){
+        console.log('Audio play failed:',err);
+        musicTrackStation.textContent = 'Kunde inte spela. Prova annan kanal.';
+      });
+    }else{
+      musicAudio.pause();
+      isPlaying = false;
+      musicPlayBtn.innerHTML = '&#9654;';
+      musicPlayer.classList.add('paused');
+    }
+  }
+
+  function setVolume(v){
+    musicAudio.volume = v/100;
+    if(v>0 && isMuted){isMuted=false;musicMuteBtn.textContent='LJUD AV';musicAudio.muted=false;}
+  }
+
+  function toggleMute(){
+    if(isMuted){musicAudio.muted=false;isMuted=false;musicMuteBtn.textContent='LJUD AV';}
+    else{musicAudio.muted=true;isMuted=true;musicMuteBtn.textContent='LJUD PA';}
+  }
+
+  function closePlayer(){
+    musicAudio.pause();
+    isPlaying = false;
+    musicPlayBtn.innerHTML = '&#9654;';
+    musicPlayer.classList.add('hidden-player');
+    musicReopenBtn.classList.add('show');
+    musicUnmuteHint.classList.remove('show');
+  }
+
+  function reopenPlayer(){
+    musicPlayer.classList.remove('hidden-player');
+    musicReopenBtn.classList.remove('show');
+  }
+
+  function pauseForVideo(){
+    if(isPlaying){
+      wasPlayingBeforeVideo = true;
+      musicAudio.pause();
+      isPlaying = false;
+      musicPlayBtn.innerHTML = '&#9654;';
+      musicPlayer.classList.add('paused');
+    }
+  }
+
+  function resumeAfterVideo(){
+    if(wasPlayingBeforeVideo){
+      wasPlayingBeforeVideo = false;
+      togglePlay();
+    }
+  }
+
+  musicPlayBtn.addEventListener('click',togglePlay);
+  musicStationSelect.addEventListener('change',function(){loadStation(parseInt(this.value));if(isPlaying)togglePlay();});
+  musicVolume.addEventListener('input',function(){setVolume(parseInt(this.value));});
+  musicMuteBtn.addEventListener('click',toggleMute);
+  musicCloseBtn.addEventListener('click',closePlayer);
+  musicReopenBtn.addEventListener('click',reopenPlayer);
+
+  musicAudio.addEventListener('error',function(){
+    musicTrackStation.textContent = 'Fel vid laddning, byter kanal...';
+    setTimeout(function(){
+      var next = (currentStation+1)%MUSIC_STATIONS.length;
+      currentStation = next;
+      loadStation(next);
+      if(isPlaying) musicAudio.play().catch(function(){});
+    },2000);
+  });
+
+  musicAudio.addEventListener('playing',function(){
+    musicTrackStation.textContent = MUSIC_STATIONS[currentStation].desc;
+  });
+
+  loadStation(currentStation);
+  musicVolume.value = parseInt(localStorage.getItem('kuribaxi_music_vol')||'70');
+  setVolume(parseInt(musicVolume.value));
+  musicVolume.addEventListener('input',function(){localStorage.setItem('kuribaxi_music_vol',this.value);});
+
+  setTimeout(function(){
+    if(!isPlaying){
+      musicUnmuteHint.classList.add('show');
+    }
+  },1500);
+
+  // === BIBLIOTEK ===
+  var libTab=localStorage.getItem('kuribaxi_lib_tab')||'series';
+  function renderLibrary(){
+    document.querySelectorAll('#libTabs button').forEach(function(b){b.classList.toggle('active',b.dataset.tab===libTab);});
+    var isMovies=libTab==='movies';
+    var dict=isMovies?watchMap.movies:watchMap.series;
+    var items=Object.values(dict).sort(function(a,b){return b.lastWatched-a.lastWatched;});
+    var libContent=document.getElementById('libContent');
+    if(items.length===0){
+      libContent.innerHTML='<div class="lib-empty">Inga '+(isMovies?'filmer':'serier')+' sparade än. Sök och spela något så hamnar det här automatiskt.</div>';
+      return;
+    }
+    libContent.innerHTML='<div class="lib-grid">'+items.map(function(it){
+      var img=it.poster?'https://image.tmdb.org/t/p/w200'+it.poster:'';
+      var prog=!isMovies?'<span class="lib-card-progress">S'+it.season+':E'+it.episode+'</span>':'';
+      var date=new Date(it.lastWatched).toLocaleDateString('sv-SE');
+      return '<div class="lib-card" data-id="'+it.id+'" data-type="'+it.type+'">'+
+        '<button class="del-btn" data-del-id="'+it.id+'" data-del-type="'+it.type+'" title="Ta bort">&#215;</button>'+
+        '<img src="'+img+'" alt="" loading="lazy" onerror="this.style.display=\'none\'">'+
+        '<div class="lib-card-body">'+
+          '<div class="lib-card-title">'+escapeHtml(it.title||'')+'</div>'+
+          '<div class="lib-card-sub">'+(it.year||'')+' &#183; '+date+'</div>'+
+          prog+
+        '</div>'+
+      '</div>';
+    }).join('')+'</div>';
+    libContent.querySelectorAll('.del-btn').forEach(function(btn){
+      btn.addEventListener('click',function(e){
+        e.stopPropagation();
+        if(btn.dataset.delType==='movie')delete watchMap.movies[btn.dataset.delId];
+        else delete watchMap.series[btn.dataset.delId];
+        saveWatchMap(watchMap);
+      });
+    });
+    libContent.querySelectorAll('.lib-card').forEach(function(card){
+      card.addEventListener('click',function(){
+        if(card.dataset.type==='movie')loadDetail(card.dataset.id,'movie').catch(handleError);
+        else{var entry=watchMap.series[card.dataset.id];loadDetail(card.dataset.id,'tv',entry&&entry.season,entry&&entry.episode).catch(handleError);}
+      });
+    });
+  }
+  document.getElementById('libTabs').addEventListener('click',function(e){
+    var btn=e.target.closest('button');if(!btn)return;
+    libTab=btn.dataset.tab;localStorage.setItem('kuribaxi_lib_tab',libTab);renderLibrary();
+  });
+  document.getElementById('clearLibBtn').addEventListener('click',function(){
+    if(!confirm('Rensa alla '+(libTab==='movies'?'filmer':'serier')+'?'))return;
+    if(libTab==='movies')watchMap.movies={};else watchMap.series={};
+    saveWatchMap(watchMap);
+  });
+
+  // === SITE SEARCH OVERLAY (no sites, but keep for completeness) ===
+  var siteSearchOverlay = document.getElementById('siteSearchOverlay');
+  var siteSearchInput = document.getElementById('siteSearchInput');
+  var siteSearchGoBtn = document.getElementById('siteSearchGoBtn');
+  var siteSearchCancelBtn = document.getElementById('siteSearchCancelBtn');
+  var siteSearchTitle = document.getElementById('siteSearchTitle');
+  var siteSearchDesc = document.getElementById('siteSearchDesc');
+  var pendingSite = null;
+
+  function openSiteSearch(site){
+    pendingSite = site;
+    siteSearchTitle.textContent = 'Sök på webbplats';
+    siteSearchDesc.textContent = 'Skriv ditt sökord med tangentbordet nedan';
+    siteSearchInput.value = '';
+    siteSearchOverlay.classList.add('show');
+    activeInput = siteSearchInput;
+    openVkb();
+  }
+  function closeSiteSearch(){
+    siteSearchOverlay.classList.remove('show');
+    pendingSite = null;
+  }
+  function doSiteSearch(){
+    if(!pendingSite) return;
+    var q = siteSearchInput.value.trim();
+    var url;
+    if(q){
+      var cleanQ = q.replace(/[^a-zA-Z0-9\s]/g, ' ').trim().replace(/\s+/g, '+');
+      url = pendingSite.searchTpl.replace('{q}', cleanQ);
+    } else {
+      url = pendingSite.url;
+    }
+    var siteName = pendingSite.name;
+    var openInNew = pendingSite.openInNewTab;
+    closeSiteSearch();
+    if(openInNew){
+      window.open(url, '_blank', 'noopener,noreferrer');
+    } else {
+      loadInPlayer(url, siteName);
+    }
+  }
+  siteSearchGoBtn.addEventListener('click', function(e){e.stopPropagation();doSiteSearch();});
+  siteSearchCancelBtn.addEventListener('click', function(e){e.stopPropagation();closeSiteSearch();});
+  siteSearchOverlay.addEventListener('click', function(e){e.stopPropagation();});
+  siteSearchInput.addEventListener('click', function(e){ activeInput = siteSearchInput; openVkb(); });
+  siteSearchInput.addEventListener('focus', function(e){ activeInput = siteSearchInput; openVkb(); });
+  siteSearchInput.addEventListener('keydown', function(e){ if(e.key === 'Enter') doSiteSearch(); });
+
+  // No websites list – this version has no streaming websites section
+  function loadInPlayer(url,name){
+    var frame=document.getElementById('vidsrcFrame');
+    var playerFrame=document.getElementById('playerFrame');
+    var browserFrame=document.getElementById('browserFrame');
+    var meta=document.getElementById('playerMeta');
+    document.getElementById('ticket').classList.add('show');
+    document.getElementById('sourcePicker').style.display='none';
+    document.getElementById('epControls').style.display='none';
+    document.getElementById('playerHeading').textContent=name+(currentTitle?' \u2014 '+currentTitle:'');
+    frame.src=url;
+    playerFrame.style.display='block';
+    browserFrame.classList.remove('show');
+    meta.innerHTML='<span class="tag">Extern</span><span class="tag active">'+escapeHtml(name)+'</span><a href="'+url+'" target="_blank" rel="noopener" style="background:var(--green);color:#fff;padding:5px 14px;border-radius:20px;text-decoration:none;font-size:12px;font-weight:700;">&#8599; Öppna i ny flik</a>';
+    document.getElementById('ticket').scrollIntoView({behavior:'smooth',block:'start'});
+    pauseForVideo();
+  }
+
+  // === SÖK ===
+  var searchMode='title';
+  var typeToggle=document.getElementById('typeToggle');
+  var mediaTypeToggle=document.getElementById('mediaTypeToggle');
+  var goBtn=document.getElementById('goBtn');
+  var resultsList=document.getElementById('resultsList');
+
+  typeToggle.addEventListener('click',function(e){
+    var btn=e.target.closest('button');if(!btn)return;
+    typeToggle.querySelectorAll('button').forEach(function(b){b.classList.remove('active');});
+    btn.classList.add('active');
+    searchMode=btn.dataset.mode;
+    if(searchMode==='title'){mediaTypeToggle.style.display='flex';queryInput.placeholder='t.ex. Dune';}
+    else{mediaTypeToggle.style.display='none';queryInput.placeholder=searchMode==='tmdb'?'t.ex. 693134':'t.ex. tt15239678';}
+  });
+  function getApiKey(){return document.getElementById('apikey').value.trim();}
+
+  async function searchTMDB(){
+    var key=getApiKey();
+    if(!key){showStatus('Ange en TMDB API-nyckel först.','error');return;}
+    var q=queryInput.value.trim();
+    if(!q){showStatus('Skriv något att söka efter.','warn');return;}
+    hideStatus();resultsList.innerHTML='';goBtn.disabled=true;showStatus('Söker...','info');
+    try{
+      var url;
+      if(searchMode==='title'){
+        var mediaType=mediaTypeToggle.querySelector('.active').dataset.type;
+        url='https://api.themoviedb.org/3/search/'+mediaType+'?api_key='+key+'&query='+encodeURIComponent(q)+'&language=sv-SE&page=1';
+      }else if(searchMode==='tmdb'){
+        var movieUrl='https://api.themoviedb.org/3/movie/'+q+'?api_key='+key+'&language=sv-SE';
+        var tvUrl='https://api.themoviedb.org/3/tv/'+q+'?api_key='+key+'&language=sv-SE';
+        var detail=null,type=null;
+        try{var r=await fetch(movieUrl);if(r.ok){detail=await r.json();type='movie';}}catch(e){}
+        if(!detail){try{var r2=await fetch(tvUrl);if(r2.ok){detail=await r2.json();type='tv';}}catch(e){}}
+        if(!detail){showStatus('Hittade ingen titel med det TMDB-ID:t.','error');goBtn.disabled=false;return;}
+        loadDetail(detail.id,type);goBtn.disabled=false;return;
+      }else if(searchMode==='imdb'){
+        var findUrl='https://api.themoviedb.org/3/find/'+q+'?api_key='+key+'&external_source=imdb_id';
+        var r=await fetch(findUrl);
+        var data=await r.json();
+        var found=null,type=null;
+        if(data.movie_results&&data.movie_results.length>0){found=data.movie_results[0];type='movie';}
+        else if(data.tv_results&&data.tv_results.length>0){found=data.tv_results[0];type='tv';}
+        else if(data.tv_episode_results&&data.tv_episode_results.length>0){found=data.tv_episode_results[0];type='tv';}
+        if(!found){showStatus('Hittade ingen titel med det IMDb-ID:t.','error');goBtn.disabled=false;return;}
+        loadDetail(found.id,type);goBtn.disabled=false;return;
+      }
+      var r=await fetch(url);
+      if(!r.ok)throw new Error('TMDB API-fel: '+r.status);
+      var data=await r.json();
+      var results=data.results||[];
+      if(results.length===0){showStatus('Inga resultat hittades.','warn');goBtn.disabled=false;return;}
+      resultsList.innerHTML=results.slice(0,10).map(function(item){
+        var title=item.title||item.name;
+        var year=(item.release_date||item.first_air_date||'').slice(0,4);
+        var type=item.title?'FILM':'SERIE';
+        var img=item.poster_path?'https://image.tmdb.org/t/p/w92'+item.poster_path:'';
+        return '<div class="result-row" data-id="'+item.id+'" data-type="'+(item.title?'movie':'tv')+'">'+
+          '<img src="'+img+'" alt="" onerror="this.style.display=\'none\'">'+
+          '<div class="rmeta"><div class="rtitle">'+escapeHtml(title)+'</div><div class="ryear">'+year+'</div></div>'+
+          '<div class="rtype">'+type+'</div></div>';
+      }).join('');
+      resultsList.querySelectorAll('.result-row').forEach(function(row){
+        row.addEventListener('click',function(){loadDetail(row.dataset.id,row.dataset.type).catch(handleError);});
+      });
+      hideStatus();
+    }catch(err){handleError(err);}
+    goBtn.disabled=false;
+  }
+  goBtn.addEventListener('click',searchTMDB);
+  queryInput.addEventListener('keydown',function(e){if(e.key==='Enter')searchTMDB();});
+
+  // === GOOGLE SEARCH ===
+  var googleQuery = document.getElementById('googleQuery');
+  var googleBtn = document.getElementById('googleBtn');
+  function searchGoogle(){
+    var q = googleQuery.value.trim();
+    if(!q){showStatus('Skriv något att söka efter på Google.','warn');return;}
+    var url = 'https://www.google.com/search?q=' + encodeURIComponent(q);
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }
+  googleBtn.addEventListener('click', searchGoogle);
+  googleQuery.addEventListener('keydown', function(e){if(e.key==='Enter')searchGoogle();});
+
+  // === LADDA DETALJER ===
+  async function loadDetail(id,type,prefillSeason,prefillEpisode){
+    var key=getApiKey();
+    if(!key){showStatus('Ange en TMDB API-nyckel först.','error');return;}
+    hideStatus();showStatus('Laddar detaljer...','info');
+    document.getElementById('ticket').classList.remove('show');
+    document.getElementById('resultsList').innerHTML='';
+    try{
+      var url='https://api.themoviedb.org/3/'+type+'/'+id+'?api_key='+key+'&language=sv-SE&append_to_response=external_ids';
+      var r=await fetch(url);
+      if(!r.ok)throw new Error('TMDB API-fel: '+r.status);
+      var detail=await r.json();
+      currentDetail=detail;currentType=type;currentId=id;
+      currentImdbId=detail.external_ids&&detail.external_ids.imdb_id?detail.external_ids.imdb_id:(detail.imdb_id||null);
+      currentTitle=detail.title||detail.name||'';
+      document.getElementById('titleText').textContent=currentTitle;
+      var year=(detail.release_date||detail.first_air_date||'').slice(0,4);
+      var runtime=detail.runtime?' &#183; '+detail.runtime+' min':(detail.episode_run_time&&detail.episode_run_time[0]?' &#183; '+detail.episode_run_time[0]+' min/avsn':'');
+      document.getElementById('subText').innerHTML=year+runtime+' &#183; '+(detail.vote_average||0).toFixed(1)+'/10';
+      document.getElementById('overviewText').textContent=detail.overview||'Ingen beskrivning tillgänglig.';
+      document.getElementById('posterImg').src=detail.poster_path?'https://image.tmdb.org/t/p/w300'+detail.poster_path:'';
+      document.getElementById('genreTags').innerHTML=(detail.genres||[]).map(function(g){return '<span class="genre-tag">'+escapeHtml(g.name)+'</span>';}).join('');
+      var epControls=document.getElementById('epControls');
+      document.getElementById('sourcePicker').style.display='flex';
+      if(type==='tv'){
+        epControls.classList.add('show');epControls.style.display='flex';
+        document.getElementById('seasonInput').value=prefillSeason||1;
+        document.getElementById('episodeInput').value=prefillEpisode||1;
+        document.getElementById('playerHeading').textContent='Spelare \u2014 Serie';
+      }else{
+        epControls.classList.remove('show');epControls.style.display='none';
+        document.getElementById('playerHeading').textContent='Spelare \u2014 Film';
+      }
+      buildSourcePicker();
+      document.getElementById('ticket').classList.add('show');
+      document.getElementById('ticket').scrollIntoView({behavior:'smooth',block:'start'});
+      loadPlayer();hideStatus();
+    }catch(err){handleError(err);}
+  }
+  function handleError(err){
+    console.error(err);
+    showStatus('Fel: '+(err.message||'Något gick fel'),'error');
+    document.getElementById('goBtn').disabled=false;
+  }
+
+  // === SPELARE ===
+  function buildSourcePicker(){
+    var picker=document.getElementById('sourcePicker');
+    picker.innerHTML=SOURCES.map(function(s){return '<button class="source-btn '+(s.key===activeSource?'active':'')+'" data-key="'+s.key+'">'+escapeHtml(s.name)+'</button>';}).join('');
+    picker.querySelectorAll('.source-btn').forEach(function(btn){
+      btn.addEventListener('click',function(){
+        activeSource=btn.dataset.key;localStorage.setItem('kuribaxi_active_source',activeSource);
+        buildSourcePicker();loadPlayer();
+      });
+    });
+  }
+  function loadPlayer(){
+    var source=SOURCES.find(function(s){return s.key===activeSource;});
+    if(!source||!currentId)return;
+    var frame=document.getElementById('vidsrcFrame');
+    var playerFrame=document.getElementById('playerFrame');
+    var browserFrame=document.getElementById('browserFrame');
+    var meta=document.getElementById('playerMeta');
+    var url;
+    if(source.isVidApi){
+      if(!currentImdbId){showStatus('VidAPI kräver IMDb-ID. Sök med IMDb-ID eller välj en annan källa.','warn');frame.src='';playerFrame.style.display='none';browserFrame.classList.add('show');return;}
+      var s=currentType==='tv'?(document.getElementById('seasonInput').value||1):'';
+      var e=currentType==='tv'?(document.getElementById('episodeInput').value||1):'';
+      if(currentType==='tv')url=source.base+'/'+currentImdbId+'/'+s+'/'+e;
+      else url=source.base+'/'+currentImdbId;
+    }else{
+      if(currentType==='tv'){var s=document.getElementById('seasonInput').value||1;var e=document.getElementById('episodeInput').value||1;url=source.base+'/tv/'+currentId+'/'+s+'/'+e;}
+      else url=source.base+'/movie/'+currentId;
+    }
+    if(source.openInBrowser){
+      frame.src='';playerFrame.style.display='none';browserFrame.classList.add('show');document.getElementById('openBrowserBtn').href=url;
+    }else{
+      browserFrame.classList.remove('show');playerFrame.style.display='block';frame.src=url;
+    }
+    if(currentType==='movie')upsertFilm(currentDetail);
+    else{var s=document.getElementById('seasonInput').value||1;var e=document.getElementById('episodeInput').value||1;upsertSeries(currentDetail,s,e);}
+    meta.innerHTML='<span class="tag">'+(currentType==='movie'?'Film':'Serie')+'</span><span class="tag active">TMDB: '+currentId+'</span>'+(currentImdbId?'<span class="tag">IMDb: '+currentImdbId+'</span>':'')+'<a href="https://www.themoviedb.org/'+currentType+'/'+currentId+'" target="_blank" rel="noopener">Öppna på TMDB &#8599;</a>'+(currentImdbId?'<a href="https://www.imdb.com/title/'+currentImdbId+'/" target="_blank" rel="noopener">Öppna på IMDb &#8599;</a>':'');
+    pauseForVideo();
+  }
+  document.getElementById('epGoBtn').addEventListener('click',function(){
+    loadPlayer();
+    if(currentType==='tv'&&currentDetail){var s=document.getElementById('seasonInput').value||1;var e=document.getElementById('episodeInput').value||1;upsertSeries(currentDetail,s,e);}
+  });
+
 })();
 </script>
 
