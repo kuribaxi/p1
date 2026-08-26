@@ -20,6 +20,7 @@
     --amber:#e0a458;
     --error:#e2574c;
     --radius:14px;
+    --green-light:#4ec9b0;
   }
   *{box-sizing:border-box; margin:0; padding:0;}
   body{
@@ -240,7 +241,7 @@
     border:none;
   }
 
-    .browser-frame{
+  .browser-frame{
     display:flex;
     align-items:center;
     justify-content:center;
@@ -362,7 +363,7 @@
     font-size:11px;
   }
 
-.verify-box{
+  .verify-box{
     margin-top:12px;
     padding:14px 16px;
     background:rgba(53,198,180,0.06);
@@ -424,52 +425,6 @@
     .clock-badge{top:14px; left:12px; right:auto; padding:7px 10px; min-width:102px;}
     .clock-time{font-size:13.5px}
     .clock-date{font-size:9.5px}
-  }
-
-/* MUSIC PLAYER */
-  .music-player{position:fixed;bottom:0;left:0;right:0;z-index:9998;background:rgba(11,18,32,0.97);border-top:1px solid var(--panel-line);backdrop-filter:blur(16px);box-shadow:0 -8px 32px rgba(0,0,0,0.4);padding:10px 20px;display:flex;align-items:center;gap:14px;transition:transform .3s ease,opacity .3s ease;}
-  .music-player.hidden-player{transform:translateY(100%);opacity:0;pointer-events:none;}
-  .music-player-left{display:flex;align-items:center;gap:10px;flex-shrink:0;}
-  .music-play-btn{width:38px;height:38px;border-radius:50%;background:var(--gold);border:none;color:#1a1305;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;font-size:16px;}
-  .music-play-btn:hover{background:var(--gold-bright);transform:scale(1.05);}
-  .music-track-info{min-width:0;}
-  .music-track-title{font-size:12px;font-weight:600;color:var(--cream);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;}
-  .music-track-station{font-size:10px;color:var(--cream-dim);font-family:'JetBrains Mono',monospace;}
-  .music-player-center{flex:1;display:flex;align-items:center;gap:12px;min-width:0;}
-  .music-volume{display:flex;align-items:center;gap:6px;}
-  .music-volume input[type=range]{width:80px;height:3px;-webkit-appearance:none;appearance:none;background:var(--panel-line);border-radius:2px;outline:none;}
-  .music-volume input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:var(--gold);cursor:pointer;}
-  .music-volume input[type=range]::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:var(--gold);cursor:pointer;border:none;}
-  .music-visualizer{display:flex;align-items:flex-end;gap:2px;height:20px;}
-  .music-bar{width:3px;background:var(--gold-bright);border-radius:2px;animation:music-bounce 1s ease-in-out infinite;}
-  .music-bar:nth-child(1){height:6px;animation-delay:0s;}
-  .music-bar:nth-child(2){height:12px;animation-delay:.1s;}
-  .music-bar:nth-child(3){height:8px;animation-delay:.2s;}
-  .music-bar:nth-child(4){height:14px;animation-delay:.15s;}
-  .music-bar:nth-child(5){height:10px;animation-delay:.05s;}
-  .music-bar:nth-child(6){height:16px;animation-delay:.25s;}
-  .music-bar:nth-child(7){height:7px;animation-delay:.1s;}
-  @keyframes music-bounce{0%,100%{transform:scaleY(1);}50%{transform:scaleY(0.4);}}
-  .music-player.paused .music-bar{animation-play-state:paused;opacity:0.3;}
-  .music-station-select{background:#0b1220;border:1px solid var(--panel-line);color:var(--cream);border-radius:8px;padding:5px 10px;font-size:11px;font-family:'JetBrains Mono',monospace;cursor:pointer;outline:none;max-width:160px;}
-  .music-station-select option{background:#0b1220;color:var(--cream);font-family:'JetBrains Mono',monospace;font-size:11px;padding:6px 10px;}
-  .music-station-select:focus{border-color:var(--gold);}
-  .music-player-right{display:flex;align-items:center;gap:10px;flex-shrink:0;}
-  .music-mute-btn{background:transparent;border:1px solid var(--panel-line);color:var(--cream-dim);border-radius:8px;padding:5px 10px;font-size:11px;cursor:pointer;font-family:'JetBrains Mono',monospace;transition:all .15s;}
-  .music-mute-btn:hover{border-color:var(--gold);color:var(--gold-bright);}
-  .music-close-btn{background:transparent;border:1px solid var(--panel-line);color:var(--cream-dim);border-radius:8px;padding:5px 10px;font-size:11px;cursor:pointer;font-family:'JetBrains Mono',monospace;transition:all .15s;}
-  .music-close-btn:hover{border-color:var(--error);color:var(--error);}
-  .music-reopen-btn{position:fixed;bottom:14px;right:14px;z-index:9997;background:var(--gold);color:#1a1305;border:none;border-radius:50%;width:44px;height:44px;display:none;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 16px rgba(201,162,39,0.3);transition:all .15s;font-size:18px;}
-  .music-reopen-btn:hover{background:var(--gold-bright);transform:scale(1.05);}
-  .music-reopen-btn.show{display:flex;}
-  .music-unmute-hint{position:fixed;bottom:70px;left:50%;transform:translateX(-50%);z-index:9996;background:var(--panel);border:1px solid var(--gold);border-radius:20px;padding:8px 18px;font-size:12px;color:var(--gold-bright);display:none;box-shadow:0 4px 16px rgba(0,0,0,0.3);animation:hint-bounce 2s infinite;}
-  .music-unmute-hint.show{display:block;}
-  @keyframes hint-bounce{0%,100%{transform:translateX(-50%) translateY(0);}50%{transform:translateX(-50%) translateY(-4px);}}
-  @media(max-width:700px){
-    .music-player{flex-wrap:wrap;padding:8px 12px;gap:8px;}
-    .music-track-title{max-width:120px;}
-    .music-volume input[type=range]{width:50px;}
-    .music-station-select{max-width:120px;}
   }
 
   /* ===== VIRTUAL KEYBOARD (RETRO-FUTURISTIC) ===== */
@@ -542,7 +497,6 @@
   .vkb-rows { display:flex; flex-direction:column; gap:6px; }
   .vkb-row { display:flex; gap:5px; justify-content:center; }
 
-  /* KEYCAPS — retro-futuristic */
   .vkb-key {
     min-width:42px; height:34px; padding:0 8px;
     background: linear-gradient(180deg, #4a4d5a 0%, #3a3d4a 100%);
@@ -592,7 +546,6 @@
   }
   .vkb-key.back:hover { background:linear-gradient(180deg,#d55 0%,#c44 100%); border-color:#e66; }
 
-  /* LIGHT THEME */
   .vkb-wrap.light .vkb-panel {
     background: #e6e8ee;
     border-color: #b4b6ba;
@@ -632,15 +585,214 @@
   .vkb-wrap.light .vkb-close:hover { background:var(--error); color:#fff; border-color:var(--error); }
   .vkb-wrap.light .vkb-head { border-bottom-color:rgba(0,0,0,0.08); }
 
-  /* VKB BLOCKER */
   .vkb-blocker {
     display:none; position:fixed; top:0; left:0; right:0; bottom:0;
     z-index:99990; background:transparent; cursor:default;
   }
   .vkb-blocker.active { display:block; }
-
   .search-box.vkb-active { border-color:var(--gold); box-shadow:0 0 20px rgba(201,162,39,0.1); opacity:0.7; }
 
+  /* ===== HISTORIK / BIBLIOTEK ===== */
+  .library-section {
+    margin-top:24px;
+    background:var(--panel);
+    border:1px solid var(--panel-line);
+    border-radius:var(--radius);
+    padding:16px 20px;
+  }
+  .library-header {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:12px;
+    margin-bottom:12px;
+  }
+  .library-header h2 {
+    font-family:'Fraunces', serif;
+    font-weight:700;
+    font-size:18px;
+    color:var(--gold-bright);
+  }
+  .library-tabs {
+    display:flex;
+    gap:4px;
+    border:1px solid var(--panel-line);
+    border-radius:8px;
+    overflow:hidden;
+  }
+  .library-tabs button {
+    background:transparent;
+    border:none;
+    color:var(--cream-dim);
+    font-size:11px;
+    font-weight:600;
+    padding:6px 14px;
+    cursor:pointer;
+    font-family:'JetBrains Mono', monospace;
+    transition:all .15s;
+  }
+  .library-tabs button.active {
+    background:var(--gold);
+    color:#1a1305;
+  }
+  .library-tabs button:hover:not(.active) {
+    color:var(--cream);
+  }
+  .library-actions {
+    display:flex;
+    gap:8px;
+  }
+  .library-actions button {
+    background:transparent;
+    border:1px solid var(--panel-line);
+    color:var(--cream-dim);
+    border-radius:6px;
+    padding:4px 12px;
+    font-size:10px;
+    font-family:'JetBrains Mono', monospace;
+    cursor:pointer;
+    transition:all .15s;
+  }
+  .library-actions button:hover {
+    border-color:var(--error);
+    color:var(--error);
+  }
+
+  .library-grid {
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(140px, 1fr));
+    gap:10px;
+    max-height:340px;
+    overflow-y:auto;
+    padding-right:4px;
+  }
+  .library-grid::-webkit-scrollbar {
+    width:4px;
+  }
+  .library-grid::-webkit-scrollbar-thumb {
+    background:var(--panel-line);
+    border-radius:2px;
+  }
+
+  .lib-card {
+    background:var(--bg-alt);
+    border:1px solid var(--panel-line);
+    border-radius:10px;
+    padding:10px;
+    cursor:pointer;
+    transition:all .15s;
+    position:relative;
+  }
+  .lib-card:hover {
+    border-color:var(--gold);
+    transform:translateY(-2px);
+  }
+  .lib-card img {
+    width:100%;
+    aspect-ratio:2/3;
+    object-fit:cover;
+    border-radius:6px;
+    background:#1a2436;
+  }
+  .lib-card-title {
+    font-size:11px;
+    font-weight:600;
+    margin-top:6px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .lib-card-sub {
+    font-size:9px;
+    color:var(--cream-dim);
+    font-family:'JetBrains Mono', monospace;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:2px;
+  }
+  .lib-card-progress {
+    color:var(--gold-bright);
+    font-weight:700;
+  }
+  .lib-empty {
+    color:var(--cream-dim);
+    font-size:13px;
+    text-align:center;
+    padding:30px 10px;
+  }
+  .lib-del-btn {
+    position:absolute;
+    top:6px;
+    right:6px;
+    width:20px;
+    height:20px;
+    border-radius:50%;
+    border:1px solid var(--panel-line);
+    background:rgba(0,0,0,0.7);
+    color:var(--cream-dim);
+    font-size:12px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:all .15s;
+    opacity:0;
+  }
+  .lib-card:hover .lib-del-btn {
+    opacity:1;
+  }
+  .lib-del-btn:hover {
+    border-color:var(--error);
+    color:var(--error);
+  }
+
+  .music-player{position:fixed;bottom:0;left:0;right:0;z-index:9998;background:rgba(11,18,32,0.97);border-top:1px solid var(--panel-line);backdrop-filter:blur(16px);box-shadow:0 -8px 32px rgba(0,0,0,0.4);padding:10px 20px;display:flex;align-items:center;gap:14px;transition:transform .3s ease,opacity .3s ease;}
+  .music-player.hidden-player{transform:translateY(100%);opacity:0;pointer-events:none;}
+  .music-player-left{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+  .music-play-btn{width:38px;height:38px;border-radius:50%;background:var(--gold);border:none;color:#1a1305;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;font-size:16px;}
+  .music-play-btn:hover{background:var(--gold-bright);transform:scale(1.05);}
+  .music-track-info{min-width:0;}
+  .music-track-title{font-size:12px;font-weight:600;color:var(--cream);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;}
+  .music-track-station{font-size:10px;color:var(--cream-dim);font-family:'JetBrains Mono',monospace;}
+  .music-player-center{flex:1;display:flex;align-items:center;gap:12px;min-width:0;}
+  .music-volume{display:flex;align-items:center;gap:6px;}
+  .music-volume input[type=range]{width:80px;height:3px;-webkit-appearance:none;appearance:none;background:var(--panel-line);border-radius:2px;outline:none;}
+  .music-volume input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:var(--gold);cursor:pointer;}
+  .music-volume input[type=range]::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:var(--gold);cursor:pointer;border:none;}
+  .music-visualizer{display:flex;align-items:flex-end;gap:2px;height:20px;}
+  .music-bar{width:3px;background:var(--gold-bright);border-radius:2px;animation:music-bounce 1s ease-in-out infinite;}
+  .music-bar:nth-child(1){height:6px;animation-delay:0s;}
+  .music-bar:nth-child(2){height:12px;animation-delay:.1s;}
+  .music-bar:nth-child(3){height:8px;animation-delay:.2s;}
+  .music-bar:nth-child(4){height:14px;animation-delay:.15s;}
+  .music-bar:nth-child(5){height:10px;animation-delay:.05s;}
+  .music-bar:nth-child(6){height:16px;animation-delay:.25s;}
+  .music-bar:nth-child(7){height:7px;animation-delay:.1s;}
+  @keyframes music-bounce{0%,100%{transform:scaleY(1);}50%{transform:scaleY(0.4);}}
+  .music-player.paused .music-bar{animation-play-state:paused;opacity:0.3;}
+  .music-station-select{background:#0b1220;border:1px solid var(--panel-line);color:var(--cream);border-radius:8px;padding:5px 10px;font-size:11px;font-family:'JetBrains Mono',monospace;cursor:pointer;outline:none;max-width:160px;}
+  .music-station-select option{background:#0b1220;color:var(--cream);font-family:'JetBrains Mono',monospace;font-size:11px;padding:6px 10px;}
+  .music-station-select:focus{border-color:var(--gold);}
+  .music-player-right{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+  .music-mute-btn{background:transparent;border:1px solid var(--panel-line);color:var(--cream-dim);border-radius:8px;padding:5px 10px;font-size:11px;cursor:pointer;font-family:'JetBrains Mono',monospace;transition:all .15s;}
+  .music-mute-btn:hover{border-color:var(--gold);color:var(--gold-bright);}
+  .music-close-btn{background:transparent;border:1px solid var(--panel-line);color:var(--cream-dim);border-radius:8px;padding:5px 10px;font-size:11px;cursor:pointer;font-family:'JetBrains Mono',monospace;transition:all .15s;}
+  .music-close-btn:hover{border-color:var(--error);color:var(--error);}
+  .music-reopen-btn{position:fixed;bottom:14px;right:14px;z-index:9997;background:var(--gold);color:#1a1305;border:none;border-radius:50%;width:44px;height:44px;display:none;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 16px rgba(201,162,39,0.3);transition:all .15s;font-size:18px;}
+  .music-reopen-btn:hover{background:var(--gold-bright);transform:scale(1.05);}
+  .music-reopen-btn.show{display:flex;}
+  .music-unmute-hint{position:fixed;bottom:70px;left:50%;transform:translateX(-50%);z-index:9996;background:var(--panel);border:1px solid var(--gold);border-radius:20px;padding:8px 18px;font-size:12px;color:var(--gold-bright);display:none;box-shadow:0 4px 16px rgba(0,0,0,0.3);animation:hint-bounce 2s infinite;}
+  .music-unmute-hint.show{display:block;}
+  @keyframes hint-bounce{0%,100%{transform:translateX(-50%) translateY(0);}50%{transform:translateX(-50%) translateY(-4px);}}
+  @media(max-width:700px){
+    .music-player{flex-wrap:wrap;padding:8px 12px;gap:8px;}
+    .music-track-title{max-width:120px;}
+    .music-volume input[type=range]{width:50px;}
+    .music-station-select{max-width:120px;}
+    .library-grid{grid-template-columns:repeat(auto-fill,minmax(110px,1fr));}
+  }
   </style>
 <base target="_blank">
 <base target="_blank">
@@ -684,14 +836,14 @@
       <button class="go-btn" id="goBtn">Sok</button>
     </div>
     
-    <!-- KEYBOARD MODE TOGGLE (ersatt med retro VKB) -->
+    <!-- KEYBOARD MODE -->
     <div style="margin-top:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
       <span style="font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--gold-bright);text-transform:uppercase;letter-spacing:0.06em;font-weight:700;">Tangentbord:</span>
       <button class="vkb-toggle-btn" id="vkbToggleBtn">⌨️ VKB: AV</button>
       <span id="kbModeHint" style="font-size:11px;color:var(--cream-dim);">Vanligt tangentbord aktivt</span>
     </div>
 
-    <!-- VIRTUAL KEYBOARD (RETRO-FUTURISTIC) -->
+    <!-- VIRTUAL KEYBOARD -->
     <div class="vkb-wrap" id="vkbWrap">
       <div class="vkb-panel" id="vkbPanel">
         <div class="vkb-head">
@@ -711,7 +863,6 @@
       </div>
     </div>
 
-    <!-- VKB BLOCKER -->
     <div class="vkb-blocker" id="vkbBlocker"></div>
 
     <div class="status" id="status"></div>
@@ -736,7 +887,6 @@
         <div class="source-picker" id="sourcePicker"></div>
         <div class="player-frame" id="playerFrame" style="position:relative;">
           <iframe id="vidsrcFrame" allowfullscreen referrerpolicy="origin"></iframe>
-          
         </div>
         <div class="browser-frame" id="browserFrame" style="display:none;">
           <div class="browser-icon">&#127760;</div>
@@ -744,10 +894,26 @@
           <a class="open-browser-btn" id="openBrowserBtn" href="#" target="_blank" rel="noopener">Spela upp i ny flik &#8594;</a>
         </div>
         <div class="player-meta" id="playerMeta"></div>
-
-        
-
         <div class="notice" id="playerNotice" style="display:none;"></div>
+      </div>
+    </div>
+
+    <!-- LIBRARY / HISTORY SECTION -->
+    <div class="library-section" id="librarySection">
+      <div class="library-header">
+        <h2>📚 Min samling</h2>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+          <div class="library-tabs" id="libTabs">
+            <button data-tab="movies" class="active">FILMER</button>
+            <button data-tab="series">SERIER</button>
+          </div>
+          <div class="library-actions">
+            <button id="clearLibBtn">Rensa</button>
+          </div>
+        </div>
+      </div>
+      <div class="library-grid" id="libContent">
+        <div class="lib-empty">Inga titlar sparade än. Sök och spela något så hamnar det här automatiskt.</div>
       </div>
     </div>
 
@@ -762,6 +928,159 @@
   const bulbsEl = document.getElementById('bulbs');
   for(let i=0;i<26;i++){const b=document.createElement('div');b.className='bulb';bulbsEl.appendChild(b);}
 
+  // ===== LIBRARY =====
+  const LS_KEY = 'kuribaxi_watch_history_v2';
+  let watchData = { movies: {}, series: {} };
+  let currentLibTab = 'movies';
+
+  function loadLibrary() {
+    try {
+      const raw = localStorage.getItem(LS_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        watchData.movies = parsed.movies || {};
+        watchData.series = parsed.series || {};
+      }
+    } catch(e) { console.warn('Failed to load library', e); }
+  }
+
+  function saveLibrary() {
+    try {
+      localStorage.setItem(LS_KEY, JSON.stringify(watchData));
+    } catch(e) { console.warn('Failed to save library', e); }
+  }
+
+  function addToLibrary(type, tmdbId, title, poster, year, imdbId, season, episode) {
+    const id = String(tmdbId);
+    const entry = {
+      id: id,
+      tmdbId: tmdbId,
+      title: title,
+      poster: poster,
+      year: year,
+      type: type,
+      imdbId: imdbId || null,
+      lastWatched: Date.now()
+    };
+    if (type === 'tv') {
+      entry.season = Math.max(1, parseInt(season) || 1);
+      entry.episode = Math.max(1, parseInt(episode) || 1);
+      // Check if existing entry has higher season/episode
+      const existing = watchData.series[id];
+      if (existing) {
+        if (entry.season > existing.season || (entry.season === existing.season && entry.episode > existing.episode)) {
+          // Newer episode, keep the new one
+        } else {
+          // Keep the existing (later) episode
+          return;
+        }
+      }
+      watchData.series[id] = entry;
+    } else {
+      watchData.movies[id] = entry;
+    }
+    saveLibrary();
+    renderLibrary();
+  }
+
+  function removeFromLibrary(type, tmdbId) {
+    const id = String(tmdbId);
+    if (type === 'movie') {
+      delete watchData.movies[id];
+    } else {
+      delete watchData.series[id];
+    }
+    saveLibrary();
+    renderLibrary();
+  }
+
+  function renderLibrary() {
+    const container = document.getElementById('libContent');
+    const isMovies = currentLibTab === 'movies';
+    const dict = isMovies ? watchData.movies : watchData.series;
+    const items = Object.values(dict).sort((a,b) => b.lastWatched - a.lastWatched);
+
+    if (items.length === 0) {
+      container.innerHTML = `<div class="lib-empty">Inga ${isMovies ? 'filmer' : 'serier'} sparade än. Sök och spela något så hamnar det här automatiskt.</div>`;
+      return;
+    }
+
+    let html = '';
+    items.forEach(item => {
+      const imgUrl = item.poster ? `https://image.tmdb.org/t/p/w200${item.poster}` : '';
+      const progress = !isMovies ? `<span class="lib-card-progress">S${item.season || 1}:E${item.episode || 1}</span>` : '';
+      const date = new Date(item.lastWatched).toLocaleDateString('sv-SE', { day:'numeric', month:'short' });
+      html += `
+        <div class="lib-card" data-id="${item.id}" data-type="${item.type}">
+          <button class="lib-del-btn" data-del-id="${item.id}" data-del-type="${item.type}" title="Ta bort">✕</button>
+          <img src="${imgUrl}" alt="" loading="lazy" onerror="this.style.display='none'">
+          <div class="lib-card-title">${escapeHtml(item.title || '')}</div>
+          <div class="lib-card-sub">
+            <span>${item.year || ''} · ${date}</span>
+            ${progress}
+          </div>
+        </div>
+      `;
+    });
+    container.innerHTML = html;
+
+    // Delete buttons
+    container.querySelectorAll('.lib-del-btn').forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        removeFromLibrary(this.dataset.delType, this.dataset.delId);
+      });
+    });
+
+    // Click to load
+    container.querySelectorAll('.lib-card').forEach(card => {
+      card.addEventListener('click', function() {
+        const id = this.dataset.id;
+        const type = this.dataset.type;
+        const entry = type === 'movie' ? watchData.movies[id] : watchData.series[id];
+        if (entry) {
+          if (type === 'tv') {
+            loadDetail(id, type, entry.season, entry.episode);
+          } else {
+            loadDetail(id, type);
+          }
+        }
+      });
+    });
+
+    // Update tab buttons
+    document.querySelectorAll('#libTabs button').forEach(b => {
+      b.classList.toggle('active', b.dataset.tab === currentLibTab);
+    });
+  }
+
+  function escapeHtml(s) {
+    if (!s) return '';
+    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+  }
+
+  // Library tab switching
+  document.getElementById('libTabs').addEventListener('click', function(e) {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    currentLibTab = btn.dataset.tab;
+    renderLibrary();
+  });
+
+  // Clear library
+  document.getElementById('clearLibBtn').addEventListener('click', function() {
+    const label = currentLibTab === 'movies' ? 'filmer' : 'serier';
+    if (!confirm(`Rensa alla sparade ${label}?`)) return;
+    if (currentLibTab === 'movies') {
+      watchData.movies = {};
+    } else {
+      watchData.series = {};
+    }
+    saveLibrary();
+    renderLibrary();
+  });
+
+  // ===== TMDB =====
   const SOURCES = [
     {key:'vidsrc2',        name:'vidsrc2.ru',        base:'https://vidsrc2.ru/embed'},
     {key:'vidsrc_ir',      name:'vidsrc.ir',         base:'https://vidsrc.ir/embed'},
@@ -778,6 +1097,9 @@
   let currentType = 'movie';
   let currentId = null;
   let currentImdbId = null;
+  let currentDetail = null;
+  let currentSeason = 1;
+  let currentEpisode = 1;
 
   let mode = 'title';
   let mediaType = 'movie';
@@ -904,7 +1226,7 @@
     });
   }
 
-  async function loadDetail(id, type){
+  async function loadDetail(id, type, prefillSeason, prefillEpisode){
     clearStatus();
     const detail = await tmdb('/' + type + '/' + id);
     let imdbId = detail.imdb_id || null;
@@ -915,19 +1237,28 @@
       } catch(e){}
     }
     resultsList.innerHTML = '';
-    renderTicket(detail, type, id, imdbId);
+    currentDetail = detail;
+    currentType = type;
+    currentId = id;
+    currentImdbId = imdbId;
+    currentSeason = prefillSeason || 1;
+    currentEpisode = prefillEpisode || 1;
+    renderTicket(detail, type, id, imdbId, currentSeason, currentEpisode);
   }
 
-  function buildUrl(source, type, id, imdbId){
+  function buildUrl(source, type, id, imdbId, season, episode){
     if(source.isVidApi){
       if(type === 'movie'){
         const useId = imdbId || id;
         return source.base + '/movie/' + useId;
       } else {
-        return source.base + '/tv/' + id + '/1/1';
+        return source.base + '/tv/' + id + '/' + (season||1) + '/' + (episode||1);
       }
     }
-    return source.base + '/' + type + '/' + id;
+    if(type === 'tv') {
+      return source.base + '/tv/' + id + '/' + (season||1) + '/' + (episode||1);
+    }
+    return source.base + '/movie/' + id;
   }
 
   function renderSourcePicker(){
@@ -940,18 +1271,15 @@
       btn.addEventListener('click', ()=>{
         activeSource = src.key;
         renderSourcePicker();
-        if(currentId) loadPlayer(currentType, currentId, currentImdbId);
+        if(currentId) loadPlayer(currentType, currentId, currentImdbId, currentSeason, currentEpisode);
       });
       picker.appendChild(btn);
     });
   }
 
-  function loadPlayer(type, id, imdbId){
-    currentType = type;
-    currentId = id;
-    currentImdbId = imdbId;
+  function loadPlayer(type, id, imdbId, season, episode){
     const src = SOURCES.find(s=>s.key===activeSource);
-    const url = buildUrl(src, type, id, imdbId);
+    const url = buildUrl(src, type, id, imdbId, season, episode);
     const iframe = document.getElementById('vidsrcFrame');
     const playerFrame = document.getElementById('playerFrame');
     const browserFrame = document.getElementById('browserFrame');
@@ -974,7 +1302,8 @@
     const tag = document.createElement('span');
     tag.className = 'tag active';
     const displayId = (src.isVidApi && type === 'movie' && imdbId) ? imdbId : id;
-    tag.textContent = src.name + ' / ' + type + ' / ' + displayId;
+    const epInfo = type === 'tv' ? ` S${season}:E${episode}` : '';
+    tag.textContent = src.name + ' / ' + type + ' / ' + displayId + epInfo;
     meta.appendChild(tag);
     const a = document.createElement('a');
     a.href = url;
@@ -983,16 +1312,32 @@
     a.textContent = 'Oppna i eget fonster \u2192';
     meta.appendChild(a);
     document.getElementById('playerNotice').style.display = 'none';
+
+    // Spara till biblioteket
+    if (currentDetail) {
+      const s = type === 'tv' ? (season || 1) : 1;
+      const e = type === 'tv' ? (episode || 1) : 1;
+      addToLibrary(
+        type,
+        id,
+        currentDetail.title || currentDetail.name || 'Unknown',
+        currentDetail.poster_path || null,
+        (currentDetail.release_date || currentDetail.first_air_date || '').slice(0,4),
+        imdbId || null,
+        s, e
+      );
+    }
   }
 
-  function renderTicket(d, type, id, imdbId){
+  function renderTicket(d, type, id, imdbId, season, episode){
     const title = d.title || d.name;
     const date = d.release_date || d.first_air_date || '';
     const year = date ? date.slice(0,4) : '&#8212;';
     const runtime = d.runtime ? d.runtime + ' min' : (d.episode_run_time && d.episode_run_time[0] ? d.episode_run_time[0] + ' min/avsnitt' : '');
     document.getElementById('posterImg').src = d.poster_path ? IMG+d.poster_path : '';
     document.getElementById('titleText').textContent = title;
-    document.getElementById('subText').textContent = [type==='tv' ? 'SERIE' : 'FILM', year, runtime, 'TMDB #' + d.id].filter(Boolean).join('  \u00b7  ');
+    const epInfo = type === 'tv' ? ` S${season||1}:E${episode||1}` : '';
+    document.getElementById('subText').textContent = [type==='tv' ? 'SERIE' : 'FILM', year, runtime, 'TMDB #' + d.id + epInfo].filter(Boolean).join('  \u00b7  ');
     document.getElementById('overviewText').textContent = d.overview || 'Ingen beskrivning tillganglig.';
     const genreBox = document.getElementById('genreTags');
     genreBox.innerHTML = '';
@@ -1001,8 +1346,38 @@
       tag.className = 'genre-tag'; tag.textContent = g.name;
       genreBox.appendChild(tag);
     });
+
+    // Add season/episode controls for TV
+    let epControls = document.getElementById('epControls');
+    if (!epControls) {
+      epControls = document.createElement('div');
+      epControls.id = 'epControls';
+      epControls.style.cssText = 'display:flex; gap:10px; align-items:center; margin:10px 0 12px; flex-wrap:wrap;';
+      document.getElementById('playerBox').insertBefore(epControls, document.getElementById('sourcePicker'));
+    }
+    if (type === 'tv') {
+      epControls.style.display = 'flex';
+      epControls.innerHTML = `
+        <span style="font-size:11px;color:var(--cream-dim);font-family:'JetBrains Mono',monospace;">Säsong</span>
+        <input type="number" id="seasonInput" value="${season||1}" min="1" max="99" style="width:55px;background:rgba(255,255,255,0.04);border:1px solid var(--panel-line);color:var(--cream);border-radius:6px;padding:5px 8px;font-size:13px;font-family:'JetBrains Mono',monospace;">
+        <span style="font-size:11px;color:var(--cream-dim);font-family:'JetBrains Mono',monospace;">Avsnitt</span>
+        <input type="number" id="episodeInput" value="${episode||1}" min="1" max="99" style="width:55px;background:rgba(255,255,255,0.04);border:1px solid var(--panel-line);color:var(--cream);border-radius:6px;padding:5px 8px;font-size:13px;font-family:'JetBrains Mono',monospace;">
+        <button id="epGoBtn" class="go-btn" style="padding:5px 16px;font-size:12px;">Uppdatera</button>
+      `;
+      document.getElementById('epGoBtn').addEventListener('click', function() {
+        const s = parseInt(document.getElementById('seasonInput').value) || 1;
+        const e = parseInt(document.getElementById('episodeInput').value) || 1;
+        currentSeason = s;
+        currentEpisode = e;
+        renderTicket(currentDetail, currentType, currentId, currentImdbId, s, e);
+        loadPlayer(currentType, currentId, currentImdbId, s, e);
+      });
+    } else {
+      epControls.style.display = 'none';
+    }
+
     renderSourcePicker();
-    loadPlayer(type, id, imdbId);
+    loadPlayer(type, id, imdbId, season, episode);
     document.getElementById('playerHeading').textContent = 'Spelare \u2014 ' + (type==='tv' ? 'Serie' : 'Film');
     ticket.classList.add('show');
     ticket.scrollIntoView({behavior:'smooth', block:'nearest'});
@@ -1014,61 +1389,47 @@
     else setStatus('Kunde inte hamta data just nu (' + err.message + '). Prova igen om en stund.', 'error');
   }
 
-  function escapeHtml(s){
-    return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  }
-
-  // === KLOCKA ===
+  // ===== KLOCKA =====
   function updateClock(){
     const now = new Date();
-    const timeStr = now.toLocaleTimeString('sv-SE', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
-    const dateStr = now.toLocaleDateString('sv-SE', {weekday:'long', day:'numeric', month:'long'});
-    document.getElementById('clockTime').textContent = timeStr;
-    document.getElementById('clockDate').textContent = dateStr;
+    document.getElementById('clockTime').textContent = now.toLocaleTimeString('sv-SE', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+    document.getElementById('clockDate').textContent = now.toLocaleDateString('sv-SE', {weekday:'long', day:'numeric', month:'long'});
   }
-  function startClock(){
-    updateClock();
-    const now = new Date();
-    const msToNext = 1000 - now.getMilliseconds();
-    setTimeout(function(){
-      updateClock();
-      setInterval(updateClock, 1000);
-    }, msToNext);
-  }
-  startClock();
+  updateClock();
+  setInterval(updateClock, 1000);
 
-  // === VIRTUAL KEYBOARD (RETRO-FUTURISTIC) ===
-  var VKB_LAYOUTS = {
+  // ===== VIRTUAL KEYBOARD =====
+  const VKB_LAYOUTS = {
     en: [['1','2','3','4','5','6','7','8','9','0'],['q','w','e','r','t','y','u','i','o','p'],['a','s','d','f','g','h','j','k','l'],['z','x','c','v','b','n','m'],['SPACE','BACK','ENTER']],
     fa: [['۱','۲','۳','۴','۵','۶','۷','۸','۹','۰'],['ض','ص','ث','ق','ف','غ','ع','ه','خ','ح','ج','چ'],['ش','س','ی','ب','ل','ا','ت','ن','م','ک','گ'],['ظ','ط','ز','ر','ذ','د','پ','و','.','ژ','ئ'],['SPACE','BACK','ENTER']],
     ckb: [['١','٢','٣','٤','٥','٦','٧','٨','٩','٠'],['ق','و','ە','ر','ت','ی','ئ','ع','ح','ه‍','پ','چ'],['ا','س','ش','د','ف','گ','ه','ژ','ک','ل','ڵ'],['ز','خ','ج','ڤ','ب','ن','م','ۆ','ێ','.','ڕ'],['SPACE','BACK','ENTER']],
     ar: [['١','٢','٣','٤','٥','٦','٧','٨','٩','٠'],['ض','ص','ث','ق','ف','غ','ع','ه','خ','ح','ج','د'],['ش','س','ي','ب','ل','ا','ت','ن','م','ك','ط'],['ئ','ء','ؤ','ر','لا','ى','ة','و','ز','ظ','ذ'],['SPACE','BACK','ENTER']]
   };
 
-  var vkbWrap = document.getElementById('vkbWrap');
-  var vkbRows = document.getElementById('vkbRows');
-  var vkbLangs = document.getElementById('vkbLangs');
-  var vkbClose = document.getElementById('vkbClose');
-  var vkbModeBtn = document.getElementById('vkbModeBtn');
-  var vkbToggleBtn = document.getElementById('vkbToggleBtn');
-  var vkbBlocker = document.getElementById('vkbBlocker');
-  var queryInput = document.getElementById('query');
-  var vkbEnabled = false;
-  var currentLang = 'en';
-  var vkbLightMode = localStorage.getItem('kuribaxi_vkb_light') === 'true';
+  const vkbWrap = document.getElementById('vkbWrap');
+  const vkbRows = document.getElementById('vkbRows');
+  const vkbLangs = document.getElementById('vkbLangs');
+  const vkbClose = document.getElementById('vkbClose');
+  const vkbModeBtn = document.getElementById('vkbModeBtn');
+  const vkbToggleBtn = document.getElementById('vkbToggleBtn');
+  const vkbBlocker = document.getElementById('vkbBlocker');
+  const queryInput = document.getElementById('query');
+  let vkbEnabled = false;
+  let currentLang = 'en';
+  let vkbLightMode = localStorage.getItem('kuribaxi_vkb_light') === 'true';
 
   function applyVkbMode(){vkbWrap.classList.toggle('light',vkbLightMode);vkbModeBtn.innerHTML=vkbLightMode?'🌙 MÖRK':'☀️ LJUS';}
   function toggleVkbMode(){vkbLightMode=!vkbLightMode;localStorage.setItem('kuribaxi_vkb_light',vkbLightMode?'true':'false');applyVkbMode();}
-  vkbModeBtn.addEventListener('click',function(e){e.stopPropagation();toggleVkbMode();});
+  vkbModeBtn.addEventListener('click', function(e){e.stopPropagation();toggleVkbMode();});
 
   function renderVkb(lang){
     currentLang=lang;
-    var layout=VKB_LAYOUTS[lang];
+    const layout=VKB_LAYOUTS[lang];
     vkbRows.innerHTML='';
     layout.forEach(function(row){
-      var rowDiv=document.createElement('div');rowDiv.className='vkb-row';
+      const rowDiv=document.createElement('div');rowDiv.className='vkb-row';
       row.forEach(function(key){
-        var btn=document.createElement('div');btn.className='vkb-key';
+        const btn=document.createElement('div');btn.className='vkb-key';
         if(key==='SPACE'){btn.className+=' space wide';btn.textContent='␣';}
         else if(key==='BACK'){btn.className+=' back wide';btn.textContent='⌫';}
         else if(key==='ENTER'){btn.className+=' enter wide';btn.textContent='↵';}
@@ -1083,9 +1444,9 @@
 
   function vkbPress(key){
     if(!vkbEnabled)return;
-    var start=queryInput.selectionStart||queryInput.value.length;
-    var end=queryInput.selectionEnd||queryInput.value.length;
-    var val=queryInput.value;
+    const start=queryInput.selectionStart||queryInput.value.length;
+    const end=queryInput.selectionEnd||queryInput.value.length;
+    let val=queryInput.value;
     if(key==='SPACE'){queryInput.value=val.slice(0,start)+' '+val.slice(end);queryInput.selectionStart=queryInput.selectionEnd=start+1;}
     else if(key==='BACK'){if(start===end&&start>0){queryInput.value=val.slice(0,start-1)+val.slice(end);queryInput.selectionStart=queryInput.selectionEnd=start-1;}else if(start!==end){queryInput.value=val.slice(0,start)+val.slice(end);queryInput.selectionStart=queryInput.selectionEnd=start;}}
     else if(key==='ENTER'){runSearch();return;}
@@ -1111,13 +1472,17 @@
     }
   }
 
-  vkbToggleBtn.addEventListener('click',function(e){e.stopPropagation();toggleVkb();});
-  vkbClose.addEventListener('click',function(e){e.stopPropagation();if(vkbEnabled)toggleVkb();});
-  vkbLangs.addEventListener('click',function(e){var btn=e.target.closest('.vkb-lang');if(!btn)return;renderVkb(btn.dataset.lang);});
-  vkbBlocker.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();});
-  queryInput.addEventListener('focus',function(e){if(vkbEnabled){e.preventDefault();this.blur();}});
+  vkbToggleBtn.addEventListener('click', function(e){e.stopPropagation();toggleVkb();});
+  vkbClose.addEventListener('click', function(e){e.stopPropagation();if(vkbEnabled)toggleVkb();});
+  vkbLangs.addEventListener('click', function(e){const btn=e.target.closest('.vkb-lang');if(!btn)return;renderVkb(btn.dataset.lang);});
+  vkbBlocker.addEventListener('click', function(e){e.preventDefault();e.stopPropagation();});
+  queryInput.addEventListener('focus', function(e){if(vkbEnabled){e.preventDefault();this.blur();}});
 
   applyVkbMode(); renderVkb('en');
+
+  // ===== INIT =====
+  loadLibrary();
+  renderLibrary();
 
 })();
 </script>
@@ -1190,8 +1555,8 @@
 
 <script>
 (function(){
-  // === MUSIC PLAYER ===
-  var MUSIC_STATIONS = [
+  // ===== MUSIC PLAYER =====
+  const MUSIC_STATIONS = [
     {name:'Radio Swiss Classic',url:'https://stream.srg-ssr.ch/m/rsc_de/mp3_128',desc:'Schweizisk klassisk radio'},
     {name:'Public Domain Classical',url:'http://relay.publicdomainradio.org/classical.mp3',desc:'Offentlig doman klassisk musik'},
     {name:'Classic FM UK',url:'http://vis.media-ice.musicradio.com/ClassicFMMP3',desc:'Storbritanniens favorit'},
@@ -1224,23 +1589,23 @@
     {name:'ClassicalNH',url:'https://nhpr.streamguys1.com/classical',desc:'New Hampshire klassisk'},
   ];
 
-  var musicAudio = document.getElementById('musicAudio');
-  var musicPlayBtn = document.getElementById('musicPlayBtn');
-  var musicStationSelect = document.getElementById('musicStationSelect');
-  var musicVolume = document.getElementById('musicVolume');
-  var musicMuteBtn = document.getElementById('musicMuteBtn');
-  var musicCloseBtn = document.getElementById('musicCloseBtn');
-  var musicReopenBtn = document.getElementById('musicReopenBtn');
-  var musicPlayer = document.getElementById('musicPlayer');
-  var musicTrackTitle = document.getElementById('musicTrackTitle');
-  var musicTrackStation = document.getElementById('musicTrackStation');
-  var musicUnmuteHint = document.getElementById('musicUnmuteHint');
-  var currentStation = parseInt(localStorage.getItem('kuribaxi_music_station')||'0');
-  var isPlaying = false;
-  var isMuted = false;
+  const musicAudio = document.getElementById('musicAudio');
+  const musicPlayBtn = document.getElementById('musicPlayBtn');
+  const musicStationSelect = document.getElementById('musicStationSelect');
+  const musicVolume = document.getElementById('musicVolume');
+  const musicMuteBtn = document.getElementById('musicMuteBtn');
+  const musicCloseBtn = document.getElementById('musicCloseBtn');
+  const musicReopenBtn = document.getElementById('musicReopenBtn');
+  const musicPlayer = document.getElementById('musicPlayer');
+  const musicTrackTitle = document.getElementById('musicTrackTitle');
+  const musicTrackStation = document.getElementById('musicTrackStation');
+  const musicUnmuteHint = document.getElementById('musicUnmuteHint');
+  let currentStation = parseInt(localStorage.getItem('kuribaxi_music_station')||'0');
+  let isPlaying = false;
+  let isMuted = false;
 
   function loadStation(index){
-    var st = MUSIC_STATIONS[index];
+    const st = MUSIC_STATIONS[index];
     if(!st)return;
     musicAudio.src = st.url;
     musicTrackTitle.textContent = st.name;
@@ -1305,7 +1670,7 @@
   musicAudio.addEventListener('error',function(){
     musicTrackStation.textContent = 'Fel vid laddning, byter kanal...';
     setTimeout(function(){
-      var next = (currentStation+1)%MUSIC_STATIONS.length;
+      const next = (currentStation+1)%MUSIC_STATIONS.length;
       currentStation = next;
       loadStation(next);
       if(isPlaying) musicAudio.play().catch(function(){});
