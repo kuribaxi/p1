@@ -840,86 +840,6 @@
     border-color: var(--gold);
   }
 
-  .player-control-bar {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    margin-top: 12px;
-    flex-wrap: wrap;
-  }
-  .ctrl-btn {
-    background: var(--bg-alt);
-    border: 1px solid var(--panel-line);
-    color: var(--cream);
-    border-radius: 8px;
-    padding: 8px 16px;
-    font-size: 12px;
-    font-family: 'JetBrains Mono', monospace;
-    cursor: pointer;
-    transition: all .15s;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .ctrl-btn:hover {
-    border-color: var(--gold);
-    color: var(--gold-bright);
-  }
-  .ctrl-btn.gold {
-    background: var(--gold);
-    color: #1a1305;
-    border-color: var(--gold);
-    font-weight: 700;
-  }
-  .ctrl-btn.gold:hover {
-    background: var(--gold-bright);
-  }
-
-  .subtitle-panel {
-    display: none;
-    margin-top: 10px;
-    padding: 14px 16px;
-    background: var(--bg-alt);
-    border: 1px solid var(--panel-line);
-    border-radius: 10px;
-    animation: panelIn 0.2s ease;
-  }
-  .subtitle-panel.show {
-    display: block;
-  }
-  @keyframes panelIn {
-    from { opacity: 0; transform: translateY(-4px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .subtitle-panel h4 {
-    color: var(--gold-bright);
-    font-size: 12px;
-    margin-bottom: 8px;
-    font-family: 'JetBrains Mono', monospace;
-  }
-  .subtitle-panel p {
-    font-size: 12px;
-    color: var(--cream-dim);
-    margin-bottom: 8px;
-    line-height: 1.5;
-  }
-  .subtitle-panel ul {
-    margin-left: 18px;
-    font-size: 12px;
-    color: var(--cream-dim);
-    line-height: 1.7;
-  }
-  .subtitle-panel li {
-    margin-bottom: 4px;
-  }
-  .subtitle-panel code {
-    background: rgba(255,255,255,0.06);
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-family: 'JetBrains Mono', monospace;
-    color: var(--gold-bright);
-  }
-
   .player-frame:fullscreen {
     width: 100vw;
     height: 100vh;
@@ -1037,9 +957,8 @@
         <div class="source-picker" id="sourcePicker"></div>
         <div class="player-frame" id="playerFrame" style="position:relative;">
           <iframe id="vidsrcFrame" allowfullscreen referrerpolicy="origin"></iframe>
-          <div class="player-overlay" id="playerOverlay">
-            <button id="overlayFsBtn" title="Helskärm (F)">⛶ Helskärm</button>
-            <button id="overlayCcBtn" title="Visa undertext-hjälp">📝 Undertexter</button>
+          <div class="player-overlay" id="playerOverlay" style="justify-content:flex-end; top:0; bottom:auto; padding:12px 14px 50px; background:linear-gradient(to bottom, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.2) 60%, transparent 100%);">
+            <button id="overlayFsBtn" title="Helskärm (F)">⛶</button>
           </div>
         </div>
         <div class="browser-frame" id="browserFrame" style="display:none;">
@@ -1048,33 +967,7 @@
           <a class="open-browser-btn" id="openBrowserBtn" href="#" target="_blank" rel="noopener">Spela upp i ny flik &#8594;</a>
         </div>
         <div class="player-meta" id="playerMeta"></div>
-        <div class="player-control-bar" id="controlBar">
-          <button class="ctrl-btn gold" id="mainFsBtn" title="Helskärm (F)">⛶ Helskärm</button>
-          <button class="ctrl-btn" id="mainCcBtn" title="Visa undertext-hjälp">📝 Undertexter-hjälp</button>
-          <button class="ctrl-btn" id="mainKbBtn" title="Visa kortkommandon">⌨️ Kortkommandon</button>
-        </div>
-        <div class="subtitle-panel" id="subtitlePanel">
-          <h4>📝 Så här aktiverar du undertexter</h4>
-          <p>Eftersom videon laddas från externa källor kan undertexterna inte styras direkt härifrån. Använd istället videospelarens egna knappar:</p>
-          <ul>
-            <li>Håll musen över videon så visas spelarens egna kontroller</li>
-            <li>Leta efter knappen <code>CC</code>, <code>Sub</code> eller <code>📝</code> (ofta nere till höger i videon)</li>
-            <li>Klicka på den och välj önskat språk — svenska finns ofta som <code>Swedish</code> eller <code>Svenska</code></li>
-            <li>I vissa players: tryck <code>C</code> på tangentbordet för att växla undertext</li>
-            <li>Om inga undertexter visas: prova att byta källa via knapparna ovan</li>
-          </ul>
-        </div>
-        <div class="subtitle-panel" id="kbPanel">
-          <h4>⌨️ Kortkommandon</h4>
-          <ul>
-            <li><code>F</code> eller <code>dubbelklick</code> på videon — Helskärm</li>
-            <li><code>ESC</code> — Avsluta helskärm</li>
-            <li><code>Mellanslag</code> — Spela / Pausa (i de flesta players)</li>
-            <li><code>C</code> — Växla undertext (i vissa players)</li>
-            <li><code>← / →</code> — Spola 10 sekunder bakåt / framåt</li>
-            <li><code>↑ / ↓</code> — Höj / sänk volym</li>
-          </ul>
-        </div>
+        
         <div class="notice" id="playerNotice" style="display:none;"></div>
       </div>
     </div>
@@ -1662,18 +1555,12 @@
   applyVkbMode(); renderVkb('en');
 
 
-  // ===== FULLSCREEN & CONTROLS =====
+  // ===== FULLSCREEN =====
   function toggleFullscreen() {
     const frame = document.getElementById('playerFrame');
     if (!document.fullscreenElement) {
       frame.requestFullscreen().catch(function(err) {
         console.log('Fullscreen error:', err);
-        // Fallback: open source in new tab
-        const src = SOURCES.find(function(s){return s.key===activeSource;});
-        if(src){
-          const url = buildUrl(src, currentType, currentId, currentImdbId, currentSeason, currentEpisode);
-          window.open(url, '_blank');
-        }
       });
     } else {
       document.exitFullscreen();
@@ -1681,24 +1568,14 @@
   }
 
   document.getElementById('overlayFsBtn').addEventListener('click', function(e){e.stopPropagation(); toggleFullscreen();});
-  document.getElementById('mainFsBtn').addEventListener('click', toggleFullscreen);
 
   // Double-click on player frame for fullscreen
   document.getElementById('playerFrame').addEventListener('dblclick', function(e){
-    // Don't trigger if clicking on overlay buttons
     if(e.target.closest('.player-overlay button')) return;
     toggleFullscreen();
   });
 
-  // Subtitle & KB panels
-  var subtitlePanel = document.getElementById('subtitlePanel');
-  var kbPanel = document.getElementById('kbPanel');
-  function hidePanels(){subtitlePanel.classList.remove('show');kbPanel.classList.remove('show');}
-  document.getElementById('overlayCcBtn').addEventListener('click', function(e){e.stopPropagation(); subtitlePanel.classList.toggle('show'); kbPanel.classList.remove('show');});
-  document.getElementById('mainCcBtn').addEventListener('click', function(){subtitlePanel.classList.toggle('show'); kbPanel.classList.remove('show');});
-  document.getElementById('mainKbBtn').addEventListener('click', function(){kbPanel.classList.toggle('show'); subtitlePanel.classList.remove('show');});
-
-  // Keyboard shortcuts (only when ticket is visible and not typing in inputs)
+  // Keyboard shortcut: F for fullscreen
   document.addEventListener('keydown', function(e){
     if(!ticket.classList.contains('show')) return;
     if(e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
@@ -1706,12 +1583,8 @@
       e.preventDefault();
       toggleFullscreen();
     }
-    if(e.key === 'Escape'){
-      if(document.fullscreenElement){
-        document.exitFullscreen();
-      } else {
-        hidePanels();
-      }
+    if(e.key === 'Escape' && document.fullscreenElement){
+      document.exitFullscreen();
     }
   });
 
