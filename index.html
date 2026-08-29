@@ -221,7 +221,7 @@
 
   /* ===== OPENSUBTITLES INTEGRATION ===== */
   .os-panel{
-    position:absolute; bottom:52px; left:12px; right:12px;
+    position:absolute; top:100px; left:12px; right:12px;
     background:rgba(18,27,46,0.98); border:1px solid var(--gold); border-radius:10px;
     padding:10px; max-height:200px; overflow-y:auto; z-index:20; display:none;
     box-shadow:0 12px 30px rgba(0,0,0,0.6); backdrop-filter:blur(12px);
@@ -236,7 +236,7 @@
 
   /* SUBTITLE OPTIONS - EXAKT SOM BILDEN */
   .sub-settings{
-    position:absolute; bottom:52px; right:12px; width:320px;
+    position:absolute; top:100px; right:12px; width:320px;
     background:#1a1a1a; border:1px solid #333; border-radius:16px;
     padding:0; z-index:21; display:none; box-shadow:0 20px 60px rgba(0,0,0,0.8);
     overflow:hidden; font-family:'Manrope',sans-serif;
@@ -401,7 +401,7 @@
       <div class="perf"></div>
       <div class="player-box" id="playerBox">
         <h3 id="playerHeading">Spelare</h3>
-        <div id="qrBypass" style="display:none; margin-bottom:10px; padding:10px 14px; background:rgba(226,87,76,0.12); border:1px solid rgba(226,87,76,0.35); border-radius:8px; display:flex; justify-content:space-between; align-items:center; gap:10px;">
+        <div id="qrBypass" style="display:none; margin-bottom:10px; padding:10px 14px; background:rgba(224,164,88,0.10); border:1px solid rgba(224,164,88,0.25); border-radius:8px; display:none; justify-content:space-between; align-items:center; gap:10px;">
           <div style="font-size:11px; color:#f0938a; font-family:'JetBrains Mono',monospace;"><span style="font-weight:700;">🤖 QR / Robot check upptäckt!</span> Denna källa kräver verifiering. Klicka för att byta till ren källa utan QR.</div>
           <div style="display:flex; gap:6px;">
             <button id="qrBypassBtn" class="go-btn" style="padding:6px 14px; font-size:11px; background:var(--teal);">Byt källa →</button>
@@ -418,7 +418,7 @@
           <div class="cc-controls" id="ccControls">
             <div class="cc-left">
               <button class="cc-btn" id="ccToggleBtn">CC</button>
-              <span class="cc-hint" id="ccHint">Hovra här nere = subs</span>
+              <span class="cc-hint" id="ccHint">Hovra här uppe = subs</span>
             </div>
             <div style="display:flex; gap:6px; align-items:center;">
               <button class="cc-btn" id="ccLangSv">SV</button>
@@ -587,18 +587,15 @@
   document.getElementById('libTabs').addEventListener('click',function(e){const btn=e.target.closest('button'); if(!btn)return; currentLibTab=btn.dataset.tab; renderLibrary();});
   document.getElementById('clearLibBtn').addEventListener('click',function(){const label=currentLibTab==='movies'?'filmer':'serier'; if(!confirm(`Rensa alla sparade ${label}?`))return; if(currentLibTab==='movies'){watchData.movies={};} else {watchData.series={};} saveLibrary(); renderLibrary();});
   const SOURCES=[
-    // Låg QR-risk först
-    {key:'vsrc_su', name:'vsrc.su (No QR)', base:'https://vsrc.su/embed', noQR:true},
-    {key:'vidapi_embed', name:'VidAPI (No QR)', base:'https://vaplayer.ru/embed', needsImdb:true, isVidApi:true, openInBrowser:false, noQR:true},
+    // Fungerande källor - accepterar 1x QR ok
+    {key:'vsrc_su', name:'vsrc.su', base:'https://vsrc.su/embed', noQR:true},
     {key:'vidsrcme_ru', name:'vidsrcme.ru', base:'https://vidsrcme.ru/embed', noQR:true},
     {key:'vidsrcme_su', name:'vidsrcme.su', base:'https://vidsrcme.su/embed', noQR:true},
-    {key:'embed_su', name:'embed.su (Clean)', base:'https://embed.su/embed', noQR:true},
+    {key:'embed_su', name:'embed.su', base:'https://embed.su/embed', noQR:true},
     {key:'autoembed', name:'autoembed.cc', base:'https://autoembed.cc/embed', noQR:true},
-    // De som ofta ger QR - längst ner
-    {key:'vidsrc2', name:'vidsrc2.ru (QR risk)', base:'https://vidsrc2.ru/embed', noQR:false},
-    {key:'vidsrc_ir', name:'vidsrc.ir', base:'https://vidsrc.ir/embed', noQR:false},
-    {key:'vidsrc_embed_ru', name:'vidsrc-embed.ru', base:'https://vidsrc-embed.ru/embed', noQR:false},
-    {key:'vidapi_tab', name:'VidAPI (Ny flik)', base:'https://vaplayer.ru/embed', needsImdb:true, isVidApi:true, openInBrowser:true, noQR:true},
+    {key:'vidsrc2', name:'vidsrc2.ru', base:'https://vidsrc2.ru/embed', noQR:false},
+    {key:'vidapi_embed', name:'VidAPI', base:'https://vaplayer.ru/embed', needsImdb:true, isVidApi:true, openInBrowser:false, noQR:true},
+    {key:'vidapi_tab', name:'VidAPI Ny flik', base:'https://vaplayer.ru/embed', needsImdb:true, isVidApi:true, openInBrowser:true, noQR:true},
   ];
   let activeSource=SOURCES[0].key; let currentType='movie'; let currentId=null; let currentImdbId=null; let currentDetail=null; let currentSeason=1; let currentEpisode=1;
   let mode='title'; let mediaType='movie'; const mediaTypeToggle=document.getElementById('mediaTypeToggle');
@@ -668,21 +665,40 @@
     if(qrBypass) qrBypass.style.display='none';
     if(qrCheckInterval) clearInterval(qrCheckInterval);
 
-    if(src.openInBrowser){playerFrame.style.display='none'; browserFrame.style.display='flex'; openBtn.href=url; iframe.src=''; browserFrameText.innerHTML='Den har kallan oppnas i webblasaren.<br><strong>Klicka knappen nedan for att spela upp.</strong>'; openBtn.textContent='Spela upp i ny flik →';}
+    if(src.openInBrowser){
+      playerFrame.style.display='none'; 
+      browserFrame.style.display='flex'; 
+      openBtn.href=url; 
+      iframe.src=''; 
+      iframe.removeAttribute('sandbox');
+      browserFrameText.innerHTML='Den har kallan oppnas i webblasaren.<br><strong>Klicka knappen nedan for att spela upp.</strong>'; 
+      openBtn.textContent='Spela upp i ny flik →';
+    }
     else {
-      playerFrame.style.display='block'; browserFrame.style.display='none'; 
-      // Anti-QR: lägg till random param + no-referrer för att undvika bot detection
-      const antiQrUrl = url + (url.includes('?') ? '&' : '?') + 't=' + Date.now() + '&autoPlay=0';
-      iframe.referrerPolicy='no-referrer';
-      // sandbox som tillåter player men blockar QR popups
-      iframe.setAttribute('sandbox','allow-same-origin allow-scripts allow-forms allow-presentation');
-      iframe.src=antiQrUrl;
+      playerFrame.style.display='block'; 
+      browserFrame.style.display='none'; 
+      // FIX: Ingen sandbox som blockar video - bara vanlig iframe så film spelas
+      iframe.removeAttribute('sandbox');
+      iframe.referrerPolicy='origin';
+      iframe.allow='autoplay; fullscreen; encrypted-media; picture-in-picture';
+      iframe.src=url;
+      console.log('Loading player:', url);
 
-      // Om källan är känd för QR, visa bypass-knappen direkt efter 3 sek
+      // Om QR visas, det är ok - bara 1 gång - visa info men blocka inte
       if(src.noQR===false){
         qrCheckInterval = setTimeout(()=>{
-          if(qrBypass) qrBypass.style.display='flex';
-        }, 3500);
+          // Visa bara info, inte blocka
+          if(qrBypass){
+            qrBypass.innerHTML = `<div style="font-size:11px; color:#e0a458; font-family:'JetBrains Mono',monospace;"><span style="font-weight:700;">ℹ️ Denna källa kan visa QR en gång - acceptera så spelas filmen.</span></div><div style="display:flex; gap:6px;"><button id="qrBypassBtn" class="go-btn" style="padding:6px 14px; font-size:11px; background:var(--gold);">Byt till annan källa om QR loopar →</button><button id="qrDismiss" style="background:transparent; border:1px solid var(--panel-line); color:var(--cream-dim); border-radius:6px; padding:4px 10px; font-size:10px; cursor:pointer;">OK</button></div>`;
+            qrBypass.style.display='flex';
+            document.getElementById('qrBypassBtn')?.addEventListener('click', switchToCleanSource);
+            document.getElementById('qrDismiss')?.addEventListener('click', ()=>{ qrBypass.style.display='none'; });
+          }
+        }, 2000);
+      }
+    }
+  }
+, 3500);
       }
       // Lyssna på meddelanden från iframe - vissa vidsrc skickar robot event
       window.addEventListener('message', function qrListener(e){
@@ -750,7 +766,7 @@
   pFrame.addEventListener('mousemove',(e)=>{
     const rect=pFrame.getBoundingClientRect();
     const yRel=(e.clientY-rect.top)/rect.height;
-    if(yRel>0.65){
+    if(yRel<0.35){ // ÖVRE 35% = CC zon nu
       showCC();
     } else {
       if(ccControls.classList.contains('visible')) hideCCDelayed();
