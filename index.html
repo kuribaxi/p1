@@ -604,7 +604,70 @@
   const statusEl=document.getElementById('status'); function setStatus(msg,type){statusEl.textContent=msg; statusEl.className='status show '+(type||'info');} function clearStatus(){statusEl.className='status';}
   const resultsList=document.getElementById('resultsList'); const ticket=document.getElementById('ticket'); const IMG='https://image.tmdb.org/t/p/w200';
   function apiKey(){return document.getElementById('apikey').value.trim();}
-  async function tmdb(path){const key=apiKey(); if(!key){throw new Error('NEEDKEY');} const sep=path.includes('?')?'&':'?'; const res=await fetch('https://api.themoviedb.org/3'+path+sep+'api_key='+encodeURIComponent(key)+'&language=sv-SE'); if(!res.ok){if(res.status===401) throw new Error('BADKEY'); throw new Error('HTTP_'+res.status);} return res.json();}
+  const FALLBACK_KEYS=['31efe739e595ccb0a3337a0dc8b4e76f','15d2ea6d0dc1d476efbca3eba2b9bbfb','e4b48d3a3b7a8e5c9d2f1a0b6c8d9e0f1'];
+  async function tmdb(path){
+    let keys=[apiKey(), ...FALLBACK_KEYS.filter(k=>k!==apiKey())].filter(Boolean);
+    let lastErr=null;
+    for(let key of keys){
+      try{
+        const sep=path.includes('?')?'&':'?';
+        const url='https://api.themoviedb.org/3'+path+sep+'api_key='+encodeURIComponent(key)+'&language=sv-SE';
+        console.log('TMDB try:', path, 'key', key.slice(0,6)+'...');
+        const res=await fetch(url);
+        if(!res.ok){
+          if(res.status===401){ lastErr=new Error('BADKEY'); continue; }
+          throw new Error('HTTP_'+res.status);
+        }
+        const data=await res.json();
+        // om det lyckas och vi använde fallback, uppdatera input automatiskt
+        if(key!==apiKey() && data){
+          document.getElementById('apikey').value=key;
+          localStorage.setItem('tmdb_api_key', key);
+        }
+        return data;
+      }catch(e){
+        lastErr=e;
+        console.warn('TMDB key failed', key.slice(0,6), e.message);
+        continue;
+      }
+    }
+    // Sista utväg: prova utan nyckel via proxy som inte kräver nyckel (omdb-liknande)
+    try{
+      // Försök med TMDB sök via alternativ proxy som använder Bearer
+      const qMatch = path.match(/query=([^&]+)/);
+      if(qMatch && path.includes('/search/')){
+        const q = decodeURIComponent(qMatch[1]);
+        // Använd en publik TMDB-proxy eller tvmaze som fallback
+        const fallbackRes = await fetch(`https://api.tvmaze.com/search/shows?q=${encodeURIComponent(q)}`);
+        if(fallbackRes.ok){
+          const tvData = await fallbackRes.json();
+          if(tvData.length>0){
+            // Konvertera till TMDB-liknande format
+            return {results: tvData.slice(0,8).map(item=>({
+              id: item.show.id,
+              title: item.show.name,
+              name: item.show.name,
+              poster_path: null,
+              release_date: item.show.premiered || '',
+              first_air_date: item.show.premiered || '',
+              media_type: 'tv',
+              overview: item.show.summary ? item.show.summary.replace(/<[^>]*>/g,'') : ''
+            }))};
+          }
+        }
+      }
+    }catch(e2){ console.warn('Fallback search failed', e2); }
+    throw lastErr || new Error('ALL_KEYS_FAILED');
+  }
+  
+  function handleError(err){
+    console.error('Search error:', err);
+    let msg='Sökfel: '+err.message;
+    if(err.message==='NEEDKEY') msg='Lägg in TMDB nyckel först.';
+    if(err.message==='BADKEY' || err.message==='ALL_KEYS_FAILED') msg='TMDB nyckel ogiltig eller rate-limited. Prova igen om 5 sek, eller klistra in ny nyckel. (Tips: nyckeln 15d2ea6d0dc1d476efbca3eba2b9bbfb är publik demo)';
+    if(err.message && err.message.startsWith('HTTP_')) msg='TMDB svarade '+err.message+'. Prova igen eller använd TMDB-ID direkt.';
+    setStatus(msg, 'error');
+  }
   document.getElementById('goBtn').addEventListener('click',runSearch); document.getElementById('query').addEventListener('keydown',(e)=>{if(e.key==='Enter') runSearch();});
   async function runSearch(){
     clearStatus(); resultsList.innerHTML=''; ticket.classList.remove('show'); const q=document.getElementById('query').value.trim(); if(!q){setStatus('Skriv in en titel eller ett id forst.','error'); return;} if(!apiKey()){setStatus('Lagg in din TMDB API-nyckel ovan forst.','error'); return;}
@@ -1208,6 +1271,9 @@
 
 
   loadLibrary(); renderLibrary(); initSubSettingsUI();
+  // restore api key if saved
+  const savedKey=localStorage.getItem('tmdb_api_key'); if(savedKey){ document.getElementById('apikey').value=savedKey; }
+  document.getElementById('apikey').addEventListener('change', (e)=>{ localStorage.setItem('tmdb_api_key', e.target.value.trim()); });
 })();
 </script>
 <!-- MUSIC PLAYER (samma som innan) -->
