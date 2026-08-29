@@ -32,23 +32,8 @@ body{background:#0a0e1a;color:#e8dcc8;font-family:Manrope,sans-serif;padding:20p
 .poster img{width:140px; border-radius:10px}
 .player-frame{position:relative; background:#000; aspect-ratio:16/9; margin:16px; border-radius:12px; overflow:hidden}
 .player-frame iframe{position:absolute; inset:0; width:100%; height:100%; border:none}
-.player-overlay{
-  position:absolute; top:0; left:0; right:0; padding:12px; 
-  background:linear-gradient(to bottom, rgba(0,0,0,0.85), transparent); 
-  display:flex; gap:8px; z-index:10;
-  opacity:1; transform:translateY(0); transition:all 0.35s ease;
-  pointer-events:auto;
-}
-.player-overlay.hidden{opacity:0; transform:translateY(-10px); pointer-events:none}
-.player-overlay button{
-  background:rgba(0,0,0,0.6); border:1px solid rgba(255,255,255,0.3); 
-  color:#fff; padding:6px 12px; border-radius:20px; cursor:pointer; 
-  font-weight:600; font-size:13px; backdrop-filter:blur(6px);
-}
-.player-frame:fullscreen .player-overlay{opacity:0; pointer-events:none}
-.player-frame:fullscreen:hover .player-overlay,
-.player-frame:fullscreen .player-overlay.show{opacity:1; pointer-events:auto}
-
+.player-overlay{position:absolute; top:0; left:0; right:0; padding:12px; background:linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); display:flex; gap:8px; z-index:10}
+.player-overlay button{background:rgba(0,0,0,0.6); border:1px solid rgba(255,255,255,0.3); color:#fff; padding:6px 12px; border-radius:8px; cursor:pointer; font-weight:700}
 .lib-section{margin-top:30px; background:#121b2e; border:1px solid #1e2d4a; border-radius:16px; padding:16px}
 .lib-tabs{display:flex; gap:8px; margin-bottom:14px}
 .lib-tabs button{background:#0b1220; border:1px solid #2a3a5a; color:#a09070; padding:8px 14px; border-radius:8px; cursor:pointer; font-size:12px; font-weight:700}
@@ -60,37 +45,11 @@ body{background:#0a0e1a;color:#e8dcc8;font-family:Manrope,sans-serif;padding:20p
 .lib-card-title{padding:8px; font-size:12px; font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
 .lib-card-sub{padding:0 8px 8px; font-size:10px; color:#a09070; display:flex; justify-content:space-between}
 .lib-card-progress{background:#4ec9b0; color:#000; font-size:9px; font-weight:700; padding:2px 6px; border-radius:10px}
-.lib-del{
-  position:absolute; top:6px; right:6px; 
-  width:22px; height:22px; 
-  background:rgba(0,0,0,0.7); border:1px solid rgba(255,255,255,0.2); 
-  color:#fff; border-radius:50%; cursor:pointer; 
-  font-size:11px; font-weight:400;
-  display:flex; align-items:center; justify-content:center;
-  z-index:5; transition:all .15s;
-}
-.lib-del:hover{background:rgba(0,0,0,0.9); border-color:rgba(255,255,255,0.4); transform:scale(1.1)}
+.lib-del{position:absolute; top:-10px; right:-10px; width:30px; height:30px; background:#e2574c; border:2px solid #fff; color:#fff; border-radius:50%; cursor:pointer; font-size:16px; font-weight:900; display:flex; align-items:center; justify-content:center; z-index:5; box-shadow:0 3px 10px rgba(0,0,0,0.5)}
+.lib-del:hover{background:#ff4444; transform:scale(1.15)}
 .lib-empty{color:#666; font-size:13px; text-align:center; padding:20px}
 .series-controls{display:flex; gap:8px; align-items:center; margin-top:10px; flex-wrap:wrap}
 .series-controls select, .series-controls button{background:#0b1220; border:1px solid #2a3a5a; color:#fff; padding:6px 10px; border-radius:6px; font-size:12px; cursor:pointer}
-
-.music-player{position:fixed; bottom:20px; left:20px; z-index:9998; background:rgba(18,27,46,0.96); border:1px solid #c9a227; border-radius:14px; padding:12px; width:280px; backdrop-filter:blur(12px); box-shadow:0 8px 24px rgba(0,0,0,0.4); transition:all .3s}
-.music-player.hidden-player{transform:translateX(-120%); opacity:0; pointer-events:none}
-.music-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:8px}
-.music-title{font-size:11px; font-weight:700; color:#c9a227; letter-spacing:0.06em}
-.music-close{width:20px; height:20px; border-radius:50%; background:rgba(255,255,255,0.1); border:none; color:#888; cursor:pointer; font-size:12px}
-.music-track-title{font-size:13px; font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-.music-track-station{font-size:10px; color:#a09070; margin-bottom:8px}
-.music-controls{display:flex; gap:8px; align-items:center; margin-bottom:8px}
-.music-play-btn{width:36px; height:36px; border-radius:50%; background:#c9a227; border:none; color:#000; font-size:14px; cursor:pointer; font-weight:700; display:flex; align-items:center; justify-content:center}
-.music-volume{flex:1; height:4px; accent-color:#c9a227}
-.music-mute-btn{background:#0b1220; border:1px solid #2a3a5a; color:#a09070; padding:4px 8px; border-radius:6px; font-size:10px; cursor:pointer}
-.music-station-select{width:100%; background:#0b1220; border:1px solid #2a3a5a; color:#fff; padding:6px 8px; border-radius:6px; font-size:11px; cursor:pointer}
-.music-reopen{position:fixed; bottom:20px; left:20px; z-index:9997; background:rgba(18,27,46,0.95); border:1px solid #c9a227; border-radius:50%; width:48px; height:48px; display:none; align-items:center; justify-content:center; cursor:pointer; font-size:20px; color:#c9a227; box-shadow:0 4px 12px rgba(0,0,0,0.4)}
-.music-reopen.show{display:flex}
-.music-unmute-hint{position:absolute; top:-30px; left:0; right:0; background:#4ec9b0; color:#000; font-size:10px; font-weight:700; padding:4px 8px; border-radius:6px; text-align:center; display:none}
-.music-unmute-hint.show{display:block}
-
 </style>
 </head>
 <body>
@@ -303,88 +262,7 @@ document.getElementById('goBtn').addEventListener('click', runSearch);
 document.getElementById('query').addEventListener('keydown', function(e){ if(e.key==='Enter') runSearch(); });
 document.getElementById('overlayFsBtn').addEventListener('click', function(){ var pf=document.getElementById('playerFrame'); if(document.fullscreenElement) document.exitFullscreen(); else pf.requestFullscreen(); });
 document.addEventListener('keydown', function(e){ if((e.key.toLowerCase()==='h'||e.key.toLowerCase()==='f') && ['INPUT','TEXTAREA','SELECT'].indexOf(e.target.tagName)===-1){ var pf=document.getElementById('playerFrame'); if(document.fullscreenElement) document.exitFullscreen(); else pf.requestFullscreen(); } });
-
-// CLASSIC MUSIC PLAYER
-(function(){
-  var MUSIC_STATIONS=[
-    {name:'Radio Swiss Classic',url:'https://stream.srg-ssr.ch/m/rsc_de/mp3_128',desc:'Schweizisk klassisk radio'},
-    {name:'Public Domain Classical',url:'https://relay.publicdomainradio.org/classical.mp3',desc:'Offentlig domän klassisk'},
-    {name:'Classic FM UK',url:'https://media-ice.musicradio.com/ClassicFMMP3',desc:'Storbritanniens favorit'},
-    {name:'DR P2 Klassik',url:'https://live-icy.gss.dr.dk:8000/A/A04L.mp3',desc:'Dansk klassisk radio'},
-    {name:'Venice Classic Radio',url:'https://uk2.streamingpulse.com/ssl/vcr2',desc:'Italiensk barock & klassisk'},
-    {name:'WQXR Classical',url:'https://stream.wqxr.org/wqxr',desc:'New York klassisk'},
-    {name:'France Musique',url:'https://direct.francemusique.fr/live/francemusique-midfi.mp3',desc:'Fransk klassisk'},
-    {name:'Klassik Radio',url:'https://live.streams.klassikradio.de/klassikradio-deutschland',desc:'Tysk klassisk radio'},
-    {name:'Radio Caprice Cello',url:'https://79.120.12.130:8002/cello',desc:'Cellomusik nonstop'},
-    {name:'YourClassical Relax',url:'https://relax.stream.publicradio.org/relax.aac',desc:'Avslappnande klassisk'},
-  ];
-  var musicAudio=document.getElementById('musicAudio');
-  var musicPlayBtn=document.getElementById('musicPlayBtn');
-  var musicStationSelect=document.getElementById('musicStationSelect');
-  var musicVolume=document.getElementById('musicVolume');
-  var musicMuteBtn=document.getElementById('musicMuteBtn');
-  var musicCloseBtn=document.getElementById('musicCloseBtn');
-  var musicReopenBtn=document.getElementById('musicReopenBtn');
-  var musicPlayer=document.getElementById('musicPlayer');
-  var musicTrackTitle=document.getElementById('musicTrackTitle');
-  var musicTrackStation=document.getElementById('musicTrackStation');
-  var musicUnmuteHint=document.getElementById('musicUnmuteHint');
-  var currentStation=parseInt(localStorage.getItem('kuribaxi_music_station')||'0');
-  var isPlaying=false; var isMuted=false;
-  function populateStations(){
-    musicStationSelect.innerHTML='';
-    MUSIC_STATIONS.forEach(function(st,i){
-      var opt=document.createElement('option'); opt.value=i; opt.textContent=st.name; if(i===currentStation) opt.selected=true; musicStationSelect.appendChild(opt);
-    });
-  }
-  function loadStation(index){
-    var st=MUSIC_STATIONS[index]; if(!st) return;
-    musicAudio.src=st.url; musicTrackTitle.textContent=st.name; musicTrackStation.textContent=st.desc; musicStationSelect.value=String(index);
-    localStorage.setItem('kuribaxi_music_station', String(index));
-    if(isPlaying){ musicAudio.play().catch(function(e){ console.log('Play error',e); }); }
-  }
-  function togglePlay(){
-    if(musicAudio.paused){
-      musicAudio.play().then(function(){ isPlaying=true; musicPlayBtn.textContent='❚❚'; musicPlayer.classList.remove('paused'); musicUnmuteHint.classList.remove('show'); }).catch(function(err){ musicTrackStation.textContent='Kunde inte spela. Prova annan kanal.'; });
-    } else {
-      musicAudio.pause(); isPlaying=false; musicPlayBtn.textContent='▶'; musicPlayer.classList.add('paused');
-    }
-  }
-  function setVolume(v){ musicAudio.volume=v/100; if(v>0 && isMuted){ isMuted=false; musicMuteBtn.textContent='LJUD AV'; musicAudio.muted=false; } }
-  function toggleMute(){ if(isMuted){ musicAudio.muted=false; isMuted=false; musicMuteBtn.textContent='LJUD AV'; } else { musicAudio.muted=true; isMuted=true; musicMuteBtn.textContent='LJUD PÅ'; } }
-  function closePlayer(){ musicAudio.pause(); isPlaying=false; musicPlayBtn.textContent='▶'; musicPlayer.classList.add('hidden-player'); musicReopenBtn.classList.add('show'); musicUnmuteHint.classList.remove('show'); }
-  function reopenPlayer(){ musicPlayer.classList.remove('hidden-player'); musicReopenBtn.classList.remove('show'); }
-  populateStations();
-  musicPlayBtn.addEventListener('click', togglePlay);
-  musicStationSelect.addEventListener('change', function(){ currentStation=parseInt(this.value); loadStation(currentStation); });
-  musicVolume.addEventListener('input', function(){ setVolume(parseInt(this.value)); localStorage.setItem('kuribaxi_music_vol', this.value); });
-  musicMuteBtn.addEventListener('click', toggleMute);
-  musicCloseBtn.addEventListener('click', closePlayer);
-  musicReopenBtn.addEventListener('click', reopenPlayer);
-  musicAudio.addEventListener('error', function(){ musicTrackStation.textContent='Fel vid laddning, byter kanal...'; setTimeout(function(){ currentStation=(currentStation+1)%MUSIC_STATIONS.length; loadStation(currentStation); },2000); });
-  loadStation(currentStation);
-  musicVolume.value=parseInt(localStorage.getItem('kuribaxi_music_vol')||'70');
-  setVolume(parseInt(musicVolume.value));
-  setTimeout(function(){ if(!isPlaying) musicUnmuteHint.classList.add('show'); }, 1500);
-})();
-
 setStatus('Klockan: '+new Date().toLocaleTimeString('sv-SE')+' - CC borttagen, använd spelarens egna CC. X ovanför varje kort för borttagning.','info');
 </script>
-
-<div class="music-player" id="musicPlayer">
-<div class="music-unmute-hint" id="musicUnmuteHint">🔊 Klicka play för att lyssna</div>
-<div class="music-head"><div class="music-title">🎵 KLASSISK MUSIK</div><button class="music-close" id="musicCloseBtn">✕</button></div>
-<div class="music-track-title" id="musicTrackTitle">Radio Swiss Classic</div>
-<div class="music-track-station" id="musicTrackStation">Schweizisk klassisk radio</div>
-<div class="music-controls">
-<button class="music-play-btn" id="musicPlayBtn">▶</button>
-<input type="range" class="music-volume" id="musicVolume" min="0" max="100" value="70">
-<button class="music-mute-btn" id="musicMuteBtn">LJUD AV</button>
-</div>
-<select class="music-station-select" id="musicStationSelect"></select>
-<audio id="musicAudio" preload="none"></audio>
-</div>
-<div class="music-reopen" id="musicReopenBtn">🎵</div>
-
 </body>
 </html>
