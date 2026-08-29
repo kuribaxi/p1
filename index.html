@@ -234,21 +234,39 @@
   .os-item-meta{font-size:10px; color:var(--cream-dim); font-family:'JetBrains Mono',monospace;}
   .os-badge{font-size:9px; padding:2px 6px; border-radius:10px; background:var(--teal); color:#000; font-weight:700; margin-left:6px;}
 
-  /* SUBTITLE SETTINGS PANEL */
+  /* SUBTITLE OPTIONS - EXAKT SOM BILDEN */
   .sub-settings{
-    position:absolute; bottom:52px; right:12px; width:260px;
-    background:rgba(18,27,46,0.98); border:1px solid var(--gold); border-radius:12px;
-    padding:12px; z-index:21; display:none; box-shadow:0 12px 30px rgba(0,0,0,0.6);
+    position:absolute; bottom:52px; right:12px; width:320px;
+    background:#1a1a1a; border:1px solid #333; border-radius:16px;
+    padding:0; z-index:21; display:none; box-shadow:0 20px 60px rgba(0,0,0,0.8);
+    overflow:hidden; font-family:'Manrope',sans-serif;
   }
   .sub-settings.show{display:block;}
-  .sub-settings h4{font-size:11px; color:var(--gold-bright); font-family:'JetBrains Mono',monospace; margin-bottom:10px; display:flex; justify-content:space-between;}
-  .sub-row{display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;}
-  .sub-row label{font-size:11px; color:var(--cream-dim); font-family:'Manrope',sans-serif;}
-  .sub-row input[type=range]{width:100px; height:3px; accent-color:var(--gold);}
-  .sub-row select, .sub-row input[type=color]{background:#0b1220; border:1px solid var(--panel-line); color:var(--cream); border-radius:6px; padding:3px 6px; font-size:11px; font-family:'JetBrains Mono',monospace;}
-  .sub-colors{display:flex; gap:6px;}
-  .sub-color{width:22px; height:22px; border-radius:50%; cursor:pointer; border:2px solid transparent; transition:all .15s;}
-  .sub-color.active{border-color:var(--gold); transform:scale(1.2); box-shadow:0 0 8px var(--gold);}
+  .sub-tabs{display:flex; border-bottom:1px solid #2a2a2a;}
+  .sub-tab{flex:1; padding:14px; text-align:center; font-size:15px; font-weight:600; color:#666; cursor:pointer; background:transparent; border:none; transition:all .15s;}
+  .sub-tab.active{color:#fff; border-bottom:2px solid #fff; background:rgba(255,255,255,0.03);}
+  .sub-close{position:absolute; top:12px; right:12px; width:28px; height:28px; border-radius:50%; background:rgba(255,255,255,0.08); border:none; color:#888; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center;}
+  .sub-content{padding:20px;}
+  .sub-section-title{font-size:13px; font-weight:700; letter-spacing:0.08em; color:#888; text-transform:uppercase; margin-bottom:16px;}
+  .sub-timing-row{display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;}
+  .sub-timing-row label{font-size:16px; color:#fff; font-weight:500;}
+  .sub-timing-controls{display:flex; align-items:center; gap:12px;}
+  .sub-timing-btn{width:44px; height:40px; border-radius:12px; background:#2a2a2a; border:1px solid #3a3a3a; color:#fff; font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all .15s;}
+  .sub-timing-btn:hover{background:#3a3a3a; border-color:#555;}
+  .sub-timing-btn:active{transform:scale(0.95);}
+  .sub-timing-val{font-size:18px; font-weight:600; color:#fff; min-width:40px; text-align:center;}
+  .sub-hint{font-size:13px; color:#888; line-height:1.4; margin-bottom:16px;}
+  .sub-reset-btn{width:100%; padding:14px; border-radius:12px; background:transparent; border:1px solid #3a3a3a; color:#fff; font-size:15px; font-weight:600; cursor:pointer; transition:all .15s;}
+  .sub-reset-btn:hover{background:#2a2a2a; border-color:#555;}
+  .sub-preview-box{width:100%; background:#000; border-radius:8px; padding:20px; text-align:center; margin:16px 0 24px; border:1px solid #222;}
+  .sub-preview-text{font-size:26px; font-weight:700; color:#fff; background:#000; display:inline-block; padding:4px 12px; border-radius:4px; line-height:1.3;}
+  .sub-option-row{display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;}
+  .sub-option-row label{font-size:15px; color:#ccc;}
+  .sub-select{padding:10px 16px; border-radius:10px; background:#2a2a2a; border:1px solid #3a3a3a; color:#fff; font-size:14px; min-width:130px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; gap:10px;}
+  .sub-select:hover{border-color:#555;}
+  .sub-color-box{width:48px; height:32px; border-radius:8px; background:#fff; border:2px solid #3a3a3a; cursor:pointer; position:relative; overflow:hidden;}
+  .sub-color-box input{position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%;}
+
 
   /* FIX FULLSCREEN SUBTITLE */
   .player-frame:fullscreen #srtOverlay,
@@ -383,6 +401,13 @@
       <div class="perf"></div>
       <div class="player-box" id="playerBox">
         <h3 id="playerHeading">Spelare</h3>
+        <div id="qrBypass" style="display:none; margin-bottom:10px; padding:10px 14px; background:rgba(226,87,76,0.12); border:1px solid rgba(226,87,76,0.35); border-radius:8px; display:flex; justify-content:space-between; align-items:center; gap:10px;">
+          <div style="font-size:11px; color:#f0938a; font-family:'JetBrains Mono',monospace;"><span style="font-weight:700;">🤖 QR / Robot check upptäckt!</span> Denna källa kräver verifiering. Klicka för att byta till ren källa utan QR.</div>
+          <div style="display:flex; gap:6px;">
+            <button id="qrBypassBtn" class="go-btn" style="padding:6px 14px; font-size:11px; background:var(--teal);">Byt källa →</button>
+            <button id="qrDismiss" style="background:transparent; border:1px solid var(--panel-line); color:var(--cream-dim); border-radius:6px; padding:4px 10px; font-size:10px; cursor:pointer;">Ignorera</button>
+          </div>
+        </div>
         <div class="source-picker" id="sourcePicker"></div>
         <div class="player-frame" id="playerFrame" style="position:relative;">
           <iframe id="vidsrcFrame" allowfullscreen referrerpolicy="origin"></iframe>
@@ -414,24 +439,97 @@
             </div>
           </div>
           <div class="sub-settings" id="subSettings">
-            <h4><span>⚙️ Subtitle Inställningar</span> <span id="subSettingsClose" style="cursor:pointer; padding:2px 6px; border:1px solid var(--panel-line); border-radius:12px;">✕</span></h4>
-            <div class="sub-row"><label>Färg</label><div class="sub-colors" id="subColorPicker">
-              <div class="sub-color active" data-color="#ffffff" style="background:#fff;"></div>
-              <div class="sub-color" data-color="#ffff00" style="background:#ffff00;"></div>
-              <div class="sub-color" data-color="#00ffff" style="background:#00ffff;"></div>
-              <div class="sub-color" data-color="#ff6b6b" style="background:#ff6b6b;"></div>
-              <div class="sub-color" data-color="#4ec9b0" style="background:#4ec9b0;"></div>
-            </div></div>
-            <div class="sub-row"><label>Storlek</label><input type="range" id="subSize" min="12" max="36" value="18"><span id="subSizeVal" style="font-size:11px; font-family:'JetBrains Mono',monospace; color:var(--gold-bright);">18px</span></div>
-            <div class="sub-row"><label>Bakgrund</label><input type="range" id="subBg" min="0" max="100" value="75"><span id="subBgVal" style="font-size:11px; font-family:'JetBrains Mono',monospace; color:var(--gold-bright);">75%</span></div>
-            <div class="sub-row"><label>Position</label><select id="subPos"><option value="bottom">Nere</option><option value="middle">Mitten</option><option value="top">Uppe</option></select></div>
-            <div class="sub-row"><label>Delay (sek)</label><input type="range" id="subDelay" min="-5" max="5" step="0.5" value="0"><span id="subDelayVal" style="font-size:11px; font-family:'JetBrains Mono',monospace; color:var(--gold-bright);">0s</span></div>
-            <div class="sub-row"><label>Kant (outline)</label><select id="subOutline"><option value="shadow">Skugga</option><option value="outline">Outline</option><option value="none">Ingen</option></select></div>
-            <div style="margin-top:10px; display:flex; gap:6px;">
-              <button class="cc-btn" id="subReset" style="flex:1; justify-content:center;">Återställ</button>
-              <button class="cc-btn" id="subSave" style="flex:1; justify-content:center; background:var(--gold); color:#000; border-color:var(--gold);">Spara</button>
+            <div class="sub-tabs">
+              <button class="sub-tab" id="subTabSubtitles">Subtitles</button>
+              <button class="sub-tab active" id="subTabOptions">Options</button>
             </div>
-            <div style="margin-top:8px; font-size:10px; color:var(--cream-dim); line-height:1.3;">Fungerar även i helskärm. Delay justerar synk om sub är före/efter.</div>
+            <button class="sub-close" id="subSettingsClose">✕</button>
+            <div class="sub-content" id="subOptionsContent">
+              <div class="sub-section-title">Subtitle Timing</div>
+              <div class="sub-timing-row">
+                <label>Subtitle delay</label>
+                <div class="sub-timing-controls">
+                  <button class="sub-timing-btn" id="delayMinus">−</button>
+                  <span class="sub-timing-val" id="subDelayVal">0s</span>
+                  <button class="sub-timing-btn" id="delayPlus">+</button>
+                </div>
+              </div>
+              <div class="sub-hint">Negative shows subtitles earlier, positive later.</div>
+              <button class="sub-reset-btn" id="subResetTiming">Reset timing</button>
+              
+              <div style="margin-top:28px;">
+                <div class="sub-section-title">Caption Style</div>
+                <div class="sub-preview-box">
+                  <span class="sub-preview-text" id="subPreviewText">Subtitle preview</span>
+                </div>
+                
+                <div class="sub-option-row">
+                  <label>Font</label>
+                  <select class="sub-select" id="subFont">
+                    <option value="default">Default</option>
+                    <option value="monospace">Monospace</option>
+                    <option value="serif">Serif</option>
+                    <option value="sans">Sans Serif</option>
+                    <option value="handwriting">Handwriting</option>
+                  </select>
+                </div>
+                
+                <div class="sub-option-row">
+                  <label>Text size</label>
+                  <select class="sub-select" id="subSizeSelect">
+                    <option value="50">50%</option>
+                    <option value="75">75%</option>
+                    <option value="100" selected>100%</option>
+                    <option value="125">125%</option>
+                    <option value="150">150%</option>
+                    <option value="200">200%</option>
+                  </select>
+                </div>
+                
+                <div class="sub-option-row">
+                  <label>Text color</label>
+                  <div class="sub-color-box" id="subColorBoxWrap">
+                    <input type="color" id="subColorInput" value="#ffffff">
+                  </div>
+                </div>
+
+                <div class="sub-option-row">
+                  <label>Background</label>
+                  <select class="sub-select" id="subBgSelect">
+                    <option value="0">None</option>
+                    <option value="50">50%</option>
+                    <option value="75" selected>75%</option>
+                    <option value="100">100%</option>
+                  </select>
+                </div>
+
+                <div style="margin-top:20px; border-top:1px solid #2a2a2a; padding-top:16px;">
+                  <div class="sub-section-title">Auto Sync</div>
+                  <div style="display:flex; gap:8px; margin-bottom:10px;">
+                    <input type="text" id="syncText" placeholder="Skriv ord du hör..." style="flex:1; background:#2a2a2a; border:1px solid #3a3a3a; color:#fff; border-radius:10px; padding:10px 12px; font-size:13px;">
+                    <button class="sub-timing-btn" id="syncBtn" style="width:auto; padding:0 14px; font-size:13px;">Synka</button>
+                  </div>
+                  <div style="display:flex; gap:8px;">
+                    <button class="sub-reset-btn" id="syncPlayPause" style="flex:1; padding:10px;">⏸️ Pausa</button>
+                    <button class="sub-reset-btn" id="syncNow" style="flex:1; padding:10px; background:#fff; color:#000; border-color:#fff;">🎯 Nu</button>
+                  </div>
+                  <div id="syncStatus" style="margin-top:8px; font-size:11px; color:#888;"></div>
+                </div>
+              </div>
+            </div>
+            <!-- Subtitles tab content (lista över laddade subs) -->
+            <div class="sub-content" id="subSubtitlesContent" style="display:none;">
+              <div class="sub-section-title">Available Subtitles</div>
+              <div id="subListContainer" style="display:flex; flex-direction:column; gap:8px;">
+                <div style="font-size:13px; color:#666; text-align:center; padding:20px;">Inga subs laddade än.<br>Sök via SV/EN/FA/KU eller dra .srt hit.</div>
+              </div>
+              <div style="margin-top:16px; display:flex; gap:8px;">
+                <button class="sub-reset-btn" id="subTabSv">SV</button>
+                <button class="sub-reset-btn" id="subTabEn">EN</button>
+                <button class="sub-reset-btn" id="subTabFa">FA</button>
+                <button class="sub-reset-btn" id="subTabKu">KU</button>
+              </div>
+            </div>
           </div>
           <div class="cc-zone-hint" id="ccZoneHint">↓ CC visas här</div>
         </div>
@@ -489,16 +587,18 @@
   document.getElementById('libTabs').addEventListener('click',function(e){const btn=e.target.closest('button'); if(!btn)return; currentLibTab=btn.dataset.tab; renderLibrary();});
   document.getElementById('clearLibBtn').addEventListener('click',function(){const label=currentLibTab==='movies'?'filmer':'serier'; if(!confirm(`Rensa alla sparade ${label}?`))return; if(currentLibTab==='movies'){watchData.movies={};} else {watchData.series={};} saveLibrary(); renderLibrary();});
   const SOURCES=[
-    {key:'vidsrc2', name:'vidsrc2.ru', base:'https://vidsrc2.ru/embed'},
-    {key:'vidsrc_ir', name:'vidsrc.ir', base:'https://vidsrc.ir/embed'},
-    {key:'vidsrcme_ru', name:'vidsrcme.ru', base:'https://vidsrcme.ru/embed'},
-    {key:'vidsrcme_su', name:'vidsrcme.su', base:'https://vidsrcme.su/embed'},
-    {key:'vidsrc_me_ru', name:'vidsrc-me.ru', base:'https://vidsrc-me.ru/embed'},
-    {key:'vidsrc_embed_ru', name:'vidsrc-embed.ru', base:'https://vidsrc-embed.ru/embed'},
-    {key:'vidsrc_embed_su', name:'vidsrc-embed.su', base:'https://vidsrc-embed.su/embed'},
-    {key:'vsrc_su', name:'vsrc.su', base:'https://vsrc.su/embed'},
-    {key:'vidapi_embed', name:'VidAPI (Player)', base:'https://vaplayer.ru/embed', needsImdb:true, isVidApi:true, openInBrowser:false},
-    {key:'vidapi_tab', name:'VidAPI (Ny flik)', base:'https://vaplayer.ru/embed', needsImdb:true, isVidApi:true, openInBrowser:true},
+    // Låg QR-risk först
+    {key:'vsrc_su', name:'vsrc.su (No QR)', base:'https://vsrc.su/embed', noQR:true},
+    {key:'vidapi_embed', name:'VidAPI (No QR)', base:'https://vaplayer.ru/embed', needsImdb:true, isVidApi:true, openInBrowser:false, noQR:true},
+    {key:'vidsrcme_ru', name:'vidsrcme.ru', base:'https://vidsrcme.ru/embed', noQR:true},
+    {key:'vidsrcme_su', name:'vidsrcme.su', base:'https://vidsrcme.su/embed', noQR:true},
+    {key:'embed_su', name:'embed.su (Clean)', base:'https://embed.su/embed', noQR:true},
+    {key:'autoembed', name:'autoembed.cc', base:'https://autoembed.cc/embed', noQR:true},
+    // De som ofta ger QR - längst ner
+    {key:'vidsrc2', name:'vidsrc2.ru (QR risk)', base:'https://vidsrc2.ru/embed', noQR:false},
+    {key:'vidsrc_ir', name:'vidsrc.ir', base:'https://vidsrc.ir/embed', noQR:false},
+    {key:'vidsrc_embed_ru', name:'vidsrc-embed.ru', base:'https://vidsrc-embed.ru/embed', noQR:false},
+    {key:'vidapi_tab', name:'VidAPI (Ny flik)', base:'https://vaplayer.ru/embed', needsImdb:true, isVidApi:true, openInBrowser:true, noQR:true},
   ];
   let activeSource=SOURCES[0].key; let currentType='movie'; let currentId=null; let currentImdbId=null; let currentDetail=null; let currentSeason=1; let currentEpisode=1;
   let mode='title'; let mediaType='movie'; const mediaTypeToggle=document.getElementById('mediaTypeToggle');
@@ -533,14 +633,65 @@
     if(source.isVidApi){if(type==='movie'){const useId=imdbId||id; return source.base+'/movie/'+useId;} else {return source.base+'/tv/'+id+'/'+(season||1)+'/'+(episode||1);}}
     if(type==='tv'){return source.base+'/tv/'+id+'/'+(season||1)+'/'+(episode||1);} return source.base+'/movie/'+id;
   }
+  function switchToCleanSource(){
+    // hitta nästa källa som är noQR
+    const cleanSources = SOURCES.filter(s=>s.noQR && !s.openInBrowser);
+    let currentIdx = cleanSources.findIndex(s=>s.key===activeSource);
+    let nextIdx = (currentIdx + 1) % cleanSources.length;
+    if(currentIdx===-1) nextIdx=0;
+    activeSource = cleanSources[nextIdx].key;
+    renderSourcePicker();
+    if(currentId) loadPlayer(currentType, currentId, currentImdbId, currentSeason, currentEpisode);
+    const qrBypass=document.getElementById('qrBypass');
+    if(qrBypass){ qrBypass.style.display='none'; }
+    setStatus(`Bytte till ren källa utan QR: ${cleanSources[nextIdx].name}`, 'info');
+  }
+  // QR bypass knappar
+  document.addEventListener('DOMContentLoaded', ()=>{
+    document.getElementById('qrBypassBtn')?.addEventListener('click', switchToCleanSource);
+    document.getElementById('qrDismiss')?.addEventListener('click', ()=>{ document.getElementById('qrBypass').style.display='none'; });
+  });
+  // För säkerhet om DOM redan laddad
+  setTimeout(()=>{
+    document.getElementById('qrBypassBtn')?.addEventListener('click', switchToCleanSource);
+    document.getElementById('qrDismiss')?.addEventListener('click', ()=>{ const el=document.getElementById('qrBypass'); if(el) el.style.display='none'; });
+  }, 1000);
+
   function renderSourcePicker(){
     const picker=document.getElementById('sourcePicker'); picker.innerHTML=''; SOURCES.forEach(src=>{const btn=document.createElement('button'); btn.className='source-btn'+(src.key===activeSource?' active':''); btn.textContent=src.name; btn.addEventListener('click',()=>{activeSource=src.key; renderSourcePicker(); if(currentId) loadPlayer(currentType,currentId,currentImdbId,currentSeason,currentEpisode);}); picker.appendChild(btn);});
   }
+  let qrCheckInterval=null;
   function loadPlayer(type,id,imdbId,season,episode){
     const src=SOURCES.find(s=>s.key===activeSource); const url=buildUrl(src,type,id,imdbId,season,episode);
     const iframe=document.getElementById('vidsrcFrame'); const playerFrame=document.getElementById('playerFrame'); const browserFrame=document.getElementById('browserFrame'); const openBtn=document.getElementById('openBrowserBtn'); const browserFrameText=document.getElementById('browserFrameText');
+    const qrBypass=document.getElementById('qrBypass');
+    if(qrBypass) qrBypass.style.display='none';
+    if(qrCheckInterval) clearInterval(qrCheckInterval);
+
     if(src.openInBrowser){playerFrame.style.display='none'; browserFrame.style.display='flex'; openBtn.href=url; iframe.src=''; browserFrameText.innerHTML='Den har kallan oppnas i webblasaren.<br><strong>Klicka knappen nedan for att spela upp.</strong>'; openBtn.textContent='Spela upp i ny flik →';}
-    else {playerFrame.style.display='block'; browserFrame.style.display='none'; iframe.src=url;}
+    else {
+      playerFrame.style.display='block'; browserFrame.style.display='none'; 
+      // Anti-QR: lägg till random param + no-referrer för att undvika bot detection
+      const antiQrUrl = url + (url.includes('?') ? '&' : '?') + 't=' + Date.now() + '&autoPlay=0';
+      iframe.referrerPolicy='no-referrer';
+      // sandbox som tillåter player men blockar QR popups
+      iframe.setAttribute('sandbox','allow-same-origin allow-scripts allow-forms allow-presentation');
+      iframe.src=antiQrUrl;
+
+      // Om källan är känd för QR, visa bypass-knappen direkt efter 3 sek
+      if(src.noQR===false){
+        qrCheckInterval = setTimeout(()=>{
+          if(qrBypass) qrBypass.style.display='flex';
+        }, 3500);
+      }
+      // Lyssna på meddelanden från iframe - vissa vidsrc skickar robot event
+      window.addEventListener('message', function qrListener(e){
+        const msg = (e.data && typeof e.data==='string') ? e.data.toLowerCase() : '';
+        if(msg.includes('robot') || msg.includes('captcha') || msg.includes('qr') || msg.includes('verify')){
+          if(qrBypass) qrBypass.style.display='flex';
+        }
+      });
+    }
     const meta=document.getElementById('playerMeta'); meta.innerHTML=''; const tag=document.createElement('span'); tag.className='tag active'; const displayId=(src.isVidApi&&type==='movie'&&imdbId)?imdbId:id; const epInfo=type==='tv'?` S${season}:E${episode}`:''; tag.textContent=src.name+' / '+type+' / '+displayId+epInfo; meta.appendChild(tag); const a=document.createElement('a'); a.href=url; a.target='_blank'; a.rel='noopener'; a.textContent='Oppna i eget fonster →'; meta.appendChild(a); document.getElementById('playerNotice').style.display='none';
     if(currentDetail){const s=type==='tv'?(season||1):1; const e=type==='tv'?(episode||1):1; addToLibrary(type,id,currentDetail.title||currentDetail.name||'Unknown',currentDetail.poster_path||null,(currentDetail.release_date||currentDetail.first_air_date||'').slice(0,4),imdbId||null,s,e);}
   }
@@ -782,23 +933,52 @@
   let srtOverlay=null;
   let srtInterval=null;
   let srtStartTime=0;
-  let subSettings = JSON.parse(localStorage.getItem('kuribaxi_sub_settings')||'{"color":"#ffffff","size":18,"bg":75,"pos":"bottom","delay":0,"outline":"shadow"}');
+  let srtPaused=false;
+  let srtPauseAccum=0;
+  let srtPauseStart=0;
+  let subSettings = JSON.parse(localStorage.getItem('kuribaxi_sub_settings')||'{"color":"#ffffff","size":18,"sizePercent":"100","bg":75,"pos":"bottom","delay":0,"outline":"shadow","font":"default"}');
 
   function applySubSettings(){
-    if(!srtOverlay) return;
+    if(!srtOverlay){
+      // update preview even if no overlay yet
+      const preview=document.getElementById('subPreviewText');
+      if(preview){
+        preview.style.color=subSettings.color||'#fff';
+        preview.style.fontSize=(subSettings.size||18)+'px';
+        preview.style.background=`rgba(0,0,0,${(subSettings.bg||75)/100})`;
+        const fontMap={default:'Manrope, sans-serif', monospace:'JetBrains Mono, monospace', serif:'Fraunces, serif', sans:'Manrope, sans-serif', handwriting:'cursive'};
+        preview.style.fontFamily=fontMap[subSettings.font]||fontMap.default;
+      }
+      return;
+    }
     srtOverlay.style.color = subSettings.color;
     srtOverlay.style.fontSize = subSettings.size + 'px';
     srtOverlay.style.background = `rgba(0,0,0,${subSettings.bg/100})`;
+    const fontMap2={default:'Manrope, sans-serif', monospace:'JetBrains Mono, monospace', serif:'Fraunces, serif', sans:'Manrope, sans-serif', handwriting:'cursive'};
+    srtOverlay.style.fontFamily=fontMap2[subSettings.font]||fontMap2.default;
     if(subSettings.pos==='bottom') srtOverlay.style.bottom='70px', srtOverlay.style.top='auto', srtOverlay.style.transform='translateX(-50%)';
     if(subSettings.pos==='middle') srtOverlay.style.bottom='50%', srtOverlay.style.top='auto', srtOverlay.style.transform='translate(-50%,50%)';
     if(subSettings.pos==='top') srtOverlay.style.top='20px', srtOverlay.style.bottom='auto', srtOverlay.style.transform='translateX(-50%)';
     if(subSettings.outline==='shadow') srtOverlay.style.textShadow='1px 1px 2px #000, 1px 1px 4px #000';
     if(subSettings.outline==='outline') srtOverlay.style.textShadow='-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000';
     if(subSettings.outline==='none') srtOverlay.style.textShadow='none';
-    // fullscreen size boost
     if(document.fullscreenElement){
       srtOverlay.style.fontSize = (subSettings.size + 6) + 'px';
     }
+    const preview=document.getElementById('subPreviewText');
+    if(preview){
+      preview.style.color=subSettings.color||'#fff';
+      preview.style.fontSize=subSettings.size+'px';
+      preview.style.background=`rgba(0,0,0,${subSettings.bg/100})`;
+      preview.style.fontFamily=fontMap2[subSettings.font]||fontMap2.default;
+    }
+  }
+
+  function getCurrentVideoTime(){
+    if(srtPaused){
+      return srtPauseStart - srtStartTime - srtPauseAccum + (parseFloat(subSettings.delay)||0);
+    }
+    return Date.now()/1000 - srtStartTime - srtPauseAccum + (parseFloat(subSettings.delay)||0);
   }
 
   function loadSRT(srtText){
@@ -806,18 +986,19 @@
     if(!srtOverlay){
       srtOverlay=document.createElement('div');
       srtOverlay.id='srtOverlay';
-      // viktigt: lägg INUTI playerFrame som går i fullscreen
       pFrame.appendChild(srtOverlay);
     }
     applySubSettings();
     srtStartTime = Date.now()/1000;
+    srtPauseAccum=0;
+    srtPaused=false;
+    srtPauseStart=0;
     if(srtInterval) clearInterval(srtInterval);
     srtInterval = setInterval(()=>{
-      const delay = parseFloat(subSettings.delay) || 0;
-      const now = Date.now()/1000 - srtStartTime + delay;
+      if(srtPaused) return;
+      const now = getCurrentVideoTime();
       const cue = srtCues.find(c=>now>=c.start && now<=c.end);
       if(cue){ 
-        // Stöd för RTL (farsi/kurdiska)
         const isRtl = /[\u0600-\u06FF]/.test(cue.text);
         srtOverlay.style.direction = isRtl ? 'rtl' : 'ltr';
         srtOverlay.textContent=cue.text; 
@@ -827,14 +1008,60 @@
       }
     }, 80);
     
-    // Se till att den syns i fullscreen också
     document.addEventListener('fullscreenchange', ()=>{
       if(srtOverlay){
-        pFrame.appendChild(srtOverlay); // re-append för att säkerställa den är kvar i fullscreen elementet
+        pFrame.appendChild(srtOverlay);
         applySubSettings();
       }
     });
+    const statusEl=document.getElementById('syncStatus');
+    if(statusEl) statusEl.textContent=`✓ ${srtCues.length} rader laddade. Klicka "Synka NU" när filmen börjar prata för auto-synk.`;
   }
+
+  function autoSyncByText(searchText){
+    if(!srtCues.length || !searchText) return;
+    const lower = searchText.toLowerCase().trim();
+    // Hitta första cue som innehåller texten
+    const found = srtCues.find(c=>c.text.toLowerCase().includes(lower));
+    if(!found){
+      const el=document.getElementById('syncStatus');
+      if(el) el.textContent=`❌ Hittade inte "${searchText}" i subben. Prova ett annat ord.`;
+      return;
+    }
+    // Sätt så att denna cue visas NU
+    const now = Date.now()/1000 - srtStartTime - srtPauseAccum;
+    const newDelay = found.start - now;
+    subSettings.delay = parseFloat(newDelay.toFixed(1));
+    document.getElementById('subDelay').value = subSettings.delay;
+    document.getElementById('subDelayVal').textContent = subSettings.delay + 's';
+    applySubSettings();
+    const el=document.getElementById('syncStatus');
+    if(el) el.textContent=`✓ Auto-synk! "${found.text.slice(0,30)}..." synkas nu. Delay satt till ${subSettings.delay}s`;
+  }
+
+  function syncNow(){
+    if(!srtCues.length){
+      const el=document.getElementById('syncStatus');
+      if(el) el.textContent='❌ Ladda en sub först!';
+      return;
+    }
+    // När användaren klickar "Synka NU" antar vi att första repliken borde visas nu
+    // Hitta nästa cue efter nuvarande tid och synka den till nu
+    const now = Date.now()/1000 - srtStartTime - srtPauseAccum;
+    // Hitta första cue som börjar efter 0, eller nästa efter nu
+    let target = srtCues.find(c=>c.start > now);
+    if(!target) target = srtCues[0];
+    const newDelay = target.start - now;
+    subSettings.delay = parseFloat(newDelay.toFixed(1));
+    const delayEl=document.getElementById('subDelay');
+    const delayValEl=document.getElementById('subDelayVal');
+    if(delayEl) delayEl.value = subSettings.delay;
+    if(delayValEl) delayValEl.textContent = subSettings.delay + 's';
+    applySubSettings();
+    const el=document.getElementById('syncStatus');
+    if(el) el.textContent=`🎯 Synkad! Nästa sub "${target.text.slice(0,25)}..." visas nu. Delay: ${subSettings.delay}s`;
+  }
+
 
   // Settings UI logic
   function initSubSettingsUI(){
@@ -862,6 +1089,36 @@
       });
     }
     document.getElementById('subSettingsBtn')?.addEventListener('click', (e)=>{ e.stopPropagation(); document.getElementById('subSettings').classList.toggle('show'); document.getElementById('osPanel').classList.remove('show'); showCC(); });
+    // Auto-sync knappar
+    document.getElementById('syncBtn')?.addEventListener('click', ()=>{
+      const txt=document.getElementById('syncText')?.value;
+      if(txt) autoSyncByText(txt);
+    });
+    document.getElementById('syncText')?.addEventListener('keydown', (e)=>{
+      if(e.key==='Enter'){
+        const txt=e.target.value;
+        if(txt) autoSyncByText(txt);
+      }
+    });
+    document.getElementById('syncNow')?.addEventListener('click', syncNow);
+    document.getElementById('syncPlayPause')?.addEventListener('click', (e)=>{
+      const btn=e.target;
+      if(srtPaused){
+        // resume
+        srtPauseAccum += (Date.now()/1000 - srtPauseStart);
+        srtPaused=false;
+        btn.textContent='⏸️ Pausa subs';
+        const el=document.getElementById('syncStatus');
+        if(el) el.textContent='▶️ Subs återupptagna';
+      } else {
+        srtPaused=true;
+        srtPauseStart=Date.now()/1000;
+        btn.textContent='▶️ Fortsätt subs';
+        const el=document.getElementById('syncStatus');
+        if(el) el.textContent='⏸️ Subs pausade';
+      }
+    });
+
     // Övre CC knapp bredvid H
     document.getElementById('overlayCcBtn')?.addEventListener('click', (e)=>{
       e.stopPropagation();
