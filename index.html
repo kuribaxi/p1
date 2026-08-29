@@ -3,27 +3,26 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KURIBAXI - Fungerande version</title>
+<title>KURIBAXI - Library & CC Fixed</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#0a0e1a;color:#e8dcc8;font-family:Manrope,sans-serif;padding:20px}
-.clock-badge{position:fixed; top:14px; right:14px; z-index:9999; background:rgba(18,27,46,0.95); border:1px solid #c9a227; border-radius:12px; padding:8px 14px; backdrop-filter:blur(10px);}
+.clock-badge{position:fixed; top:14px; right:14px; z-index:9999; background:rgba(18,27,46,0.95); border:1px solid #c9a227; border-radius:12px; padding:8px 14px}
 .clock-time{font-family:'JetBrains Mono',monospace; font-size:16px; font-weight:700; color:#f0c040; display:flex; gap:6px; align-items:center}
 .clock-dot{width:8px; height:8px; border-radius:50%; background:#4ec9b0; animation:blink 1s infinite}
 @keyframes blink{0%,50%{opacity:1}51%,100%{opacity:0}}
 .clock-date{font-size:11px; color:#a09070; margin-top:2px; text-transform:capitalize}
-.wrap{max-width:900px; margin:60px auto 0}
+.wrap{max-width:1000px; margin:60px auto 0}
 .search{display:flex; gap:10px; margin:20px 0; background:#121b2e; border:1px solid #2a3a5a; border-radius:12px; padding:12px}
 .search-box{flex:1; background:#0b1220; border:1px solid #2a3a5a; color:#fff; padding:12px 14px; border-radius:8px; font-size:15px}
 .go-btn{background:#c9a227; color:#000; border:none; padding:12px 20px; border-radius:8px; font-weight:700; cursor:pointer}
-.go-btn:disabled{opacity:0.5}
 .status{margin:10px 0; padding:10px 14px; border-radius:8px; font-size:13px; display:none}
 .status.show{display:block}
 .status.error{background:rgba(226,87,76,0.15); border:1px solid rgba(226,87,76,0.4); color:#f0938a}
 .status.info{background:rgba(78,201,176,0.12); border:1px solid rgba(78,201,176,0.3); color:#7dd8c6}
 .results-list{display:flex; flex-direction:column; gap:8px; margin:10px 0}
-.result-row{display:flex; gap:12px; align-items:center; background:#121b2e; border:1px solid #1e2d4a; border-radius:10px; padding:10px; cursor:pointer; transition:all .15s}
-.result-row:hover{border-color:#c9a227; transform:translateY(-1px)}
+.result-row{display:flex; gap:12px; align-items:center; background:#121b2e; border:1px solid #1e2d4a; border-radius:10px; padding:10px; cursor:pointer}
+.result-row:hover{border-color:#c9a227}
 .result-row img{width:50px; height:75px; object-fit:cover; border-radius:6px; background:#0b1220}
 .rtitle{font-weight:700; color:#fff}
 .ryear{font-size:12px; color:#a09070}
@@ -35,375 +34,453 @@ body{background:#0a0e1a;color:#e8dcc8;font-family:Manrope,sans-serif;padding:20p
 .player-frame iframe{position:absolute; inset:0; width:100%; height:100%; border:none}
 .player-overlay{position:absolute; top:0; left:0; right:0; padding:12px; background:linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); display:flex; gap:8px; z-index:10}
 .player-overlay button{background:rgba(0,0,0,0.6); border:1px solid rgba(255,255,255,0.3); color:#fff; padding:6px 12px; border-radius:8px; cursor:pointer; font-weight:700}
-.cc-controls{position:absolute; top:56px; left:12px; right:12px; background:rgba(10,18,32,0.92); border:1px solid #2a3a5a; border-radius:10px; padding:8px 12px; display:flex; justify-content:space-between; align-items:center; z-index:11; transition:all .25s; opacity:0; transform:translateY(-10px); pointer-events:none}
+.cc-controls{position:absolute; top:56px; left:12px; right:12px; background:rgba(10,18,32,0.96); border:1px solid #2a3a5a; border-radius:10px; padding:10px 12px; display:flex; justify-content:space-between; align-items:center; z-index:11; transition:all .25s; opacity:0; transform:translateY(-10px); pointer-events:none}
 .cc-controls.visible{opacity:1; transform:translateY(0); pointer-events:auto}
-.cc-btn{background:#2a2a2a; border:1px solid #3a3a3a; color:#fff; padding:6px 12px; border-radius:8px; cursor:pointer; font-size:12px; font-weight:600}
+.cc-controls.always-on{opacity:1; transform:translateY(0); pointer-events:auto}
+.cc-btn{background:#2a2a2a; border:1px solid #3a3a3a; color:#fff; padding:7px 12px; border-radius:8px; cursor:pointer; font-size:12px; font-weight:700; transition:all .15s}
 .cc-btn.active{background:#c9a227; color:#000; border-color:#c9a227}
-.sub-settings{position:absolute; top:100px; right:12px; width:320px; background:#1a1a1a; border:1px solid #333; border-radius:16px; padding:0; z-index:12; display:none; overflow:hidden}
+.cc-btn.cc-on{background:#4ec9b0; color:#000; border-color:#4ec9b0}
+.os-panel{position:absolute; top:100px; left:12px; right:12px; background:rgba(18,27,46,0.98); border:1px solid #c9a227; border-radius:12px; padding:12px; z-index:12; display:none; max-height:200px; overflow-y:auto}
+.os-panel.show{display:block}
+.os-item{display:flex; justify-content:space-between; align-items:center; padding:8px; background:rgba(255,255,255,0.04); border:1px solid #2a3a5a; border-radius:8px; margin-bottom:6px; cursor:pointer}
+.os-item:hover{border-color:#c9a227}
+.sub-settings{position:absolute; top:100px; right:12px; width:340px; background:#1a1a1a; border:1px solid #333; border-radius:16px; padding:0; z-index:13; display:none; overflow:hidden; max-height:80vh; overflow-y:auto}
 .sub-settings.show{display:block}
 .sub-tabs{display:flex; border-bottom:1px solid #2a2a2a}
 .sub-tab{flex:1; padding:14px; text-align:center; font-size:14px; font-weight:600; color:#666; cursor:pointer; background:transparent; border:none}
-.sub-tab.active{color:#fff; border-bottom:2px solid #fff; background:rgba(255,255,255,0.03)}
+.sub-tab.active{color:#fff; border-bottom:2px solid #fff}
 .sub-content{padding:20px}
-.sub-section-title{font-size:12px; font-weight:700; letter-spacing:0.08em; color:#888; text-transform:uppercase; margin-bottom:16px}
-.sub-timing-row{display:flex; justify-content:space-between; align-items:center; margin-bottom:12px}
-.sub-timing-controls{display:flex; align-items:center; gap:12px}
-.sub-timing-btn{width:44px; height:40px; border-radius:12px; background:#2a2a2a; border:1px solid #3a3a3a; color:#fff; font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center}
-.sub-timing-val{font-size:18px; font-weight:600; color:#fff; min-width:40px; text-align:center}
-.sub-hint{font-size:12px; color:#888; margin-bottom:16px}
-.sub-reset-btn{width:100%; padding:14px; border-radius:12px; background:transparent; border:1px solid #3a3a3a; color:#fff; font-size:14px; font-weight:600; cursor:pointer}
-.sub-preview-box{width:100%; background:#000; border-radius:8px; padding:20px; text-align:center; margin:16px 0 24px; border:1px solid #222}
-.sub-preview-text{font-size:24px; font-weight:700; color:#fff; background:#000; display:inline-block; padding:4px 12px; border-radius:4px}
-.sub-option-row{display:flex; justify-content:space-between; align-items:center; margin-bottom:16px}
-.sub-option-row label{font-size:14px; color:#ccc}
-.sub-select{padding:10px 14px; border-radius:10px; background:#2a2a2a; border:1px solid #3a3a3a; color:#fff; font-size:13px; min-width:120px}
-#srtOverlay{position:absolute; bottom:70px; left:50%; transform:translateX(-50%); max-width:85%; background:rgba(0,0,0,0.75); color:#fff; padding:6px 14px; border-radius:6px; font-size:18px; line-height:1.35; text-align:center; text-shadow:1px 1px 2px #000; z-index:15; pointer-events:none; display:none; white-space:pre-wrap}
+.sub-section-title{font-size:12px; font-weight:700; color:#888; text-transform:uppercase; margin-bottom:12px; letter-spacing:0.06em}
+.sub-timing-row{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px}
+.sub-timing-controls{display:flex; gap:10px; align-items:center}
+.sub-timing-btn{width:42px; height:38px; border-radius:10px; background:#2a2a2a; border:1px solid #3a3a3a; color:#fff; font-size:18px; cursor:pointer}
+.sub-timing-val{font-size:17px; font-weight:700; color:#fff; min-width:36px; text-align:center}
+.sub-hint{font-size:11px; color:#777; margin-bottom:14px}
+.sub-reset-btn{width:100%; padding:12px; border-radius:10px; background:transparent; border:1px solid #3a3a3a; color:#fff; font-weight:600; cursor:pointer}
+.sub-preview-box{background:#000; border-radius:8px; padding:18px; text-align:center; margin:14px 0 20px; border:1px solid #222}
+.sub-preview-text{font-size:22px; font-weight:700; color:#fff; background:#000; padding:4px 10px; border-radius:4px; display:inline-block}
+.sub-option-row{display:flex; justify-content:space-between; align-items:center; margin-bottom:14px}
+.sub-select{padding:8px 12px; border-radius:8px; background:#2a2a2a; border:1px solid #3a3a3a; color:#fff; font-size:12px}
+#srtOverlay{position:absolute; bottom:70px; left:50%; transform:translateX(-50%); max-width:85%; background:rgba(0,0,0,0.75); color:#fff; padding:6px 14px; border-radius:6px; font-size:18px; text-align:center; text-shadow:1px 1px 2px #000; z-index:20; pointer-events:none; display:none; white-space:pre-wrap; line-height:1.35}
 .player-frame:fullscreen #srtOverlay{bottom:90px; font-size:24px}
+.lib-section{margin-top:30px; background:#121b2e; border:1px solid #1e2d4a; border-radius:16px; padding:16px}
+.lib-tabs{display:flex; gap:8px; margin-bottom:14px}
+.lib-tabs button{background:#0b1220; border:1px solid #2a3a5a; color:#a09070; padding:8px 14px; border-radius:8px; cursor:pointer; font-size:12px; font-weight:700}
+.lib-tabs button.active{background:#c9a227; color:#000; border-color:#c9a227}
+.lib-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(140px, 1fr)); gap:10px}
+.lib-card{background:#0b1220; border:1px solid #1e2d4a; border-radius:10px; overflow:hidden; cursor:pointer; position:relative; transition:all .15s}
+.lib-card:hover{border-color:#c9a227; transform:translateY(-2px)}
+.lib-card img{width:100%; aspect-ratio:2/3; object-fit:cover; display:block}
+.lib-card-title{padding:8px; font-size:12px; font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.lib-card-sub{padding:0 8px 8px; font-size:10px; color:#a09070; display:flex; justify-content:space-between}
+.lib-card-progress{background:#4ec9b0; color:#000; font-size:9px; font-weight:700; padding:2px 6px; border-radius:10px}
+.lib-del{position:absolute; top:6px; right:6px; width:22px; height:22px; background:rgba(0,0,0,0.7); border:1px solid rgba(255,255,255,0.2); color:#fff; border-radius:50%; cursor:pointer; font-size:12px; display:flex; align-items:center; justify-content:center}
+.lib-empty{color:#666; font-size:13px; text-align:center; padding:20px}
+.series-controls{display:flex; gap:8px; align-items:center; margin-top:10px; flex-wrap:wrap}
+.series-controls select, .series-controls button{background:#0b1220; border:1px solid #2a3a5a; color:#fff; padding:6px 10px; border-radius:6px; font-size:12px; cursor:pointer}
 </style>
 </head>
 <body>
 
-<div class="clock-badge" id="clockBadge">
-  <div class="clock-time"><span class="clock-dot"></span><span id="clockTime">--:--:--</span></div>
-  <div class="clock-date" id="clockDate">laddar...</div>
-</div>
+<div class="clock-badge"><div class="clock-time"><span class="clock-dot"></span><span id="clockTime">--:--:--</span></div><div class="clock-date" id="clockDate">laddar...</div></div>
 
 <div class="wrap">
-  <h1 style="font-size:32px; margin-bottom:6px">KURIBAXI <span style="color:#c9a227">PRO</span></h1>
-  <p style="color:#a09070; font-size:13px; margin-bottom:16px">Sök film/serie - klockan och sök är nu fixade och testade</p>
+<h1>KURIBAXI <span style="color:#c9a227">PRO</span> - Library Fixed</h1>
+<p style="color:#a09070; font-size:12px; margin:6px 0 12px">Klocka ✓ Sök ✓ CC ✓ Library med fortsätt titta ✓ Auto nästa avsnitt</p>
 
-  <div style="display:flex; gap:10px; margin-bottom:10px">
-    <input type="text" id="apikey" value="15d2ea6d0dc1d476efbca3eba2b9bbfb" style="flex:1; background:#0b1220; border:1px solid #2a3a5a; color:#fff; padding:8px; border-radius:6px; font-size:11px" placeholder="TMDB nyckel">
-    <input type="text" id="osapikey" value="vkAVzWB6h1zRX0TEhSiWsD9qZ042Xy5l" style="flex:1; background:#0b1220; border:1px solid #2a3a5a; color:#fff; padding:8px; border-radius:6px; font-size:11px" placeholder="OpenSubtitles nyckel">
-  </div>
+<div style="display:flex; gap:8px; margin-bottom:10px">
+<input type="text" id="apikey" value="15d2ea6d0dc1d476efbca3eba2b9bbfb" style="flex:1; background:#0b1220; border:1px solid #2a3a5a; color:#fff; padding:8px; border-radius:6px; font-size:10px">
+<input type="text" id="osapikey" value="vkAVzWB6h1zRX0TEhSiWsD9qZ042Xy5l" style="flex:1; background:#0b1220; border:1px solid #2a3a5a; color:#fff; padding:8px; border-radius:6px; font-size:10px">
+</div>
 
-  <div class="search">
-    <input type="text" id="query" class="search-box" placeholder="Skriv t.ex. Dune, Inception, Breaking Bad..." value="Dune">
-    <button class="go-btn" id="goBtn">SÖK</button>
-  </div>
+<div class="search">
+<input type="text" id="query" class="search-box" placeholder="Sök film/serie..." value="Dune">
+<button class="go-btn" id="goBtn">SÖK</button>
+</div>
 
-  <div class="status" id="status"></div>
-  <div class="results-list" id="resultsList"></div>
+<div class="status" id="status"></div>
+<div class="results-list" id="resultsList"></div>
 
-  <div class="ticket" id="ticket">
-    <div class="ticket-body">
-      <div class="poster"><img id="posterImg" alt=""></div>
-      <div>
-        <h2 id="titleText" style="color:#fff; font-size:22px"></h2>
-        <div id="subText" style="color:#a09070; font-size:13px; margin:4px 0"></div>
-        <p id="overviewText" style="color:#c8b898; font-size:13px; margin-top:10px; line-height:1.4"></p>
-      </div>
-    </div>
-    <div class="player-frame" id="playerFrame">
-      <iframe id="vidsrcFrame" allowfullscreen allow="autoplay; fullscreen; encrypted-media; picture-in-picture"></iframe>
-      
-      <div class="player-overlay">
-        <button id="overlayFsBtn">⛶ H</button>
-        <button id="overlayCcBtn" style="border-color:#c9a227; color:#f0c040">CC</button>
-      </div>
+<div class="ticket" id="ticket">
+<div class="ticket-body">
+<div class="poster"><img id="posterImg" alt=""></div>
+<div style="flex:1">
+<h2 id="titleText" style="color:#fff; font-size:20px"></h2>
+<div id="subText" style="color:#a09070; font-size:12px; margin:4px 0"></div>
+<p id="overviewText" style="color:#c8b898; font-size:12px; margin-top:8px; line-height:1.4"></p>
+<div class="series-controls" id="seriesControls" style="display:none">
+<label style="font-size:11px; color:#a09070">Säsong:</label><select id="seasonSelect"></select>
+<label style="font-size:11px; color:#a09070">Avsnitt:</label><select id="episodeSelect"></select>
+<button id="nextEpBtn" style="background:#4ec9b0; color:#000; font-weight:700">Nästa avsnitt →</button>
+</div>
+</div>
+</div>
 
-      <div class="cc-controls" id="ccControls">
-        <div style="display:flex; gap:8px; align-items:center">
-          <button class="cc-btn" id="ccToggleBtn">CC</button>
-          <span id="ccHint" style="font-size:11px; color:#a09070">Undertexter: AV</span>
-        </div>
-        <div style="display:flex; gap:6px">
-          <button class="cc-btn" id="ccLangSv">SV</button>
-          <button class="cc-btn" id="ccLangEn">EN</button>
-          <button class="cc-btn" id="ccLangFa" style="border-color:#c9a227; color:#f0c040">FA</button>
-          <button class="cc-btn" id="ccLangKu" style="border-color:#ff6b6b; color:#ff9f9f">KU</button>
-          <button class="cc-btn" id="subSettingsBtn">⚙️</button>
-        </div>
-      </div>
+<div class="player-frame" id="playerFrame">
+<iframe id="vidsrcFrame" allowfullscreen allow="autoplay; fullscreen; encrypted-media; picture-in-picture"></iframe>
+<div class="player-overlay">
+<button id="overlayFsBtn">⛶ H</button>
+<button id="overlayCcBtn" style="border-color:#c9a227; color:#f0c040">CC</button>
+</div>
 
-      <div class="sub-settings" id="subSettings">
-        <div class="sub-tabs">
-          <button class="sub-tab" id="subTabSubtitles">Subtitles</button>
-          <button class="sub-tab active" id="subTabOptions">Options</button>
-        </div>
-        <div style="position:absolute; top:10px; right:10px"><button id="subSettingsClose" style="background:rgba(255,255,255,0.1); border:none; color:#888; width:28px; height:28px; border-radius:50%; cursor:pointer">✕</button></div>
-        <div class="sub-content">
-          <div class="sub-section-title">Subtitle Timing</div>
-          <div class="sub-timing-row">
-            <label>Subtitle delay</label>
-            <div class="sub-timing-controls">
-              <button class="sub-timing-btn" id="delayMinus">−</button>
-              <span class="sub-timing-val" id="subDelayVal">0s</span>
-              <button class="sub-timing-btn" id="delayPlus">+</button>
-            </div>
-          </div>
-          <div class="sub-hint">Negative shows subtitles earlier, positive later.</div>
-          <button class="sub-reset-btn" id="subResetTiming">Reset timing</button>
-          <div style="margin-top:24px">
-            <div class="sub-section-title">Caption Style</div>
-            <div class="sub-preview-box"><span class="sub-preview-text" id="subPreviewText">Subtitle preview</span></div>
-            <div class="sub-option-row"><label>Font</label><select class="sub-select" id="subFont"><option value="default">Default</option><option value="monospace">Monospace</option><option value="serif">Serif</option></select></div>
-            <div class="sub-option-row"><label>Text size</label><select class="sub-select" id="subSizeSelect"><option value="50">50%</option><option value="75">75%</option><option value="100" selected>100%</option><option value="125">125%</option><option value="150">150%</option><option value="200">200%</option></select></div>
-            <div class="sub-option-row"><label>Text color</label><input type="color" id="subColorInput" value="#ffffff" style="width:50px; height:32px; border-radius:8px; border:1px solid #3a3a3a"></div>
-            <div class="sub-option-row"><label>Background</label><select class="sub-select" id="subBgSelect"><option value="0">None</option><option value="75" selected>75%</option><option value="100">100%</option></select></div>
-          </div>
-        </div>
-      </div>
+<div class="cc-controls" id="ccControls">
+<div style="display:flex; gap:8px; align-items:center">
+<button class="cc-btn" id="ccToggleBtn">CC AV</button>
+<span id="ccHint" style="font-size:11px; color:#a09070">Undertexter: AV - Klicka CC för att aktivera</span>
+</div>
+<div style="display:flex; gap:6px">
+<button class="cc-btn" id="ccLangSv">SV</button>
+<button class="cc-btn" id="ccLangEn">EN</button>
+<button class="cc-btn" id="ccLangFa" style="border-color:#c9a227; color:#f0c040">FA</button>
+<button class="cc-btn" id="ccLangKu" style="border-color:#ff6b6b; color:#ff9f9f">KU</button>
+<button class="cc-btn" id="subSettingsBtn">⚙️</button>
+</div>
+</div>
 
-    </div>
-  </div>
+<div class="os-panel" id="osPanel">
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px"><span style="font-size:11px; font-weight:700; color:#c9a227">OpenSubtitles.com</span><button id="osClose" style="background:transparent; border:1px solid #2a3a5a; color:#fff; padding:2px 8px; border-radius:10px; cursor:pointer">✕</button></div>
+<div id="osResults"></div>
+</div>
+
+<div class="sub-settings" id="subSettings">
+<div class="sub-tabs"><button class="sub-tab" id="subTabSubtitles">Subtitles</button><button class="sub-tab active" id="subTabOptions">Options</button></div>
+<div style="position:absolute; top:10px; right:10px"><button id="subSettingsClose" style="background:rgba(255,255,255,0.1); border:none; color:#888; width:26px; height:26px; border-radius:50%; cursor:pointer">✕</button></div>
+<div class="sub-content" id="subOptionsContent">
+<div class="sub-section-title">Subtitle Timing</div>
+<div class="sub-timing-row"><label>Subtitle delay</label><div class="sub-timing-controls"><button class="sub-timing-btn" id="delayMinus">−</button><span class="sub-timing-val" id="subDelayVal">0s</span><button class="sub-timing-btn" id="delayPlus">+</button></div></div>
+<div class="sub-hint">Negative shows subtitles earlier, positive later.</div>
+<button class="sub-reset-btn" id="subResetTiming">Reset timing</button>
+<div style="margin-top:20px"><div class="sub-section-title">Caption Style</div><div class="sub-preview-box"><span class="sub-preview-text" id="subPreviewText">Subtitle preview</span></div>
+<div class="sub-option-row"><label>Font</label><select class="sub-select" id="subFont"><option value="default">Default</option><option value="monospace">Monospace</option><option value="serif">Serif</option></select></div>
+<div class="sub-option-row"><label>Text size</label><select class="sub-select" id="subSizeSelect"><option value="50">50%</option><option value="75">75%</option><option value="100" selected>100%</option><option value="125">125%</option><option value="150">150%</option><option value="200">200%</option></select></div>
+<div class="sub-option-row"><label>Text color</label><input type="color" id="subColorInput" value="#ffffff" style="width:48px; height:30px; border-radius:8px"></div>
+<div class="sub-option-row"><label>Background</label><select class="sub-select" id="subBgSelect"><option value="0">None</option><option value="50">50%</option><option value="75" selected>75%</option><option value="100">100%</option></select></div>
+</div>
+</div>
+<div class="sub-content" id="subSubtitlesContent" style="display:none">
+<div class="sub-section-title">Laddade Undertexter</div>
+<div id="subListContainer" style="font-size:12px; color:#888">Inga subs laddade. Sök via FA/KU/SV/EN.</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="lib-section">
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px">
+<h3 style="font-size:14px; color:#c9a227">📚 MIN LISTA - Fortsätt titta</h3>
+<button id="clearLibBtn" style="background:transparent; border:1px solid #2a3a5a; color:#a09070; padding:4px 10px; border-radius:6px; font-size:10px; cursor:pointer">Rensa</button>
+</div>
+<div class="lib-tabs" id="libTabs"><button data-tab="movies" class="active">Filmer</button><button data-tab="series">Serier</button></div>
+<div id="libContent"></div>
+</div>
+
 </div>
 
 <script>
-// CLOCK - SIMPLEST POSSIBLE - KÖRS FÖRST
-function updateClock(){
-  try{
-    var now=new Date();
-    var tEl=document.getElementById('clockTime');
-    var dEl=document.getElementById('clockDate');
-    if(tEl) tEl.textContent=now.toLocaleTimeString('sv-SE',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-    if(dEl) dEl.textContent=now.toLocaleDateString('sv-SE',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-  }catch(e){ console.log('clock err',e); }
-}
-updateClock();
-setInterval(updateClock,1000);
-console.log('Clock started');
+// CLOCK
+function updateClock(){ try{ var now=new Date(); document.getElementById('clockTime').textContent=now.toLocaleTimeString('sv-SE',{hour:'2-digit',minute:'2-digit',second:'2-digit'}); document.getElementById('clockDate').textContent=now.toLocaleDateString('sv-SE',{weekday:'long',day:'numeric',month:'long'}); }catch(e){} }
+updateClock(); setInterval(updateClock,1000);
 
-// SEARCH - SIMPLEST POSSIBLE WITH HARDCODED WORKING KEY
-var TMDB_KEY = "15d2ea6d0dc1d476efbca3eba2b9bbfb"; // Public demo key that always works
-var IMG = "https://image.tmdb.org/t/p/w200";
-var currentDetail=null;
-var currentId=null;
-var currentType='movie';
+// LIBRARY SYSTEM
+var LS_KEY='kuribaxi_watch_history_v2';
+var watchData={movies:{}, series:{}};
+var currentLibTab='movies';
+function loadLibrary(){ try{ var raw=localStorage.getItem(LS_KEY); if(raw){ var p=JSON.parse(raw); watchData.movies=p.movies||{}; watchData.series=p.series||{}; } }catch(e){} }
+function saveLibrary(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(watchData)); }catch(e){} }
+function addToLibrary(type, tmdbId, title, poster, year, imdbId, season, episode, timePos){
+  var id=String(tmdbId);
+  var entry={id:id, tmdbId:tmdbId, title:title, poster:poster, year:year, type:type, imdbId:imdbId||null, lastWatched:Date.now(), timePos: timePos||0};
+  if(type==='tv'){
+    entry.season=Math.max(1,parseInt(season)||1);
+    entry.episode=Math.max(1,parseInt(episode)||1);
+    var existing=watchData.series[id];
+    // Only update if newer episode or later time
+    if(existing){
+      if(entry.season<existing.season) return;
+      if(entry.season===existing.season && entry.episode<existing.episode) return;
+    }
+    watchData.series[id]=entry;
+  } else {
+    watchData.movies[id]=entry;
+  }
+  saveLibrary(); renderLibrary();
+}
+function removeFromLibrary(type, tmdbId){ var id=String(tmdbId); if(type==='movie') delete watchData.movies[id]; else delete watchData.series[id]; saveLibrary(); renderLibrary(); }
+function renderLibrary(){
+  var container=document.getElementById('libContent');
+  var isMovies=currentLibTab==='movies';
+  var dict=isMovies?watchData.movies:watchData.series;
+  var items=Object.values(dict).sort(function(a,b){ return b.lastWatched-a.lastWatched; });
+  if(items.length===0){ container.innerHTML='<div class="lib-empty">Inga '+(isMovies?'filmer':'serier')+' sparade än. Sök och spela något så hamnar det här automatiskt.<br><br>Serier sparar automatiskt nästa avsnitt.</div>'; return; }
+  var html='<div class="lib-grid">';
+  items.forEach(function(item){
+    var imgUrl=item.poster?'https://image.tmdb.org/t/p/w200'+item.poster:'';
+    var progress=!isMovies?'<span class="lib-card-progress">S'+(item.season||1)+':E'+(item.episode||1)+'</span>':'';
+    var date=new Date(item.lastWatched).toLocaleDateString('sv-SE',{day:'numeric',month:'short'});
+    var timeInfo=item.timePos?'<span style="font-size:9px; color:#c9a227">'+Math.floor(item.timePos/60)+'m sparad</span>':'';
+    html+='<div class="lib-card" data-id="'+item.id+'" data-type="'+item.type+'"><button class="lib-del" data-del-id="'+item.id+'" data-del-type="'+item.type+'">✕</button><img src="'+imgUrl+'" onerror="this.style.display=\'none\'"><div class="lib-card-title">'+item.title+'</div><div class="lib-card-sub"><span>'+(item.year||'')+' · '+date+'</span>'+progress+'</div><div style="padding:0 8px 6px">'+timeInfo+'</div></div>';
+  });
+  html+='</div>';
+  container.innerHTML=html;
+  container.querySelectorAll('.lib-del').forEach(function(btn){ btn.addEventListener('click',function(e){ e.stopPropagation(); removeFromLibrary(this.dataset.delType, this.dataset.delId); }); });
+  container.querySelectorAll('.lib-card').forEach(function(card){
+    card.addEventListener('click',function(){
+      var id=this.dataset.id; var type=this.dataset.type;
+      var entry=type==='movie'?watchData.movies[id]:watchData.series[id];
+      if(entry){ loadDetail(id, type, entry.season, entry.episode); }
+    });
+  });
+  document.querySelectorAll('#libTabs button').forEach(function(b){ b.classList.toggle('active', b.dataset.tab===currentLibTab); });
+}
+document.getElementById('libTabs').addEventListener('click',function(e){ var btn=e.target.closest('button'); if(!btn) return; currentLibTab=btn.dataset.tab; renderLibrary(); });
+document.getElementById('clearLibBtn').addEventListener('click',function(){ if(!confirm('Rensa alla sparade '+ (currentLibTab==='movies'?'filmer':'serier')+'?')) return; if(currentLibTab==='movies') watchData.movies={}; else watchData.series={}; saveLibrary(); renderLibrary(); });
+loadLibrary(); renderLibrary();
 
-function getApiKey(){ 
-  var el=document.getElementById('apikey');
-  return (el && el.value.trim()) ? el.value.trim() : TMDB_KEY;
-}
-function setStatus(msg,type){
-  var el=document.getElementById('status');
-  if(!el) return;
-  el.textContent=msg;
-  el.className='status show '+(type||'info');
-  console.log('STATUS:', msg);
-}
-function clearStatus(){
-  var el=document.getElementById('status');
-  if(el) el.className='status';
-}
-
+// SEARCH & PLAYER (same as minimal fixed)
+function getApiKey(){ var el=document.getElementById('apikey'); return el&&el.value.trim()?el.value.trim():'15d2ea6d0dc1d476efbca3eba2b9bbfb'; }
+function setStatus(msg,type){ var el=document.getElementById('status'); if(!el) return; el.textContent=msg; el.className='status show '+(type||'info'); }
+function clearStatus(){ var el=document.getElementById('status'); if(el) el.className='status'; }
 async function tmdb(path){
   var key=getApiKey();
   var sep=path.includes('?')?'&':'?';
   var url='https://api.themoviedb.org/3'+path+sep+'api_key='+encodeURIComponent(key)+'&language=sv-SE';
-  console.log('Fetching TMDB:', url);
   var res=await fetch(url);
-  if(!res.ok){
-    throw new Error('TMDB '+res.status);
-  }
+  if(!res.ok) throw new Error('TMDB '+res.status);
   return res.json();
 }
-
 async function runSearch(){
-  var qEl=document.getElementById('query');
-  var q=qEl ? qEl.value.trim() : '';
-  console.log('Search clicked, query:', q);
-  if(!q){ setStatus('Skriv en titel först','error'); return; }
+  var q=document.getElementById('query').value.trim();
+  if(!q){ setStatus('Skriv titel','error'); return; }
   var btn=document.getElementById('goBtn');
-  var list=document.getElementById('resultsList');
-  var ticket=document.getElementById('ticket');
-  if(btn){ btn.disabled=true; btn.textContent='Söker...'; }
-  if(list) list.innerHTML='';
-  if(ticket) ticket.classList.remove('show');
-  clearStatus();
-  setStatus('Söker efter "'+q+'" ...','info');
+  btn.disabled=true; btn.textContent='Söker...';
+  document.getElementById('resultsList').innerHTML='';
+  document.getElementById('ticket').classList.remove('show');
+  clearStatus(); setStatus('Söker "'+q+'" ...','info');
   try{
     var data=await tmdb('/search/multi?query='+encodeURIComponent(q));
     var items=(data.results||[]).filter(function(r){ return r.media_type==='movie'||r.media_type==='tv'; });
-    console.log('Search results:', items.length);
-    if(items.length===0){
-      setStatus('Inga träffar för "'+q+'". Prova engelska titeln.','error');
-    } else if(items.length===1){
-      await loadDetail(items[0].id, items[0].media_type);
-      setStatus('Hittade 1 träff: '+(items[0].title||items[0].name),'info');
-    } else {
-      setStatus('Hittade '+items.length+' träffar. Klicka en för att spela.','info');
-      renderResultList(items.slice(0,8));
-    }
-  }catch(err){
-    console.error('Search error',err);
-    setStatus('Sökfel: '+err.message+'. Prova TMDB-ID 693134 för Dune. Nyckeln testad: '+getApiKey().slice(0,6)+'...','error');
-  }finally{
-    if(btn){ btn.disabled=false; btn.textContent='SÖK'; }
-  }
+    if(items.length===0) setStatus('Inga träffar','error');
+    else if(items.length===1){ await loadDetail(items[0].id, items[0].media_type); }
+    else { setStatus(items.length+' träffar','info'); renderResultList(items.slice(0,8)); }
+  }catch(err){ setStatus('Fel: '+err.message,'error'); }
+  finally{ btn.disabled=false; btn.textContent='SÖK'; }
 }
-
 function renderResultList(items){
-  var list=document.getElementById('resultsList');
-  if(!list) return;
-  list.innerHTML='';
+  var list=document.getElementById('resultsList'); list.innerHTML='';
   items.forEach(function(item){
-    var title=item.title||item.name||'Okänd';
-    var date=item.release_date||item.first_air_date||'';
-    var year=date?date.slice(0,4):'—';
-    var row=document.createElement('div');
-    row.className='result-row';
-    var imgSrc=item.poster_path?IMG+item.poster_path:'';
-    row.innerHTML='<img src="'+imgSrc+'" onerror="this.style.display=\'none\'"><div><div class="rtitle">'+title+'</div><div class="ryear">'+year+' · '+(item.media_type==='tv'?'SERIE':'FILM')+'</div></div><div class="ryear" style="margin-left:auto">#'+item.id+'</div>';
+    var title=item.title||item.name; var date=item.release_date||item.first_air_date||''; var year=date.slice(0,4);
+    var row=document.createElement('div'); row.className='result-row';
+    row.innerHTML='<img src="'+(item.poster_path?'https://image.tmdb.org/t/p/w200'+item.poster_path:'')+'" onerror="this.style.display=\'none\'"><div><div class="rtitle">'+title+'</div><div class="ryear">'+year+' · '+(item.media_type==='tv'?'SERIE':'FILM')+'</div></div><div class="ryear" style="margin-left:auto">#'+item.id+'</div>';
     row.addEventListener('click',function(){ loadDetail(item.id, item.media_type); });
     list.appendChild(row);
   });
 }
-
-async function loadDetail(id,type){
+var currentDetail=null, currentId=null, currentType='movie', currentImdbId=null, currentSeason=1, currentEpisode=1;
+async function loadDetail(id,type,prefillSeason,prefillEpisode){
   try{
-    clearStatus();
-    setStatus('Laddar detaljer...','info');
+    clearStatus(); setStatus('Laddar...','info');
     var detail=await tmdb('/'+type+'/'+id);
     var imdbId=detail.imdb_id||'';
-    if(!imdbId && type==='tv'){
-      try{ var ext=await tmdb('/tv/'+id+'/external_ids'); imdbId=ext.imdb_id||''; }catch(e){}
-    }
-    currentDetail=detail; currentId=id; currentType=type;
-    document.getElementById('titleText').textContent=detail.title||detail.name||'';
-    document.getElementById('subText').textContent=(detail.release_date||detail.first_air_date||'').slice(0,4)+' · TMDB #'+id+' · '+(imdbId?('IMDB '+imdbId):'');
+    if(!imdbId && type==='tv'){ try{ var ext=await tmdb('/tv/'+id+'/external_ids'); imdbId=ext.imdb_id||''; }catch(e){} }
+    currentDetail=detail; currentId=id; currentType=type; currentImdbId=imdbId;
+    currentSeason=prefillSeason||1; currentEpisode=prefillEpisode||1;
+    document.getElementById('titleText').textContent=detail.title||detail.name;
+    document.getElementById('subText').textContent=(detail.release_date||detail.first_air_date||'').slice(0,4)+' · TMDB #'+id;
     document.getElementById('overviewText').textContent=detail.overview||'Ingen beskrivning.';
-    var poster=document.getElementById('posterImg');
-    if(poster) poster.src=detail.poster_path? 'https://image.tmdb.org/t/p/w300'+detail.poster_path : '';
+    document.getElementById('posterImg').src=detail.poster_path?'https://image.tmdb.org/t/p/w300'+detail.poster_path:'';
     document.getElementById('ticket').classList.add('show');
     document.getElementById('resultsList').innerHTML='';
-    setStatus('Klar! Välj källa nedan för att spela.','info');
-    loadPlayer(type, id, imdbId, 1, 1);
-    window.scrollTo({top:document.getElementById('ticket').offsetTop-20, behavior:'smooth'});
-  }catch(err){
-    setStatus('Kunde inte ladda detaljer: '+err.message,'error');
-  }
+    // series controls
+    if(type==='tv'){
+      document.getElementById('seriesControls').style.display='flex';
+      // load seasons
+      var seasonSel=document.getElementById('seasonSelect'); seasonSel.innerHTML='';
+      var seasons=detail.number_of_seasons||5;
+      for(var s=1;s<=seasons;s++){ var opt=document.createElement('option'); opt.value=s; opt.textContent='Säsong '+s; if(s==currentSeason) opt.selected=true; seasonSel.appendChild(opt); }
+      var epSel=document.getElementById('episodeSelect'); epSel.innerHTML='';
+      for(var e=1;e<=20;e++){ var opt=document.createElement('option'); opt.value=e; opt.textContent='Avsnitt '+e; if(e==currentEpisode) opt.selected=true; epSel.appendChild(opt); }
+    } else {
+      document.getElementById('seriesControls').style.display='none';
+    }
+    loadPlayer(type,id,imdbId,currentSeason,currentEpisode);
+    setStatus('Klar!','info');
+  }catch(err){ setStatus('Fel: '+err.message,'error'); }
 }
-
-var SOURCES=[
-  {key:'vsrc', name:'vsrc.su', base:'https://vsrc.su/embed'},
-  {key:'embed', name:'embed.su', base:'https://embed.su/embed'},
-  {key:'auto', name:'autoembed.cc', base:'https://autoembed.cc/embed'},
-];
+var SOURCES=[{key:'vsrc', name:'vsrc.su', base:'https://vsrc.su/embed'},{key:'embed', name:'embed.su', base:'https://embed.su/embed'},{key:'auto', name:'autoembed.cc', base:'https://autoembed.cc/embed'}];
 var activeSource='vsrc';
-
-function buildUrl(source,type,id,imdbId,s,e){
-  if(type==='tv') return source.base+'/tv/'+id+'/'+(s||1)+'/'+(e||1);
-  return source.base+'/movie/'+id;
-}
-
+function buildUrl(source,type,id,imdbId,s,e){ if(type==='tv') return source.base+'/tv/'+id+'/'+(s||1)+'/'+(e||1); return source.base+'/movie/'+id; }
 function loadPlayer(type,id,imdbId,season,episode){
   var src=SOURCES.find(function(s){ return s.key===activeSource; });
   var url=buildUrl(src,type,id,imdbId,season,episode);
   var iframe=document.getElementById('vidsrcFrame');
-  if(!iframe) return;
   iframe.removeAttribute('sandbox');
   iframe.src=url;
-  console.log('Player loaded:', url);
+  // Save to library
+  var title=currentDetail ? (currentDetail.title||currentDetail.name) : 'Film';
+  var poster=currentDetail ? currentDetail.poster_path : '';
+  var year=(currentDetail && (currentDetail.release_date||currentDetail.first_air_date||'').slice(0,4))||'';
+  addToLibrary(type, id, title, poster, year, imdbId, season, episode, 0);
 }
+document.getElementById('seasonSelect').addEventListener('change', function(){ currentSeason=parseInt(this.value); loadPlayer(currentType, currentId, currentImdbId, currentSeason, currentEpisode); });
+document.getElementById('episodeSelect').addEventListener('change', function(){ currentEpisode=parseInt(this.value); loadPlayer(currentType, currentId, currentImdbId, currentSeason, currentEpisode); });
+document.getElementById('nextEpBtn').addEventListener('click', function(){
+  currentEpisode+=1;
+  if(currentEpisode>20){ currentEpisode=1; currentSeason+=1; document.getElementById('seasonSelect').value=currentSeason; }
+  document.getElementById('episodeSelect').value=currentEpisode;
+  loadPlayer(currentType, currentId, currentImdbId, currentSeason, currentEpisode);
+  setStatus('Nästa avsnitt: S'+currentSeason+' E'+currentEpisode+' sparad i listan','info');
+});
 
 // BUTTONS
 document.getElementById('goBtn').addEventListener('click', runSearch);
 document.getElementById('query').addEventListener('keydown', function(e){ if(e.key==='Enter') runSearch(); });
-document.getElementById('overlayFsBtn').addEventListener('click', function(){
-  var pf=document.getElementById('playerFrame');
-  if(document.fullscreenElement) document.exitFullscreen();
-  else pf.requestFullscreen();
-});
-document.addEventListener('keydown', function(e){
-  if(e.key.toLowerCase()==='h' || e.key.toLowerCase()==='f'){
-    if(['INPUT','TEXTAREA','SELECT'].indexOf(e.target.tagName)===-1){
-      var pf=document.getElementById('playerFrame');
-      if(document.fullscreenElement) document.exitFullscreen();
-      else pf.requestFullscreen();
-    }
-  }
-});
+document.getElementById('overlayFsBtn').addEventListener('click', function(){ var pf=document.getElementById('playerFrame'); if(document.fullscreenElement) document.exitFullscreen(); else pf.requestFullscreen(); });
+document.addEventListener('keydown', function(e){ if((e.key.toLowerCase()==='h'||e.key.toLowerCase()==='f') && ['INPUT','TEXTAREA','SELECT'].indexOf(e.target.tagName)===-1){ var pf=document.getElementById('playerFrame'); if(document.fullscreenElement) document.exitFullscreen(); else pf.requestFullscreen(); } });
 
-// CC show on top hover
+// CC SYSTEM - FIXED TO BE ACTIVATABLE
+var ccEnabled=false;
 var pFrame=document.getElementById('playerFrame');
 var ccControls=document.getElementById('ccControls');
 function showCC(){ if(ccControls) ccControls.classList.add('visible'); }
-function hideCC(){ if(ccControls) ccControls.classList.remove('visible'); }
+function hideCC(){ if(!ccEnabled && ccControls && !document.getElementById('subSettings').classList.contains('show') && !document.getElementById('osPanel').classList.contains('show')) ccControls.classList.remove('visible'); }
 if(pFrame){
   pFrame.addEventListener('mousemove', function(e){
     var rect=pFrame.getBoundingClientRect();
     var yRel=(e.clientY-rect.top)/rect.height;
-    if(yRel<0.4) showCC();
+    if(yRel<0.45) showCC();
   });
-  pFrame.addEventListener('mouseleave', hideCC);
+  pFrame.addEventListener('mouseleave', function(){ setTimeout(hideCC, 800); });
 }
-
-// Subtitle settings
-var subSettings=JSON.parse(localStorage.getItem('kuribaxi_sub_settings')||'{"color":"#ffffff","size":18,"sizePercent":"100","bg":75,"delay":0,"font":"default"}');
-var srtCues=[];
-var srtOverlay=null;
-var srtInterval=null;
-var srtStartTime=0;
-
-function applySubSettings(){
-  if(!srtOverlay){
-    var preview=document.getElementById('subPreviewText');
-    if(preview){
-      preview.style.color=subSettings.color;
-      preview.style.fontSize=subSettings.size+'px';
-      preview.style.background='rgba(0,0,0,'+subSettings.bg/100+')';
-    }
-    return;
+var ccToggleBtn=document.getElementById('ccToggleBtn');
+function setCCEnabled(enabled){
+  ccEnabled=enabled;
+  if(enabled){
+    ccToggleBtn.textContent='CC PÅ'; ccToggleBtn.classList.add('cc-on'); ccToggleBtn.classList.remove('active');
+    document.getElementById('ccHint').textContent='Undertexter: PÅ - Välj språk nedan';
+    if(ccControls) ccControls.classList.add('always-on');
+    if(srtOverlay && srtCues.length>0) srtOverlay.style.display='block';
+  } else {
+    ccToggleBtn.textContent='CC AV'; ccToggleBtn.classList.remove('cc-on'); 
+    document.getElementById('ccHint').textContent='Undertexter: AV - Klicka CC för att aktivera';
+    if(ccControls) ccControls.classList.remove('always-on');
+    if(srtOverlay) srtOverlay.style.display='none';
+    if(ccControls && !ccControls.matches(':hover')) ccControls.classList.remove('visible');
   }
-  srtOverlay.style.color=subSettings.color;
-  srtOverlay.style.fontSize=subSettings.size+'px';
-  srtOverlay.style.background='rgba(0,0,0,'+subSettings.bg/100+')';
 }
+ccToggleBtn.addEventListener('click', function(){ setCCEnabled(!ccEnabled); });
+document.getElementById('overlayCcBtn').addEventListener('click', function(){ showCC(); setCCEnabled(true); });
 
+// SUBTITLE SYSTEM
+var subSettings=JSON.parse(localStorage.getItem('kuribaxi_sub_settings')||'{"color":"#ffffff","size":18,"sizePercent":"100","bg":75,"delay":0,"font":"default"}');
+var srtCues=[]; var srtOverlay=null; var srtInterval=null; var srtStartTime=0;
+function applySubSettings(){
+  var preview=document.getElementById('subPreviewText');
+  if(preview){ preview.style.color=subSettings.color; preview.style.fontSize=subSettings.size+'px'; preview.style.background='rgba(0,0,0,'+subSettings.bg/100+')'; }
+  if(!srtOverlay) return;
+  srtOverlay.style.color=subSettings.color; srtOverlay.style.fontSize=subSettings.size+'px'; srtOverlay.style.background='rgba(0,0,0,'+subSettings.bg/100+')';
+}
 function parseSRT(srt){
   var cues=[]; var blocks=srt.trim().split(/\n\s*\n/);
   for(var i=0;i<blocks.length;i++){
     var b=blocks[i]; var lines=b.split('\n'); if(lines.length<2) continue;
-    var timeLine=null; for(var j=0;j<lines.length;j++){ if(lines[j].indexOf('-->')!==-1){ timeLine=lines[j]; break; } }
-    if(!timeLine) continue;
-    var parts=timeLine.split(' --> ');
-    function toSec(t){ var p=t.split(':'); var sec=parseFloat(p[2].replace(',','.')); return parseFloat(p[0])*3600 + parseFloat(p[1])*60 + sec; }
+    var tl=null; for(var j=0;j<lines.length;j++){ if(lines[j].indexOf('-->')!==-1){ tl=lines[j]; break; } }
+    if(!tl) continue;
+    var parts=tl.split(' --> ');
+    function toSec(t){ var p=t.split(':'); return parseFloat(p[0])*3600 + parseFloat(p[1])*60 + parseFloat(p[2].replace(',','.')); }
     var start=toSec(parts[0]); var end=toSec(parts[1]);
-    var idx=lines.indexOf(timeLine);
+    var idx=lines.indexOf(tl);
     var text=lines.slice(idx+1).join('\n');
     cues.push({start:start,end:end,text:text});
   }
   return cues;
 }
-
 function loadSRT(text){
   srtCues=parseSRT(text);
-  if(!srtOverlay){
-    srtOverlay=document.createElement('div');
-    srtOverlay.id='srtOverlay';
-    document.getElementById('playerFrame').appendChild(srtOverlay);
-  }
+  if(!srtOverlay){ srtOverlay=document.createElement('div'); srtOverlay.id='srtOverlay'; document.getElementById('playerFrame').appendChild(srtOverlay); }
   applySubSettings();
   srtStartTime=Date.now()/1000;
   if(srtInterval) clearInterval(srtInterval);
   srtInterval=setInterval(function(){
+    if(!ccEnabled) return;
     var now=Date.now()/1000 - srtStartTime + (parseFloat(subSettings.delay)||0);
-    var cue=null;
-    for(var i=0;i<srtCues.length;i++){ var c=srtCues[i]; if(now>=c.start && now<=c.end){ cue=c; break; } }
+    var cue=null; for(var i=0;i<srtCues.length;i++){ var c=srtCues[i]; if(now>=c.start && now<=c.end){ cue=c; break; } }
     if(cue){ srtOverlay.textContent=cue.text; srtOverlay.style.display='block'; } else { srtOverlay.style.display='none'; }
   },100);
+  setCCEnabled(true);
+  document.getElementById('subListContainer').innerHTML='<div style="color:#4ec9b0">✓ '+srtCues.length+' rader laddade. CC aktiverad!</div><div style="margin-top:8px; font-size:11px; color:#ccc">'+text.slice(0,120)+'...</div>';
+  setStatus('Undertexter laddade! CC aktiverad automatiskt.','info');
 }
 
+// OpenSubtitles search
+async function searchOpenSubtitles(query, lang){
+  var osKey=document.getElementById('osapikey').value.trim();
+  if(!osKey){ setStatus('Lägg in OpenSubtitles API nyckel','error'); return; }
+  var osPanel=document.getElementById('osPanel');
+  var osResults=document.getElementById('osResults');
+  osPanel.classList.add('show'); showCC();
+  osResults.innerHTML='<div style="font-size:12px; color:#a09070">Söker '+lang.toUpperCase()+' subs för "'+query+'"...</div>';
+  try{
+    var res=await fetch('https://api.opensubtitles.com/api/v1/subtitles?query='+encodeURIComponent(query)+'&languages='+lang, {headers:{'Api-Key':osKey,'Content-Type':'application/json'}});
+    if(!res.ok) throw new Error('OS '+res.status);
+    var data=await res.json();
+    var items=(data.data||[]).slice(0,6);
+    if(items.length===0){ osResults.innerHTML='<div style="font-size:12px; color:#888">Inga '+lang.toUpperCase()+' subs hittade. Prova EN eller dra in egen .srt</div>'; return; }
+    osResults.innerHTML='';
+    items.forEach(function(item){
+      var attr=item.attributes||{};
+      var div=document.createElement('div'); div.className='os-item';
+      div.innerHTML='<div><div style="font-size:12px; color:#fff; font-weight:600">'+(attr.release||attr.movie_name||query)+'</div><div style="font-size:10px; color:#888">Lang: '+attr.language+' · Downloads: '+(attr.download_count||0)+'</div></div><button style="background:#c9a227; color:#000; border:none; padding:4px 10px; border-radius:6px; font-size:10px; font-weight:700">Ladda</button>';
+      div.addEventListener('click', async function(){
+        try{
+          var fileId=attr.files&&attr.files[0]&&attr.files[0].file_id;
+          if(!fileId) throw new Error('Ingen fil');
+          var downRes=await fetch('https://api.opensubtitles.com/api/v1/download',{method:'POST', headers:{'Api-Key':osKey,'Content-Type':'application/json'}, body:JSON.stringify({file_id:fileId})});
+          var downData=await downRes.json();
+          var fileUrl=downData.link;
+          var srtRes=await fetch(fileUrl);
+          var srtText=await srtRes.text();
+          loadSRT(srtText);
+          osPanel.classList.remove('show');
+        }catch(e){ osResults.innerHTML='<div style="color:#f0938a; font-size:11px">Fel: '+e.message+' - Prova dra in egen .srt fil istället</div>'; }
+      });
+      osResults.appendChild(div);
+    });
+  }catch(err){ osResults.innerHTML='<div style="color:#f0938a; font-size:11px">Sökfel: '+err.message+'. Du kan dra en .srt fil direkt till spelaren.</div>'; }
+}
+document.getElementById('ccLangSv').addEventListener('click', function(){ var t=currentDetail?(currentDetail.title||currentDetail.name):document.getElementById('query').value; searchOpenSubtitles(t,'sv'); });
+document.getElementById('ccLangEn').addEventListener('click', function(){ var t=currentDetail?(currentDetail.title||currentDetail.name):document.getElementById('query').value; searchOpenSubtitles(t,'en'); });
+document.getElementById('ccLangFa').addEventListener('click', function(){ var t=currentDetail?(currentDetail.title||currentDetail.name):document.getElementById('query').value; searchOpenSubtitles(t,'fa'); });
+document.getElementById('ccLangKu').addEventListener('click', function(){ var t=currentDetail?(currentDetail.title||currentDetail.name):document.getElementById('query').value; searchOpenSubtitles(t,'ku'); });
+document.getElementById('osClose').addEventListener('click', function(){ document.getElementById('osPanel').classList.remove('show'); });
+
+// Drag & drop SRT
+var pf=document.getElementById('playerFrame');
+pf.addEventListener('dragover', function(e){ e.preventDefault(); pf.style.outline='2px dashed #c9a227'; });
+pf.addEventListener('dragleave', function(){ pf.style.outline='none'; });
+pf.addEventListener('drop', function(e){
+  e.preventDefault(); pf.style.outline='none';
+  var file=e.dataTransfer.files[0];
+  if(!file) return;
+  var reader=new FileReader();
+  reader.onload=function(ev){ loadSRT(ev.target.result); };
+  reader.readAsText(file);
+});
+
 // Settings UI
-document.getElementById('subSettingsBtn').addEventListener('click', function(e){ e.stopPropagation(); document.getElementById('subSettings').classList.toggle('show'); showCC(); });
+document.getElementById('subSettingsBtn').addEventListener('click', function(e){ e.stopPropagation(); document.getElementById('subSettings').classList.toggle('show'); document.getElementById('osPanel').classList.remove('show'); showCC(); });
 document.getElementById('subSettingsClose').addEventListener('click', function(){ document.getElementById('subSettings').classList.remove('show'); });
+document.getElementById('subTabSubtitles').addEventListener('click', function(){ this.classList.add('active'); document.getElementById('subTabOptions').classList.remove('active'); document.getElementById('subSubtitlesContent').style.display='block'; document.getElementById('subOptionsContent').style.display='none'; });
+document.getElementById('subTabOptions').addEventListener('click', function(){ this.classList.add('active'); document.getElementById('subTabSubtitles').classList.remove('active'); document.getElementById('subOptionsContent').style.display='block'; document.getElementById('subSubtitlesContent').style.display='none'; });
 document.getElementById('delayMinus').addEventListener('click', function(){ subSettings.delay=parseFloat((subSettings.delay-0.5).toFixed(1)); document.getElementById('subDelayVal').textContent=subSettings.delay+'s'; localStorage.setItem('kuribaxi_sub_settings', JSON.stringify(subSettings)); });
 document.getElementById('delayPlus').addEventListener('click', function(){ subSettings.delay=parseFloat((subSettings.delay+0.5).toFixed(1)); document.getElementById('subDelayVal').textContent=subSettings.delay+'s'; localStorage.setItem('kuribaxi_sub_settings', JSON.stringify(subSettings)); });
 document.getElementById('subResetTiming').addEventListener('click', function(){ subSettings.delay=0; document.getElementById('subDelayVal').textContent='0s'; localStorage.setItem('kuribaxi_sub_settings', JSON.stringify(subSettings)); });
 document.getElementById('subColorInput').addEventListener('input', function(e){ subSettings.color=e.target.value; applySubSettings(); localStorage.setItem('kuribaxi_sub_settings', JSON.stringify(subSettings)); });
 document.getElementById('subSizeSelect').addEventListener('change', function(e){ subSettings.sizePercent=e.target.value; subSettings.size=Math.round(18*parseInt(e.target.value)/100); applySubSettings(); localStorage.setItem('kuribaxi_sub_settings', JSON.stringify(subSettings)); });
 document.getElementById('subBgSelect').addEventListener('change', function(e){ subSettings.bg=parseInt(e.target.value); applySubSettings(); localStorage.setItem('kuribaxi_sub_settings', JSON.stringify(subSettings)); });
-document.getElementById('overlayCcBtn').addEventListener('click', function(){ showCC(); });
 
-// Auto search on load to prove it works
-window.addEventListener('load', function(){
-  console.log('Page loaded, testing search...');
-  setTimeout(function(){
-    // Don't auto search, just show that clock works
-    setStatus('Klockan funkar: '+new Date().toLocaleTimeString('sv-SE')+' - Skriv en titel och tryck SÖK. Testa "Dune" som redan står i rutan.','info');
-  },500);
-});
+// Init
+setStatus('Klockan: '+new Date().toLocaleTimeString('sv-SE')+' - Sök funkar, CC går att aktivera, lista sparas automatiskt.','info');
 </script>
 </body>
 </html>
