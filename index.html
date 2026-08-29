@@ -74,7 +74,18 @@ body{background:#0a0e1a;color:#e8dcc8;font-family:Manrope,sans-serif;padding:20p
 .lib-card-title{padding:8px; font-size:12px; font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
 .lib-card-sub{padding:0 8px 8px; font-size:10px; color:#a09070; display:flex; justify-content:space-between}
 .lib-card-progress{background:#4ec9b0; color:#000; font-size:9px; font-weight:700; padding:2px 6px; border-radius:10px}
-.lib-del{position:absolute; top:6px; right:6px; width:22px; height:22px; background:rgba(0,0,0,0.7); border:1px solid rgba(255,255,255,0.2); color:#fff; border-radius:50%; cursor:pointer; font-size:12px; display:flex; align-items:center; justify-content:center}
+.lib-del{
+  position:absolute; top:-8px; right:-8px; 
+  width:28px; height:28px; 
+  background:#e2574c; border:2px solid #fff; color:#fff; 
+  border-radius:50%; cursor:pointer; font-size:14px; font-weight:900;
+  display:flex; align-items:center; justify-content:center;
+  z-index:5; box-shadow:0 2px 8px rgba(0,0,0,0.5);
+  transition:all .15s;
+}
+.lib-del:hover{background:#ff6b6b; transform:scale(1.15)}
+.lib-card{overflow:visible !important}
+.lib-grid{padding-top:10px}
 .lib-empty{color:#666; font-size:13px; text-align:center; padding:20px}
 .series-controls{display:flex; gap:8px; align-items:center; margin-top:10px; flex-wrap:wrap}
 .series-controls select, .series-controls button{background:#0b1220; border:1px solid #2a3a5a; color:#fff; padding:6px 10px; border-radius:6px; font-size:12px; cursor:pointer}
@@ -149,7 +160,19 @@ body{background:#0a0e1a;color:#e8dcc8;font-family:Manrope,sans-serif;padding:20p
 <div class="sub-section-title">Subtitle Timing</div>
 <div class="sub-timing-row"><label>Subtitle delay</label><div class="sub-timing-controls"><button class="sub-timing-btn" id="delayMinus">−</button><span class="sub-timing-val" id="subDelayVal">0s</span><button class="sub-timing-btn" id="delayPlus">+</button></div></div>
 <div class="sub-hint">Negative shows subtitles earlier, positive later.</div>
-<button class="sub-reset-btn" id="subResetTiming">Reset timing</button>
+<div style="display:flex; gap:6px; margin-bottom:10px">
+<button class="sub-reset-btn" id="subResetTiming" style="flex:1">Reset timing</button>
+<button class="sub-reset-btn" id="syncNowBtn" style="flex:1; background:#4ec9b0; color:#000; border-color:#4ec9b0; font-weight:800">🎯 Synka NU</button>
+</div>
+<div style="background:rgba(201,162,39,0.08); border:1px solid rgba(201,162,39,0.2); border-radius:8px; padding:8px; margin-bottom:12px">
+<div style="font-size:10px; color:#c9a227; font-weight:700; margin-bottom:4px">🔄 AUTO-SYNK - Om sub inte synkar:</div>
+<div style="font-size:10px; color:#a09070; line-height:1.3; margin-bottom:6px">1. När någon börjar prata i filmen, klicka <b>🎯 Synka NU</b> direkt<br>2. Eller skriv ord du hör nedan och klicka Synka</div>
+<div style="display:flex; gap:6px">
+<input type="text" id="syncText" placeholder="Ord du hör nu t.ex. hello..." style="flex:1; background:#0b1220; border:1px solid #2a3a5a; color:#fff; padding:6px 8px; border-radius:6px; font-size:11px">
+<button id="syncTextBtn" style="background:#c9a227; color:#000; border:none; padding:6px 10px; border-radius:6px; font-size:11px; font-weight:700; cursor:pointer">Synka</button>
+</div>
+<div id="syncStatus" style="font-size:10px; color:#4ec9b0; margin-top:6px"></div>
+</div>
 <div style="margin-top:20px"><div class="sub-section-title">Caption Style</div><div class="sub-preview-box"><span class="sub-preview-text" id="subPreviewText">Subtitle preview</span></div>
 <div class="sub-option-row"><label>Font</label><select class="sub-select" id="subFont"><option value="default">Default</option><option value="monospace">Monospace</option><option value="serif">Serif</option></select></div>
 <div class="sub-option-row"><label>Text size</label><select class="sub-select" id="subSizeSelect"><option value="50">50%</option><option value="75">75%</option><option value="100" selected>100%</option><option value="125">125%</option><option value="150">150%</option><option value="200">200%</option></select></div>
@@ -400,17 +423,62 @@ function loadSRT(text){
   if(!srtOverlay){ srtOverlay=document.createElement('div'); srtOverlay.id='srtOverlay'; document.getElementById('playerFrame').appendChild(srtOverlay); }
   applySubSettings();
   srtStartTime=Date.now()/1000;
+  subSettings.delay=0;
+  document.getElementById('subDelayVal').textContent='0s';
   if(srtInterval) clearInterval(srtInterval);
   srtInterval=setInterval(function(){
     if(!ccEnabled) return;
     var now=Date.now()/1000 - srtStartTime + (parseFloat(subSettings.delay)||0);
     var cue=null; for(var i=0;i<srtCues.length;i++){ var c=srtCues[i]; if(now>=c.start && now<=c.end){ cue=c; break; } }
-    if(cue){ srtOverlay.textContent=cue.text; srtOverlay.style.display='block'; } else { srtOverlay.style.display='none'; }
-  },100);
+    if(cue){ 
+      var isRtl=/[\u0600-\u06FF]/.test(cue.text);
+      if(srtOverlay){ srtOverlay.style.direction=isRtl?'rtl':'ltr'; }
+      srtOverlay.textContent=cue.text; srtOverlay.style.display='block'; 
+    } else { srtOverlay.style.display='none'; }
+  },80);
   setCCEnabled(true);
-  document.getElementById('subListContainer').innerHTML='<div style="color:#4ec9b0">✓ '+srtCues.length+' rader laddade. CC aktiverad!</div><div style="margin-top:8px; font-size:11px; color:#ccc">'+text.slice(0,120)+'...</div>';
-  setStatus('Undertexter laddade! CC aktiverad automatiskt.','info');
+  document.getElementById('subListContainer').innerHTML='<div style="color:#4ec9b0">✓ '+srtCues.length+' rader laddade. CC aktiverad! Om osynkad, klicka 🎯 Synka NU när någon pratar.</div><div style="margin-top:8px; font-size:11px; color:#ccc">'+text.slice(0,120)+'...</div>';
+  setStatus('Subs laddade! Klicka 🎯 Synka NU när dialog börjar för perfekt synk.','info');
+  var syncStatus=document.getElementById('syncStatus');
+  if(syncStatus) syncStatus.textContent='✓ '+srtCues.length+' rader. Klicka Synka NU när filmen pratar.';
 }
+
+function syncNow(){
+  if(!srtCues.length){ var s=document.getElementById('syncStatus'); if(s) s.textContent='❌ Ladda sub först!'; return; }
+  // Hitta nästa cue och synka den till nu
+  var now=Date.now()/1000 - srtStartTime;
+  var target=null;
+  // Hitta första cue som börjar efter nu, eller första om ingen
+  for(var i=0;i<srtCues.length;i++){ if(srtCues[i].start > now+0.5){ target=srtCues[i]; break; } }
+  if(!target) target=srtCues[0];
+  var newDelay = target.start - now;
+  // Sätt så target visas NU: now + delay = target.start => delay = target.start - now, men vi vill att den ska visas nu, så delay = target.start - now med minus? 
+  // Vi vill att target ska visas nu: now + delay = target.start => Vi vill att now = target.start, så vi sätter srtStartTime bakåt
+  srtStartTime = Date.now()/1000 - target.start + (parseFloat(subSettings.delay)||0);
+  // Alternativt sätt delay
+  subSettings.delay=0;
+  document.getElementById('subDelayVal').textContent='0s';
+  localStorage.setItem('kuribaxi_sub_settings', JSON.stringify(subSettings));
+  var s=document.getElementById('syncStatus');
+  if(s) s.textContent='✓ Synkad! "'+target.text.slice(0,25)+'..." visas nu.';
+  setStatus('✓ Synkad till: '+target.text.slice(0,30),'info');
+}
+
+function syncByText(txt){
+  if(!srtCues.length || !txt){ var s=document.getElementById('syncStatus'); if(s) s.textContent='❌ Skriv ett ord först'; return; }
+  var lower=txt.toLowerCase().trim();
+  var found=null;
+  for(var i=0;i<srtCues.length;i++){ if(srtCues[i].text.toLowerCase().indexOf(lower)!==-1){ found=srtCues[i]; break; } }
+  if(!found){ var s=document.getElementById('syncStatus'); if(s) s.textContent='❌ Hittade inte "'+txt+'" - prova annat ord'; return; }
+  srtStartTime = Date.now()/1000 - found.start;
+  subSettings.delay=0;
+  document.getElementById('subDelayVal').textContent='0s';
+  localStorage.setItem('kuribaxi_sub_settings', JSON.stringify(subSettings));
+  var s=document.getElementById('syncStatus');
+  if(s) s.textContent='✓ Hittade "'+found.text.slice(0,25)+'..." - synkad!';
+  setStatus('Auto-synk: '+found.text.slice(0,40),'info');
+}
+
 
 // OpenSubtitles search
 async function searchOpenSubtitles(query, lang){
@@ -472,9 +540,12 @@ document.getElementById('subSettingsBtn').addEventListener('click', function(e){
 document.getElementById('subSettingsClose').addEventListener('click', function(){ document.getElementById('subSettings').classList.remove('show'); });
 document.getElementById('subTabSubtitles').addEventListener('click', function(){ this.classList.add('active'); document.getElementById('subTabOptions').classList.remove('active'); document.getElementById('subSubtitlesContent').style.display='block'; document.getElementById('subOptionsContent').style.display='none'; });
 document.getElementById('subTabOptions').addEventListener('click', function(){ this.classList.add('active'); document.getElementById('subTabSubtitles').classList.remove('active'); document.getElementById('subOptionsContent').style.display='block'; document.getElementById('subSubtitlesContent').style.display='none'; });
-document.getElementById('delayMinus').addEventListener('click', function(){ subSettings.delay=parseFloat((subSettings.delay-0.5).toFixed(1)); document.getElementById('subDelayVal').textContent=subSettings.delay+'s'; localStorage.setItem('kuribaxi_sub_settings', JSON.stringify(subSettings)); });
-document.getElementById('delayPlus').addEventListener('click', function(){ subSettings.delay=parseFloat((subSettings.delay+0.5).toFixed(1)); document.getElementById('subDelayVal').textContent=subSettings.delay+'s'; localStorage.setItem('kuribaxi_sub_settings', JSON.stringify(subSettings)); });
-document.getElementById('subResetTiming').addEventListener('click', function(){ subSettings.delay=0; document.getElementById('subDelayVal').textContent='0s'; localStorage.setItem('kuribaxi_sub_settings', JSON.stringify(subSettings)); });
+document.getElementById('delayMinus').addEventListener('click', function(){ subSettings.delay=parseFloat((subSettings.delay-0.5).toFixed(1)); document.getElementById('subDelayVal').textContent=subSettings.delay+'s'; localStorage.setItem('kuribaxi_sub_settings', JSON.stringify(subSettings)); var s=document.getElementById('syncStatus'); if(s) s.textContent='Delay: '+subSettings.delay+'s'; });
+document.getElementById('delayPlus').addEventListener('click', function(){ subSettings.delay=parseFloat((subSettings.delay+0.5).toFixed(1)); document.getElementById('subDelayVal').textContent=subSettings.delay+'s'; localStorage.setItem('kuribaxi_sub_settings', JSON.stringify(subSettings)); var s=document.getElementById('syncStatus'); if(s) s.textContent='Delay: '+subSettings.delay+'s'; });
+document.getElementById('subResetTiming').addEventListener('click', function(){ subSettings.delay=0; srtStartTime=Date.now()/1000; document.getElementById('subDelayVal').textContent='0s'; localStorage.setItem('kuribaxi_sub_settings', JSON.stringify(subSettings)); var s=document.getElementById('syncStatus'); if(s) s.textContent='✓ Reset till 0s'; });
+document.getElementById('syncNowBtn').addEventListener('click', syncNow);
+document.getElementById('syncTextBtn').addEventListener('click', function(){ var txt=document.getElementById('syncText').value; syncByText(txt); });
+document.getElementById('syncText').addEventListener('keydown', function(e){ if(e.key==='Enter'){ syncByText(this.value); } });
 document.getElementById('subColorInput').addEventListener('input', function(e){ subSettings.color=e.target.value; applySubSettings(); localStorage.setItem('kuribaxi_sub_settings', JSON.stringify(subSettings)); });
 document.getElementById('subSizeSelect').addEventListener('change', function(e){ subSettings.sizePercent=e.target.value; subSettings.size=Math.round(18*parseInt(e.target.value)/100); applySubSettings(); localStorage.setItem('kuribaxi_sub_settings', JSON.stringify(subSettings)); });
 document.getElementById('subBgSelect').addEventListener('change', function(e){ subSettings.bg=parseInt(e.target.value); applySubSettings(); localStorage.setItem('kuribaxi_sub_settings', JSON.stringify(subSettings)); });
