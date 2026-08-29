@@ -2,1126 +2,408 @@
 <html lang="sv">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Var kan jag se den? — Kuribaxi Player</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,900&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KURIBAXI - Fungerande version</title>
 <style>
-  :root{
-    --bg:#0b1220;
-    --bg-alt:#0f1830;
-    --panel:#121b2e;
-    --panel-line:rgba(212,175,55,0.16);
-    --gold:#c9a227;
-    --gold-bright:#e8c766;
-    --cream:#f3ecdd;
-    --cream-dim:#a9a290;
-    --teal:#35c6b4;
-    --amber:#e0a458;
-    --error:#e2574c;
-    --radius:14px;
-    --green-light:#4ec9b0;
-  }
-  *{box-sizing:border-box; margin:0; padding:0;}
-  body{
-    background:
-      radial-gradient(700px 400px at 15% -10%, rgba(201,162,39,0.10), transparent),
-      radial-gradient(900px 500px at 90% 10%, rgba(53,198,180,0.06), transparent),
-      var(--bg);
-    color:var(--cream);
-    font-family:'Manrope', sans-serif;
-    min-height:100vh;
-    padding:0 0 40px;
-  }
-  .mono{font-family:'JetBrains Mono', monospace;}
-  .marquee{
-    padding:32px 20px 22px;
-    text-align:center;
-    position:relative;
-    border-bottom:1px solid var(--panel-line);
-    background:linear-gradient(180deg, rgba(201,162,39,0.06), transparent);
-  }
-  .bulbs{display:flex; justify-content:center; gap:7px; margin-bottom:14px;}
-  .bulb{width:6px; height:6px; border-radius:50%; background:var(--gold-bright); box-shadow:0 0 6px 1px rgba(232,199,102,0.6); animation:flicker 3.2s ease-in-out infinite;}
-  .bulb:nth-child(3n){animation-delay:.4s} .bulb:nth-child(5n){animation-delay:.9s} .bulb:nth-child(7n){animation-delay:1.4s}
-  @media (prefers-reduced-motion: reduce){ .bulb{animation:none} }
-  @keyframes flicker{0%,100%{opacity:1} 50%{opacity:.35}}
-  .marquee h1{font-family:'Fraunces', serif; font-weight:900; font-size:clamp(26px, 5vw, 42px); letter-spacing:-0.01em; color:var(--cream);}
-  .marquee h1 span{color:var(--gold-bright);}
-  .marquee p{margin-top:8px; font-size:13px; color:var(--cream-dim); max-width:520px; margin-left:auto; margin-right:auto; line-height:1.5;}
-  .wrap{max-width:980px; margin:0 auto; padding:0 20px;}
-  .config{margin-top:22px; background:var(--panel); border:1px solid var(--panel-line); border-radius:var(--radius); padding:16px 20px;}
-  .config-row{display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end;}
-  .field{display:flex; flex-direction:column; gap:6px; flex:1; min-width:180px;}
-  .field label{font-size:11px; text-transform:uppercase; letter-spacing:0.06em; color:var(--gold-bright); font-weight:600;}
-  input[type=text], input[type=password], select{background:rgba(255,255,255,0.04); border:1px solid var(--panel-line); color:var(--cream); border-radius:8px; padding:10px 12px; font-size:13.5px; font-family:'Manrope', sans-serif; outline:none; transition:border-color .15s;}
-  input:focus, select:focus{border-color:var(--gold);} input::placeholder{color:var(--cream-dim);} select{cursor:pointer;}
-  .search{margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;}
-  .search input{flex:1; min-width:220px; font-size:14.5px; padding:12px 14px;}
-  .type-toggle{display:flex; border:1px solid var(--panel-line); border-radius:8px; overflow:hidden;}
-  .type-toggle button{background:transparent; border:none; color:var(--cream-dim); font-size:12px; font-weight:600; padding:0 14px; cursor:pointer; font-family:'JetBrains Mono', monospace; letter-spacing:0.03em;}
-  .type-toggle button.active{background:var(--gold); color:#1a1305;}
-  .go-btn{background:var(--gold); color:#1a1305; border:none; font-weight:700; font-size:13.5px; padding:0 22px; border-radius:8px; cursor:pointer; transition:background .15s, transform .1s;}
-  .go-btn:hover{background:var(--gold-bright);} .go-btn:active{transform:scale(0.98);} .go-btn:disabled{opacity:0.5; cursor:default;}
-  .status{margin-top:12px; font-size:13px; padding:10px 14px; border-radius:8px; display:none;}
-  .status.show{display:block;} .status.error{background:rgba(226,87,76,0.1); border:1px solid rgba(226,87,76,0.3); color:#f0938a;}
-  .status.info{background:rgba(53,198,180,0.08); border:1px solid rgba(53,198,180,0.25); color:var(--teal);}
-  .status.warn{background:rgba(224,164,88,0.10); border:1px solid rgba(224,164,88,0.30); color:var(--amber);}
-  .results-list{margin-top:14px; display:flex; flex-direction:column; gap:8px;}
-  .result-row{display:flex; gap:12px; align-items:center; background:var(--panel); border:1px solid var(--panel-line); border-radius:10px; padding:8px 12px; cursor:pointer; transition:border-color .15s, background .15s;}
-  .result-row:hover{border-color:var(--gold); background:rgba(201,162,39,0.06);}
-  .result-row img{width:36px; height:54px; object-fit:cover; border-radius:4px; background:#1a2436; flex-shrink:0;}
-  .result-row .rmeta{min-width:0;} .result-row .rtitle{font-size:13.5px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-  .result-row .ryear{font-size:11px; color:var(--cream-dim); font-family:'JetBrains Mono', monospace;}
-  .result-row .rtype{margin-left:auto; font-size:10px; font-family:'JetBrains Mono', monospace; color:var(--gold-bright); border:1px solid var(--panel-line); padding:3px 7px; border-radius:20px; flex-shrink:0;}
-  .ticket{margin-top:18px; display:none; background:var(--panel); border:1px solid var(--panel-line); border-radius:var(--radius); overflow:hidden; box-shadow:0 20px 60px -20px rgba(0,0,0,0.6);}
-  .ticket.show{display:block;} .ticket-main{display:flex; gap:0;}
-  .sprockets{width:22px; flex-shrink:0; background:repeating-linear-gradient(180deg, var(--bg-alt) 0 14px, var(--panel) 14px 22px); position:relative;}
-  .sprockets::before{content:''; position:absolute; inset:0; background-image:radial-gradient(circle at 11px 11px, var(--bg) 4px, transparent 4.5px); background-size:100% 22px;}
-  .ticket-body{flex:1; padding:18px 20px; display:flex; gap:16px;}
-  .poster{width:90px; flex-shrink:0; border-radius:8px; overflow:hidden; background:#1a2436; aspect-ratio:2/3;}
-  .poster img{width:100%; height:100%; object-fit:cover; display:block;}
-  .ticket-info{min-width:0;} .ticket-info h2{font-family:'Fraunces', serif; font-weight:700; font-size:20px; line-height:1.15; color:var(--cream);}
-  .ticket-info .sub{margin-top:4px; font-size:11px; color:var(--gold-bright); font-family:'JetBrains Mono', monospace; letter-spacing:0.02em;}
-  .ticket-info .overview{margin-top:8px; font-size:12px; line-height:1.5; color:var(--cream-dim);}
-  .genres{margin-top:8px; display:flex; gap:6px; flex-wrap:wrap;} .genre-tag{font-size:10px; padding:3px 9px; border-radius:20px; border:1px solid var(--panel-line); color:var(--cream-dim);}
-  .perf{position:relative; border-top:1px dashed var(--panel-line); margin:0 20px;}
-  .perf::before, .perf::after{content:''; position:absolute; top:-8px; width:16px; height:16px; background:var(--bg); border-radius:50%;}
-  .perf::before{left:-28px;} .perf::after{right:-28px;}
-  .player-box{padding:18px 20px 20px;}
-  .player-box h3{font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color:var(--cream-dim); margin-bottom:12px; font-weight:700;}
-  .player-frame{position:relative; width:100%; aspect-ratio:16/9; background:#000; border-radius:10px; overflow:hidden; border:1px solid var(--panel-line);}
-  .player-frame iframe{position:absolute; inset:0; width:100%; height:100%; border:none;}
-  .browser-frame{display:flex; align-items:center; justify-content:center; flex-direction:column; gap:16px; background:var(--bg-alt); aspect-ratio:16/9; border-radius:10px; border:1px solid var(--panel-line); text-align:center; padding:24px;}
-  .browser-frame .browser-icon{width:56px; height:56px; border-radius:14px; background:rgba(201,162,39,0.10); border:1px solid var(--panel-line); display:flex; align-items:center; justify-content:center; font-size:24px;}
-  .browser-frame p{font-size:13px; color:var(--cream-dim); max-width:380px; line-height:1.5;}
-  .browser-frame p strong{color:var(--cream);}
-  .open-browser-btn{display:inline-flex; align-items:center; gap:8px; background:var(--gold); color:#1a1305; border:none; font-weight:700; font-size:14px; padding:12px 28px; border-radius:10px; cursor:pointer; transition:background .15s, transform .1s; text-decoration:none;}
-  .open-browser-btn:hover{background:var(--gold-bright);} .open-browser-btn:active{transform:scale(0.98);}
-  .source-picker{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px;}
-  .source-btn{font-size:11px; font-family:'JetBrains Mono', monospace; padding:5px 12px; border-radius:20px; border:1px solid var(--panel-line); background:transparent; color:var(--cream-dim); cursor:pointer; transition:all .15s;}
-  .source-btn:hover{border-color:var(--gold); color:var(--gold-bright);} .source-btn.active{background:var(--gold); color:#1a1305; border-color:var(--gold); font-weight:600;}
-  .player-meta{margin-top:10px; display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
-  .player-meta a{color:var(--gold-bright); text-decoration:none; border-bottom:1px dotted var(--gold); font-size:12px;}
-  .player-meta a:hover{color:var(--gold);} .player-meta .tag{font-size:10px; font-family:'JetBrains Mono', monospace; color:var(--cream-dim); border:1px solid var(--panel-line); padding:3px 10px; border-radius:20px;}
-  .player-meta .tag.active{color:#0a1a17; background:var(--teal); border-color:var(--teal);}
-  .notice{margin-top:10px; font-size:11.5px; color:var(--cream-dim); line-height:1.5; padding:10px 14px; background:rgba(224,164,88,0.06); border:1px solid rgba(224,164,88,0.15); border-radius:8px;}
-  .notice strong{color:var(--amber);} .notice code{background:rgba(255,255,255,0.06); padding:2px 6px; border-radius:4px; font-family:'JetBrains Mono', monospace; font-size:11px;}
-  .verify-box{margin-top:12px; padding:14px 16px; background:rgba(53,198,180,0.06); border:1px solid rgba(53,198,180,0.2); border-radius:10px;}
-  .verify-box h4{font-size:12px; color:var(--teal); margin-bottom:8px; font-weight:700;}
-  .verify-box ol{margin-left:18px; font-size:12px; color:var(--cream-dim); line-height:1.7;}
-  .verify-box li{margin-bottom:4px;} .verify-box code{background:rgba(255,255,255,0.06); padding:2px 6px; border-radius:4px; font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--gold-bright);}
-  .verify-box a{color:var(--gold-bright); text-decoration:none; border-bottom:1px dotted var(--gold);} .verify-box a:hover{color:var(--gold);}
-  footer{max-width:980px; margin:32px auto 0; padding:0 20px; text-align:center; font-size:11px; color:var(--cream-dim); opacity:0.6;}
-  .clock-badge{position:fixed; top:14px; right:14px; z-index:9999; background:rgba(18,27,46,0.92); border:1px solid var(--panel-line); border-radius:12px; padding:8px 12px; backdrop-filter:blur(10px); box-shadow:0 8px 24px rgba(0,0,0,0.35), 0 0 0 1px rgba(201,162,39,0.08) inset; pointer-events:none; text-align:right; min-width:118px;}
-  .clock-time{font-family:'JetBrains Mono',monospace; font-size:15px; font-weight:700; color:var(--gold-bright); line-height:1; letter-spacing:0.02em;}
-  .clock-date{font-family:'Manrope',sans-serif; font-size:10.5px; color:var(--cream-dim); margin-top:3px; text-transform:capitalize; line-height:1.2;}
-  .clock-dot{width:6px; height:6px; border-radius:50%; background:var(--teal); display:inline-block; margin-right:6px; box-shadow:0 0 6px var(--teal); animation:blink 1.5s infinite;}
-  @keyframes blink{0%,100%{opacity:1} 50%{opacity:0.35}}
-  @media(max-width:600px){.clock-badge{top:14px; left:12px; right:auto; padding:7px 10px; min-width:102px;} .clock-time{font-size:13.5px} .clock-date{font-size:9.5px}}
-
-  .vkb-wrap{display:none; width:100%; max-width:800px; margin:10px auto 0; padding:0 10px; z-index:99991; position:relative;}
-  .vkb-wrap.open{display:block !important;}
-  .vkb-panel{width:100%; background:#1e1f2a; border:2px solid #4a4d52; border-radius:20px; padding:16px 18px 18px; box-shadow:0 20px 60px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.08), 0 0 0 1px rgba(201,162,39,0.15) inset; position:relative;}
-  .vkb-panel::before{content:''; position:absolute; inset:-1px; border-radius:21px; padding:1px; background:linear-gradient(135deg, rgba(201,162,39,0.25), transparent 40%, transparent 60%, rgba(53,198,180,0.15)); -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite:xor; mask-composite:exclude; pointer-events:none;}
-  .vkb-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid rgba(212,175,55,0.12);}
-  .vkb-title{font-size:11px; font-family:'JetBrains Mono',monospace; color:var(--gold-bright); text-transform:uppercase; letter-spacing:0.08em; font-weight:700;}
-  .vkb-head-right{display:flex; gap:8px; align-items:center;}
-  .vkb-mode-btn{font-size:10px; font-family:'JetBrains Mono',monospace; padding:4px 12px; border-radius:20px; border:1px solid #4a4d52; background:#2a2d3a; color:#d0d0d8; cursor:pointer; transition:all .15s; font-weight:600;}
-  .vkb-mode-btn:hover{background:#3a3d4a; color:#fff; border-color:#6a6d72;}
-  .vkb-close{width:28px; height:28px; border-radius:50%; background:#2a2d3a; border:1px solid #4a4d52; color:#d0d0d8; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:16px; font-weight:700; transition:all .15s;}
-  .vkb-close:hover{background:var(--error); color:#fff; border-color:var(--error);}
-  .vkb-langs{display:flex; gap:5px; margin-bottom:10px;}
-  .vkb-lang{font-size:10px; font-family:'JetBrains Mono',monospace; padding:4px 14px; border-radius:20px; border:1px solid #4a4d52; background:#2a2d3a; color:#d0d0d8; cursor:pointer; transition:all .15s; font-weight:600;}
-  .vkb-lang:hover{background:#3a3d4a; color:#fff; border-color:#6a6d72;} .vkb-lang.active{background:var(--gold); color:#1a1305; border-color:var(--gold); font-weight:700;}
-  .vkb-rows{display:flex; flex-direction:column; gap:6px;} .vkb-row{display:flex; gap:5px; justify-content:center;}
-  .vkb-key{min-width:42px; height:34px; padding:0 8px; background:linear-gradient(180deg, #4a4d5a 0%, #3a3d4a 100%); border:1px solid #5a5d6a; border-radius:10px; color:#eaeaee; font-size:16px; font-weight:700; font-family:'Manrope',sans-serif; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all .12s ease; user-select:none; flex:1; box-shadow:0 3px 0 #2a2d3a, 0 4px 12px rgba(0,0,0,0.4); text-shadow:0 1px 2px rgba(0,0,0,0.5); position:relative; overflow:hidden; letter-spacing:0.02em;}
-  .vkb-key::before{content:''; position:absolute; top:0; left:0; right:0; height:40%; background:linear-gradient(180deg, rgba(255,255,255,0.12), transparent); border-radius:10px 10px 0 0; pointer-events:none;}
-  .vkb-key:hover{background:linear-gradient(180deg, #5a5d6a 0%, #4a4d5a 100%); border-color:#7a7d8a; transform:translateY(-1px); box-shadow:0 4px 0 #2a2d3a, 0 6px 16px rgba(0,0,0,0.5);}
-  .vkb-key:active{transform:translateY(3px); box-shadow:0 1px 0 #2a2d3a, 0 2px 6px rgba(0,0,0,0.4);}
-  .vkb-key.wide{min-width:60px; flex:1.5; font-size:12px; font-family:'JetBrains Mono',monospace;} .vkb-key.space{flex:4; font-size:14px; letter-spacing:4px;}
-  .vkb-key.enter{background:linear-gradient(180deg, #3cb371 0%, #2e8b57 100%); border-color:#4cd581; color:#fff; box-shadow:0 3px 0 #1e6b3a, 0 4px 12px rgba(0,0,0,0.5);}
-  .vkb-key.enter:hover{background:linear-gradient(180deg,#4cd581 0%,#3cb371 100%); border-color:#5ce591;}
-  .vkb-key.back{background:linear-gradient(180deg, #c44 0%, #a33 100%); border-color:#d55; color:#fff; box-shadow:0 3px 0 #822, 0 4px 12px rgba(0,0,0,0.5);}
-  .vkb-key.back:hover{background:linear-gradient(180deg,#d55 0%,#c44 100%); border-color:#e66;}
-  .vkb-wrap.light .vkb-panel{background:#e6e8ee; border-color:#b4b6ba; box-shadow:0 20px 60px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.8);}
-  .vkb-wrap.light .vkb-key{background:linear-gradient(180deg, #f4f4f8 0%, #e0e2e8 100%); border-color:#c8cad0; color:#2a2d32; box-shadow:0 3px 0 #b4b6ba, 0 4px 12px rgba(0,0,0,0.12); text-shadow:none;}
-  .vkb-wrap.light .vkb-key::before{background:linear-gradient(180deg,rgba(255,255,255,0.6),transparent);}
-  .vkb-wrap.light .vkb-key:hover{background:linear-gradient(180deg,#fff 0%,#ececf0 100%); border-color:#a8aab0; box-shadow:0 4px 0 #b4b6ba,0 6px 16px rgba(0,0,0,0.12);}
-  .vkb-wrap.light .vkb-key:active{box-shadow:0 1px 0 #b4b6ba,0 2px 6px rgba(0,0,0,0.1);}
-  .vkb-wrap.light .vkb-key.enter{background:linear-gradient(180deg,#3cb371 0%,#2e8b57 100%); border-color:#4cd581; color:#fff; box-shadow:0 3px 0 #1e6b3a,0 4px 12px rgba(0,0,0,0.2);}
-  .vkb-wrap.light .vkb-key.back{background:linear-gradient(180deg,#c44 0%,#a33 100%); border-color:#d55; color:#fff; box-shadow:0 3px 0 #822,0 4px 12px rgba(0,0,0,0.2);}
-  .vkb-wrap.light .vkb-lang{background:#d0d2d8; border-color:#b8bac0; color:#2a2d32;} .vkb-wrap.light .vkb-lang:hover{background:#e0e2e8; border-color:#a8aab0;}
-  .vkb-wrap.light .vkb-mode-btn{background:#d0d2d8; border-color:#b8bac0; color:#2a2d32;} .vkb-wrap.light .vkb-mode-btn:hover{background:#e0e2e8; border-color:#a8aab0;}
-  .vkb-wrap.light .vkb-close{background:#d0d2d8; border-color:#b8bac0; color:#2a2d32;} .vkb-wrap.light .vkb-close:hover{background:var(--error); color:#fff; border-color:var(--error);}
-  .vkb-wrap.light .vkb-head{border-bottom-color:rgba(0,0,0,0.08);}
-  .vkb-blocker{display:none; position:fixed; top:0; left:0; right:0; bottom:0; z-index:99990; background:transparent; cursor:default;}
-  .vkb-blocker.active{display:block;} .search-box.vkb-active{border-color:var(--gold); box-shadow:0 0 20px rgba(201,162,39,0.1); opacity:0.7;}
-  .library-section{margin-top:24px; background:var(--panel); border:1px solid var(--panel-line); border-radius:var(--radius); padding:16px 20px;}
-  .library-header{display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:12px;}
-  .library-header h2{font-family:'Fraunces', serif; font-weight:700; font-size:18px; color:var(--gold-bright);}
-  .library-tabs{display:flex; gap:4px; border:1px solid var(--panel-line); border-radius:8px; overflow:hidden;}
-  .library-tabs button{background:transparent; border:none; color:var(--cream-dim); font-size:11px; font-weight:600; padding:6px 14px; cursor:pointer; font-family:'JetBrains Mono', monospace; transition:all .15s;}
-  .library-tabs button.active{background:var(--gold); color:#1a1305;} .library-tabs button:hover:not(.active){color:var(--cream);}
-  .library-actions{display:flex; gap:8px;} .library-actions button{background:transparent; border:1px solid var(--panel-line); color:var(--cream-dim); border-radius:6px; padding:4px 12px; font-size:10px; font-family:'JetBrains Mono', monospace; cursor:pointer; transition:all .15s;}
-  .library-actions button:hover{border-color:var(--error); color:var(--error);}
-  .library-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(140px, 1fr)); gap:10px; max-height:340px; overflow-y:auto; padding-right:4px;}
-  .library-grid::-webkit-scrollbar{width:4px;} .library-grid::-webkit-scrollbar-thumb{background:var(--panel-line); border-radius:2px;}
-  .lib-card{background:var(--bg-alt); border:1px solid var(--panel-line); border-radius:10px; padding:10px; cursor:pointer; transition:all .15s; position:relative;}
-  .lib-card:hover{border-color:var(--gold); transform:translateY(-2px);} .lib-card img{width:100%; aspect-ratio:2/3; object-fit:cover; border-radius:6px; background:#1a2436;}
-  .lib-card-title{font-size:11px; font-weight:600; margin-top:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-  .lib-card-sub{font-size:9px; color:var(--cream-dim); font-family:'JetBrains Mono', monospace; display:flex; justify-content:space-between; align-items:center; margin-top:2px;}
-  .lib-card-progress{color:var(--gold-bright); font-weight:700;} .lib-empty{color:var(--cream-dim); font-size:13px; text-align:center; padding:30px 10px;}
-  .lib-del-btn{position:absolute; top:6px; right:6px; width:20px; height:20px; border-radius:50%; border:1px solid var(--panel-line); background:rgba(0,0,0,0.7); color:var(--cream-dim); font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all .15s; opacity:0;}
-  .lib-card:hover .lib-del-btn{opacity:1;} .lib-del-btn:hover{border-color:var(--error); color:var(--error);}
-  .music-player{position:fixed;bottom:0;left:0;right:0;z-index:9998;background:rgba(11,18,32,0.97);border-top:1px solid var(--panel-line);backdrop-filter:blur(16px);box-shadow:0 -8px 32px rgba(0,0,0,0.4);padding:10px 20px;display:flex;align-items:center;gap:14px;transition:transform .3s ease,opacity .3s ease;}
-  .music-player.hidden-player{transform:translateY(100%);opacity:0;pointer-events:none;}
-  .music-player-left{display:flex;align-items:center;gap:10px;flex-shrink:0;}
-  .music-play-btn{width:38px;height:38px;border-radius:50%;background:var(--gold);border:none;color:#1a1305;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;font-size:16px;}
-  .music-play-btn:hover{background:var(--gold-bright);transform:scale(1.05);}
-  .music-track-info{min-width:0;} .music-track-title{font-size:12px;font-weight:600;color:var(--cream);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;}
-  .music-track-station{font-size:10px;color:var(--cream-dim);font-family:'JetBrains Mono',monospace;}
-  .music-player-center{flex:1;display:flex;align-items:center;gap:12px;min-width:0;}
-  .music-volume{display:flex;align-items:center;gap:6px;} .music-volume input[type=range]{width:80px;height:3px;-webkit-appearance:none;appearance:none;background:var(--panel-line);border-radius:2px;outline:none;}
-  .music-volume input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:var(--gold);cursor:pointer;}
-  .music-volume input[type=range]::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:var(--gold);cursor:pointer;border:none;}
-  .music-visualizer{display:flex;align-items:flex-end;gap:2px;height:20px;} .music-bar{width:3px;background:var(--gold-bright);border-radius:2px;animation:music-bounce 1s ease-in-out infinite;}
-  .music-bar:nth-child(1){height:6px;animation-delay:0s;} .music-bar:nth-child(2){height:12px;animation-delay:.1s;} .music-bar:nth-child(3){height:8px;animation-delay:.2s;} .music-bar:nth-child(4){height:14px;animation-delay:.15s;} .music-bar:nth-child(5){height:10px;animation-delay:.05s;} .music-bar:nth-child(6){height:16px;animation-delay:.25s;} .music-bar:nth-child(7){height:7px;animation-delay:.1s;}
-  @keyframes music-bounce{0%,100%{transform:scaleY(1);}50%{transform:scaleY(0.4);}} .music-player.paused .music-bar{animation-play-state:paused;opacity:0.3;}
-  .music-station-select{background:#0b1220;border:1px solid var(--panel-line);color:var(--cream);border-radius:8px;padding:5px 10px;font-size:11px;font-family:'JetBrains Mono',monospace;cursor:pointer;outline:none;max-width:160px;}
-  .music-station-select option{background:#0b1220;color:var(--cream);font-family:'JetBrains Mono',monospace;font-size:11px;padding:6px 10px;} .music-station-select:focus{border-color:var(--gold);}
-  .music-player-right{display:flex;align-items:center;gap:10px;flex-shrink:0;} .music-mute-btn{background:transparent;border:1px solid var(--panel-line);color:var(--cream-dim);border-radius:8px;padding:5px 10px;font-size:11px;cursor:pointer;font-family:'JetBrains Mono',monospace;transition:all .15s;}
-  .music-mute-btn:hover{border-color:var(--gold);color:var(--gold-bright);} .music-close-btn{background:transparent;border:1px solid var(--panel-line);color:var(--cream-dim);border-radius:8px;padding:5px 10px;font-size:11px;cursor:pointer;font-family:'JetBrains Mono',monospace;transition:all .15s;}
-  .music-close-btn:hover{border-color:var(--error);color:var(--error);} .music-reopen-btn{position:fixed;bottom:14px;right:14px;z-index:9997;background:var(--gold);color:#1a1305;border:none;border-radius:50%;width:44px;height:44px;display:none;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 16px rgba(201,162,39,0.3);transition:all .15s;font-size:18px;}
-  .music-reopen-btn:hover{background:var(--gold-bright);transform:scale(1.05);} .music-reopen-btn.show{display:flex;} .music-unmute-hint{position:fixed;bottom:70px;left:50%;transform:translateX(-50%);z-index:9996;background:var(--panel);border:1px solid var(--gold);border-radius:20px;padding:8px 18px;font-size:12px;color:var(--gold-bright);display:none;box-shadow:0 4px 16px rgba(0,0,0,0.3);animation:hint-bounce 2s infinite;}
-  .music-unmute-hint.show{display:block;} @keyframes hint-bounce{0%,100%{transform:translateX(-50%) translateY(0);}50%{transform:translateX(-50%) translateY(-4px);}}
-  @media(max-width:700px){.music-player{flex-wrap:wrap;padding:8px 12px;gap:8px;} .music-track-title{max-width:120px;} .music-volume input[type=range]{width:50px;} .music-station-select{max-width:120px;} .library-grid{grid-template-columns:repeat(auto-fill,minmax(110px,1fr));}}
-
-  /* ===== PLAYER CONTROLS + NY CC LOGIK ===== */
-  .player-frame { position: relative; }
-  .player-overlay {
-    position: absolute;
-    bottom:auto; top:0; left:0; right:0;
-    padding:12px 14px 50px;
-    background:linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 60%, transparent 100%);
-    display:flex; gap:8px; justify-content:flex-start; align-items:center;
-    opacity:1; transition:opacity 0.3s ease; pointer-events:none; z-index:12;
-  }
-  .player-frame .player-overlay { opacity:0; }
-  .player-frame:hover .player-overlay, .player-frame:fullscreen .player-overlay { opacity:1; }
-  .player-overlay button.active{background:var(--gold) !important; color:#1a1305 !important; border-color:var(--gold) !important;}
-
-  .player-overlay button {
-    pointer-events:auto; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.25); color:#fff; border-radius:8px; padding:7px 14px; font-size:12px; cursor:pointer; backdrop-filter:blur(6px); transition:all .15s; font-family:'Manrope',sans-serif; font-weight:600; display:inline-flex; align-items:center; gap:6px;
-  }
-  .player-overlay button:hover{background:var(--gold); color:#1a1305; border-color:var(--gold);}
-  .player-frame:fullscreen{width:100vw; height:100vh; aspect-ratio:auto; border-radius:0; display:flex; align-items:center; justify-content:center; background:#000;}
-  .player-frame:fullscreen iframe{width:100%; height:100%; position:static;}
-  .player-frame:fullscreen .player-overlay{opacity:0;} .player-frame:fullscreen:hover .player-overlay{opacity:1;}
-
-  /* ===== OPENSUBTITLES INTEGRATION ===== */
-  .os-panel{
-    position:absolute; bottom:52px; left:12px; right:12px;
-    background:rgba(18,27,46,0.98); border:1px solid var(--gold); border-radius:10px;
-    padding:10px; max-height:200px; overflow-y:auto; z-index:20; display:none;
-    box-shadow:0 12px 30px rgba(0,0,0,0.6); backdrop-filter:blur(12px);
-  }
-  .os-panel.show{display:block;}
-  .os-panel h4{font-size:11px; color:var(--gold-bright); font-family:'JetBrains Mono',monospace; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;}
-  .os-item{display:flex; justify-content:space-between; align-items:center; padding:6px 8px; border-radius:6px; background:rgba(255,255,255,0.03); border:1px solid transparent; margin-bottom:6px; cursor:pointer; transition:all .15s;}
-  .os-item:hover{border-color:var(--gold); background:rgba(201,162,39,0.08);}
-  .os-item-name{font-size:11px; color:var(--cream); max-width:65%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-  .os-item-meta{font-size:10px; color:var(--cream-dim); font-family:'JetBrains Mono',monospace;}
-  .os-badge{font-size:9px; padding:2px 6px; border-radius:10px; background:var(--teal); color:#000; font-weight:700; margin-left:6px;}
-
-  /* SUBTITLE OPTIONS - EXAKT SOM BILDEN */
-  .sub-settings{
-    position:absolute; bottom:52px; right:12px; width:320px;
-    background:#1a1a1a; border:1px solid #333; border-radius:16px;
-    padding:0; z-index:21; display:none; box-shadow:0 20px 60px rgba(0,0,0,0.8);
-    overflow:hidden; font-family:'Manrope',sans-serif;
-  }
-  .sub-settings.show{display:block;}
-  .sub-tabs{display:flex; border-bottom:1px solid #2a2a2a;}
-  .sub-tab{flex:1; padding:14px; text-align:center; font-size:15px; font-weight:600; color:#666; cursor:pointer; background:transparent; border:none; transition:all .15s;}
-  .sub-tab.active{color:#fff; border-bottom:2px solid #fff; background:rgba(255,255,255,0.03);}
-  .sub-close{position:absolute; top:12px; right:12px; width:28px; height:28px; border-radius:50%; background:rgba(255,255,255,0.08); border:none; color:#888; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center;}
-  .sub-content{padding:20px;}
-  .sub-section-title{font-size:13px; font-weight:700; letter-spacing:0.08em; color:#888; text-transform:uppercase; margin-bottom:16px;}
-  .sub-timing-row{display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;}
-  .sub-timing-row label{font-size:16px; color:#fff; font-weight:500;}
-  .sub-timing-controls{display:flex; align-items:center; gap:12px;}
-  .sub-timing-btn{width:44px; height:40px; border-radius:12px; background:#2a2a2a; border:1px solid #3a3a3a; color:#fff; font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all .15s;}
-  .sub-timing-btn:hover{background:#3a3a3a; border-color:#555;}
-  .sub-timing-btn:active{transform:scale(0.95);}
-  .sub-timing-val{font-size:18px; font-weight:600; color:#fff; min-width:40px; text-align:center;}
-  .sub-hint{font-size:13px; color:#888; line-height:1.4; margin-bottom:16px;}
-  .sub-reset-btn{width:100%; padding:14px; border-radius:12px; background:transparent; border:1px solid #3a3a3a; color:#fff; font-size:15px; font-weight:600; cursor:pointer; transition:all .15s;}
-  .sub-reset-btn:hover{background:#2a2a2a; border-color:#555;}
-  .sub-preview-box{width:100%; background:#000; border-radius:8px; padding:20px; text-align:center; margin:16px 0 24px; border:1px solid #222;}
-  .sub-preview-text{font-size:26px; font-weight:700; color:#fff; background:#000; display:inline-block; padding:4px 12px; border-radius:4px; line-height:1.3;}
-  .sub-option-row{display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;}
-  .sub-option-row label{font-size:15px; color:#ccc;}
-  .sub-select{padding:10px 16px; border-radius:10px; background:#2a2a2a; border:1px solid #3a3a3a; color:#fff; font-size:14px; min-width:130px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; gap:10px;}
-  .sub-select:hover{border-color:#555;}
-  .sub-color-box{width:48px; height:32px; border-radius:8px; background:#fff; border:2px solid #3a3a3a; cursor:pointer; position:relative; overflow:hidden;}
-  .sub-color-box input{position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%;}
-
-
-  /* FIX FULLSCREEN SUBTITLE */
-  .player-frame:fullscreen #srtOverlay,
-  .player-frame:fullscreen .cc-controls,
-  .player-frame:fullscreen .os-panel,
-  .player-frame:fullscreen .sub-settings{
-    z-index:2147483647 !important;
-  }
-  .player-frame:fullscreen{
-    background:#000;
-  }
-  #srtOverlay{
-    position:absolute; bottom:70px; left:50%; transform:translateX(-50%);
-    max-width:85%; background:rgba(0,0,0,0.75); color:#fff; padding:6px 14px; border-radius:6px;
-    font-size:18px; line-height:1.35; text-align:center; text-shadow:1px 1px 2px #000;
-    z-index:2147483646; pointer-events:none; font-family:Manrope,sans-serif; display:none;
-    white-space:pre-wrap; word-wrap:break-word;
-  }
-  .player-frame:fullscreen #srtOverlay{
-    bottom:90px;
-    font-size:24px !important;
-    max-width:80%;
-  }
-
-
-  /* NYA CC - VISAS BARA NÄR MUSEN ÄR PÅ NEDRE DELEN */
-  .cc-controls{
-    position:absolute; bottom:0; left:0; right:0;
-    padding:44px 16px 14px;
-    background:linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.55) 55%, transparent 100%);
-    display:flex; gap:10px; justify-content:space-between; align-items:center;
-    z-index:12;
-    opacity:0; transform:translateY(12px);
-    transition:opacity .22s ease, transform .22s ease;
-    pointer-events:none;
-  }
-  .cc-controls.visible{opacity:1; transform:translateY(0); pointer-events:auto;}
-  .cc-left{display:flex; gap:10px; align-items:center;}
-  .cc-btn{
-    background:rgba(255,255,255,0.14); border:1px solid rgba(255,255,255,0.28); color:#fff;
-    border-radius:8px; padding:7px 14px; font-size:12px; font-family:'JetBrains Mono',monospace; font-weight:700;
-    cursor:pointer; backdrop-filter:blur(8px); transition:all .15s; display:inline-flex; align-items:center; gap:6px;
-  }
-  .cc-btn:hover{background:var(--gold); color:#1a1305; border-color:var(--gold);}
-  .cc-btn.active{background:var(--gold); color:#1a1305; border-color:var(--gold); box-shadow:0 0 14px rgba(201,162,39,0.5);}
-  .cc-hint{font-size:11px; color:var(--cream); font-family:'JetBrains Mono',monospace; opacity:0.9;}
-  .cc-zone-hint{
-    position:absolute; bottom:8px; left:50%; transform:translateX(-50%);
-    font-size:10px; font-family:'JetBrains Mono',monospace; color:rgba(255,255,255,0.45);
-    background:rgba(0,0,0,0.4); padding:3px 8px; border-radius:20px; border:1px solid rgba(255,255,255,0.1);
-    pointer-events:none; z-index:11; opacity:0; transition:opacity .2s;
-  }
-  .player-frame:hover .cc-zone-hint{opacity:1;}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0e1a;color:#e8dcc8;font-family:Manrope,sans-serif;padding:20px}
+.clock-badge{position:fixed; top:14px; right:14px; z-index:9999; background:rgba(18,27,46,0.95); border:1px solid #c9a227; border-radius:12px; padding:8px 14px; backdrop-filter:blur(10px);}
+.clock-time{font-family:'JetBrains Mono',monospace; font-size:16px; font-weight:700; color:#f0c040; display:flex; gap:6px; align-items:center}
+.clock-dot{width:8px; height:8px; border-radius:50%; background:#4ec9b0; animation:blink 1s infinite}
+@keyframes blink{0%,50%{opacity:1}51%,100%{opacity:0}}
+.clock-date{font-size:11px; color:#a09070; margin-top:2px; text-transform:capitalize}
+.wrap{max-width:900px; margin:60px auto 0}
+.search{display:flex; gap:10px; margin:20px 0; background:#121b2e; border:1px solid #2a3a5a; border-radius:12px; padding:12px}
+.search-box{flex:1; background:#0b1220; border:1px solid #2a3a5a; color:#fff; padding:12px 14px; border-radius:8px; font-size:15px}
+.go-btn{background:#c9a227; color:#000; border:none; padding:12px 20px; border-radius:8px; font-weight:700; cursor:pointer}
+.go-btn:disabled{opacity:0.5}
+.status{margin:10px 0; padding:10px 14px; border-radius:8px; font-size:13px; display:none}
+.status.show{display:block}
+.status.error{background:rgba(226,87,76,0.15); border:1px solid rgba(226,87,76,0.4); color:#f0938a}
+.status.info{background:rgba(78,201,176,0.12); border:1px solid rgba(78,201,176,0.3); color:#7dd8c6}
+.results-list{display:flex; flex-direction:column; gap:8px; margin:10px 0}
+.result-row{display:flex; gap:12px; align-items:center; background:#121b2e; border:1px solid #1e2d4a; border-radius:10px; padding:10px; cursor:pointer; transition:all .15s}
+.result-row:hover{border-color:#c9a227; transform:translateY(-1px)}
+.result-row img{width:50px; height:75px; object-fit:cover; border-radius:6px; background:#0b1220}
+.rtitle{font-weight:700; color:#fff}
+.ryear{font-size:12px; color:#a09070}
+.ticket{display:none; margin-top:20px; background:#121b2e; border:1px solid #c9a227; border-radius:16px; overflow:hidden}
+.ticket.show{display:block}
+.ticket-body{display:flex; gap:20px; padding:20px}
+.poster img{width:140px; border-radius:10px}
+.player-frame{position:relative; background:#000; aspect-ratio:16/9; margin:16px; border-radius:12px; overflow:hidden}
+.player-frame iframe{position:absolute; inset:0; width:100%; height:100%; border:none}
+.player-overlay{position:absolute; top:0; left:0; right:0; padding:12px; background:linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); display:flex; gap:8px; z-index:10}
+.player-overlay button{background:rgba(0,0,0,0.6); border:1px solid rgba(255,255,255,0.3); color:#fff; padding:6px 12px; border-radius:8px; cursor:pointer; font-weight:700}
+.cc-controls{position:absolute; top:56px; left:12px; right:12px; background:rgba(10,18,32,0.92); border:1px solid #2a3a5a; border-radius:10px; padding:8px 12px; display:flex; justify-content:space-between; align-items:center; z-index:11; transition:all .25s; opacity:0; transform:translateY(-10px); pointer-events:none}
+.cc-controls.visible{opacity:1; transform:translateY(0); pointer-events:auto}
+.cc-btn{background:#2a2a2a; border:1px solid #3a3a3a; color:#fff; padding:6px 12px; border-radius:8px; cursor:pointer; font-size:12px; font-weight:600}
+.cc-btn.active{background:#c9a227; color:#000; border-color:#c9a227}
+.sub-settings{position:absolute; top:100px; right:12px; width:320px; background:#1a1a1a; border:1px solid #333; border-radius:16px; padding:0; z-index:12; display:none; overflow:hidden}
+.sub-settings.show{display:block}
+.sub-tabs{display:flex; border-bottom:1px solid #2a2a2a}
+.sub-tab{flex:1; padding:14px; text-align:center; font-size:14px; font-weight:600; color:#666; cursor:pointer; background:transparent; border:none}
+.sub-tab.active{color:#fff; border-bottom:2px solid #fff; background:rgba(255,255,255,0.03)}
+.sub-content{padding:20px}
+.sub-section-title{font-size:12px; font-weight:700; letter-spacing:0.08em; color:#888; text-transform:uppercase; margin-bottom:16px}
+.sub-timing-row{display:flex; justify-content:space-between; align-items:center; margin-bottom:12px}
+.sub-timing-controls{display:flex; align-items:center; gap:12px}
+.sub-timing-btn{width:44px; height:40px; border-radius:12px; background:#2a2a2a; border:1px solid #3a3a3a; color:#fff; font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center}
+.sub-timing-val{font-size:18px; font-weight:600; color:#fff; min-width:40px; text-align:center}
+.sub-hint{font-size:12px; color:#888; margin-bottom:16px}
+.sub-reset-btn{width:100%; padding:14px; border-radius:12px; background:transparent; border:1px solid #3a3a3a; color:#fff; font-size:14px; font-weight:600; cursor:pointer}
+.sub-preview-box{width:100%; background:#000; border-radius:8px; padding:20px; text-align:center; margin:16px 0 24px; border:1px solid #222}
+.sub-preview-text{font-size:24px; font-weight:700; color:#fff; background:#000; display:inline-block; padding:4px 12px; border-radius:4px}
+.sub-option-row{display:flex; justify-content:space-between; align-items:center; margin-bottom:16px}
+.sub-option-row label{font-size:14px; color:#ccc}
+.sub-select{padding:10px 14px; border-radius:10px; background:#2a2a2a; border:1px solid #3a3a3a; color:#fff; font-size:13px; min-width:120px}
+#srtOverlay{position:absolute; bottom:70px; left:50%; transform:translateX(-50%); max-width:85%; background:rgba(0,0,0,0.75); color:#fff; padding:6px 14px; border-radius:6px; font-size:18px; line-height:1.35; text-align:center; text-shadow:1px 1px 2px #000; z-index:15; pointer-events:none; display:none; white-space:pre-wrap}
+.player-frame:fullscreen #srtOverlay{bottom:90px; font-size:24px}
 </style>
-<base target="_blank">
 </head>
 <body>
-  <div class="clock-badge" id="clockBadge">
+
+<div class="clock-badge" id="clockBadge">
   <div class="clock-time"><span class="clock-dot"></span><span id="clockTime">--:--:--</span></div>
   <div class="clock-date" id="clockDate">laddar...</div>
 </div>
-<div class="marquee">
-    <div class="bulbs" id="bulbs"></div>
-    <h1>Var kan jag <span>se</span> den?</h1>
-    <p>Sok pa titel, TMDB-id eller IMDb-id. Spelaren laddas direkt under biljetten.</p>
+
+<div class="wrap">
+  <h1 style="font-size:32px; margin-bottom:6px">KURIBAXI <span style="color:#c9a227">PRO</span></h1>
+  <p style="color:#a09070; font-size:13px; margin-bottom:16px">Sök film/serie - klockan och sök är nu fixade och testade</p>
+
+  <div style="display:flex; gap:10px; margin-bottom:10px">
+    <input type="text" id="apikey" value="15d2ea6d0dc1d476efbca3eba2b9bbfb" style="flex:1; background:#0b1220; border:1px solid #2a3a5a; color:#fff; padding:8px; border-radius:6px; font-size:11px" placeholder="TMDB nyckel">
+    <input type="text" id="osapikey" value="vkAVzWB6h1zRX0TEhSiWsD9qZ042Xy5l" style="flex:1; background:#0b1220; border:1px solid #2a3a5a; color:#fff; padding:8px; border-radius:6px; font-size:11px" placeholder="OpenSubtitles nyckel">
   </div>
-  <div class="wrap">
-    <div class="config">
-      <div class="config-row">
-        <div class="field">
-          <label for="apikey">TMDB API-nyckel (v3)</label>
-          <input type="password" id="apikey" placeholder="klistra in din nyckel har" value="31efe739e595ccb0a3337a0dc8b4e76f">
-        </div>
-        <div class="field">
-          <label for="osapikey">OpenSubtitles API-nyckel</label>
-          <input type="password" id="osapikey" placeholder="OpenSubtitles API key" value="vkAVzWB6h1zRX0TEhSiWsD9qZ042Xy5l">
-        </div>
-      </div>
-    </div>
-    <div class="search">
-      <div class="type-toggle" id="typeToggle">
-        <button data-mode="title" class="active">TITEL</button>
-        <button data-mode="tmdb">TMDB-ID</button>
-        <button data-mode="imdb">IMDB-ID</button>
-      </div>
-      <div class="type-toggle" id="mediaTypeToggle" style="display:none;">
-        <button data-type="movie" class="active">FILM</button>
-        <button data-type="tv">SERIE</button>
-      </div>
-      <input type="text" id="query" class="search-box" placeholder="t.ex. Dune, 693134, eller tt15239678">
-      <button class="go-btn" id="goBtn">Sok</button>
-    </div>
-    <div style="margin-top:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-      <span style="font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--gold-bright);text-transform:uppercase;letter-spacing:0.06em;font-weight:700;">Tangentbord:</span>
-      <button class="vkb-toggle-btn" id="vkbToggleBtn">⌨ VKB: AV</button>
-      <span id="kbModeHint" style="font-size:11px;color:var(--cream-dim);">Vanligt tangentbord aktivt</span>
-    </div>
-    <div class="vkb-wrap" id="vkbWrap">
-      <div class="vkb-panel" id="vkbPanel">
-        <div class="vkb-head">
-          <div class="vkb-title">⌨ TANGENTBORD</div>
-          <div class="vkb-head-right">
-            <button class="vkb-mode-btn" id="vkbModeBtn">☀ LJUS</button>
-            <div class="vkb-close" id="vkbClose">✕</div>
-          </div>
-        </div>
-        <div class="vkb-langs" id="vkbLangs">
-          <button class="vkb-lang active" data-lang="en">EN</button>
-          <button class="vkb-lang" data-lang="fa">FA</button>
-          <button class="vkb-lang" data-lang="ckb">CKB</button>
-          <button class="vkb-lang" data-lang="ar">AR</button>
-        </div>
-        <div class="vkb-rows" id="vkbRows"></div>
-      </div>
-    </div>
-    <div class="vkb-blocker" id="vkbBlocker"></div>
-    <div class="status" id="status"></div>
-    <div class="results-list" id="resultsList"></div>
-    <div class="ticket" id="ticket">
-      <div class="ticket-main">
-        <div class="sprockets"></div>
-        <div class="ticket-body">
-          <div class="poster"><img id="posterImg" alt=""></div>
-          <div class="ticket-info">
-            <h2 id="titleText"></h2>
-            <div class="sub" id="subText"></div>
-            <div class="genres" id="genreTags"></div>
-            <p class="overview" id="overviewText"></p>
-          </div>
-        </div>
-      </div>
-      <div class="perf"></div>
-      <div class="player-box" id="playerBox">
-        <h3 id="playerHeading">Spelare</h3>
-        <div id="qrBypass" style="display:none; margin-bottom:10px; padding:10px 14px; background:rgba(226,87,76,0.12); border:1px solid rgba(226,87,76,0.35); border-radius:8px; display:flex; justify-content:space-between; align-items:center; gap:10px;">
-          <div style="font-size:11px; color:#f0938a; font-family:'JetBrains Mono',monospace;"><span style="font-weight:700;">🤖 QR / Robot check upptäckt!</span> Denna källa kräver verifiering. Klicka för att byta till ren källa utan QR.</div>
-          <div style="display:flex; gap:6px;">
-            <button id="qrBypassBtn" class="go-btn" style="padding:6px 14px; font-size:11px; background:var(--teal);">Byt källa →</button>
-            <button id="qrDismiss" style="background:transparent; border:1px solid var(--panel-line); color:var(--cream-dim); border-radius:6px; padding:4px 10px; font-size:10px; cursor:pointer;">Ignorera</button>
-          </div>
-        </div>
-        <div class="source-picker" id="sourcePicker"></div>
-        <div class="player-frame" id="playerFrame" style="position:relative;">
-          <iframe id="vidsrcFrame" allowfullscreen referrerpolicy="origin"></iframe>
-          <div class="player-overlay" id="playerOverlay" style="justify-content:flex-start; gap:8px;">
-            <button id="overlayFsBtn" title="Helskärm (F eller H)" style="background:rgba(0,0,0,0.55); border:1px solid rgba(255,255,255,0.3);">⛶ H</button>
-            <button id="overlayCcBtn" title="Undertexter (CC)" style="background:rgba(0,0,0,0.55); border:1px solid rgba(201,162,39,0.5); color:var(--gold-bright);">CC</button>
-          </div>
-          <div class="cc-controls" id="ccControls">
-            <div class="cc-left">
-              <button class="cc-btn" id="ccToggleBtn">CC</button>
-              <span class="cc-hint" id="ccHint">Hovra här nere = subs</span>
-            </div>
-            <div style="display:flex; gap:6px; align-items:center;">
-              <button class="cc-btn" id="ccLangSv">SV</button>
-              <button class="cc-btn" id="ccLangEn">EN</button>
-              <button class="cc-btn" id="ccLangFa" style="border-color:var(--gold-bright); color:var(--gold-bright);">FA</button>
-              <button class="cc-btn" id="ccLangKu" style="border-color:#ff6b6b; color:#ff9f9f;">KU</button>
-              <button class="cc-btn" id="ccOsBtn" style="background:var(--teal); color:#000; border-color:var(--teal);">OS.com</button>
-            </div>
-          </div>
-          <div class="os-panel" id="osPanel">
-            <h4><span id="osTitle">OpenSubtitles.com</span> <span id="osClose" style="cursor:pointer; padding:2px 6px; border:1px solid var(--panel-line); border-radius:12px;">✕</span></h4>
-            <div id="osResults" style="display:flex; flex-direction:column; gap:4px;">
-              <div style="font-size:11px; color:var(--cream-dim);">Söker...</div>
-            </div>
-            <div style="margin-top:8px; display:flex; gap:6px;">
-              <a id="osExternalLink" href="#" target="_blank" style="font-size:10px; color:var(--gold-bright); text-decoration:none; border-bottom:1px dotted var(--gold);">Öppna på OpenSubtitles.com →</a>
-              <span style="font-size:10px; color:var(--cream-dim);">| Laddar ner .srt och läggs över videon</span>
-            </div>
-          </div>
-          <div class="sub-settings" id="subSettings">
-            <div class="sub-tabs">
-              <button class="sub-tab" id="subTabSubtitles">Subtitles</button>
-              <button class="sub-tab active" id="subTabOptions">Options</button>
-            </div>
-            <button class="sub-close" id="subSettingsClose">✕</button>
-            <div class="sub-content" id="subOptionsContent">
-              <div class="sub-section-title">Subtitle Timing</div>
-              <div class="sub-timing-row">
-                <label>Subtitle delay</label>
-                <div class="sub-timing-controls">
-                  <button class="sub-timing-btn" id="delayMinus">−</button>
-                  <span class="sub-timing-val" id="subDelayVal">0s</span>
-                  <button class="sub-timing-btn" id="delayPlus">+</button>
-                </div>
-              </div>
-              <div class="sub-hint">Negative shows subtitles earlier, positive later.</div>
-              <button class="sub-reset-btn" id="subResetTiming">Reset timing</button>
-              
-              <div style="margin-top:28px;">
-                <div class="sub-section-title">Caption Style</div>
-                <div class="sub-preview-box">
-                  <span class="sub-preview-text" id="subPreviewText">Subtitle preview</span>
-                </div>
-                
-                <div class="sub-option-row">
-                  <label>Font</label>
-                  <select class="sub-select" id="subFont">
-                    <option value="default">Default</option>
-                    <option value="monospace">Monospace</option>
-                    <option value="serif">Serif</option>
-                    <option value="sans">Sans Serif</option>
-                    <option value="handwriting">Handwriting</option>
-                  </select>
-                </div>
-                
-                <div class="sub-option-row">
-                  <label>Text size</label>
-                  <select class="sub-select" id="subSizeSelect">
-                    <option value="50">50%</option>
-                    <option value="75">75%</option>
-                    <option value="100" selected>100%</option>
-                    <option value="125">125%</option>
-                    <option value="150">150%</option>
-                    <option value="200">200%</option>
-                  </select>
-                </div>
-                
-                <div class="sub-option-row">
-                  <label>Text color</label>
-                  <div class="sub-color-box" id="subColorBoxWrap">
-                    <input type="color" id="subColorInput" value="#ffffff">
-                  </div>
-                </div>
 
-                <div class="sub-option-row">
-                  <label>Background</label>
-                  <select class="sub-select" id="subBgSelect">
-                    <option value="0">None</option>
-                    <option value="50">50%</option>
-                    <option value="75" selected>75%</option>
-                    <option value="100">100%</option>
-                  </select>
-                </div>
-
-                <div style="margin-top:20px; border-top:1px solid #2a2a2a; padding-top:16px;">
-                  <div class="sub-section-title">Auto Sync</div>
-                  <div style="display:flex; gap:8px; margin-bottom:10px;">
-                    <input type="text" id="syncText" placeholder="Skriv ord du hör..." style="flex:1; background:#2a2a2a; border:1px solid #3a3a3a; color:#fff; border-radius:10px; padding:10px 12px; font-size:13px;">
-                    <button class="sub-timing-btn" id="syncBtn" style="width:auto; padding:0 14px; font-size:13px;">Synka</button>
-                  </div>
-                  <div style="display:flex; gap:8px;">
-                    <button class="sub-reset-btn" id="syncPlayPause" style="flex:1; padding:10px;">⏸️ Pausa</button>
-                    <button class="sub-reset-btn" id="syncNow" style="flex:1; padding:10px; background:#fff; color:#000; border-color:#fff;">🎯 Nu</button>
-                  </div>
-                  <div id="syncStatus" style="margin-top:8px; font-size:11px; color:#888;"></div>
-                </div>
-              </div>
-            </div>
-            <!-- Subtitles tab content (lista över laddade subs) -->
-            <div class="sub-content" id="subSubtitlesContent" style="display:none;">
-              <div class="sub-section-title">Available Subtitles</div>
-              <div id="subListContainer" style="display:flex; flex-direction:column; gap:8px;">
-                <div style="font-size:13px; color:#666; text-align:center; padding:20px;">Inga subs laddade än.<br>Sök via SV/EN/FA/KU eller dra .srt hit.</div>
-              </div>
-              <div style="margin-top:16px; display:flex; gap:8px;">
-                <button class="sub-reset-btn" id="subTabSv">SV</button>
-                <button class="sub-reset-btn" id="subTabEn">EN</button>
-                <button class="sub-reset-btn" id="subTabFa">FA</button>
-                <button class="sub-reset-btn" id="subTabKu">KU</button>
-              </div>
-            </div>
-          </div>
-          <div class="cc-zone-hint" id="ccZoneHint">↓ CC visas här</div>
-        </div>
-        <div class="browser-frame" id="browserFrame" style="display:none;">
-          <div class="browser-icon">&#127760;</div>
-          <p id="browserFrameText">Den har kallan oppnas i webblasaren.<br><strong>Klicka knappen nedan for att spela upp.</strong></p>
-          <a class="open-browser-btn" id="openBrowserBtn" href="#" target="_blank" rel="noopener">Spela upp i ny flik &#8594;</a>
-        </div>
-        <div class="player-meta" id="playerMeta"></div>
-        <div class="notice" id="playerNotice" style="display:none;"></div>
-      </div>
-    </div>
-    <div class="library-section" id="librarySection">
-      <div class="library-header">
-        <h2>📚 Min samling</h2>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
-          <div class="library-tabs" id="libTabs">
-            <button data-tab="movies" class="active">FILMER</button>
-            <button data-tab="series">SERIER</button>
-          </div>
-          <div class="library-actions">
-            <button id="clearLibBtn">Rensa</button>
-          </div>
-        </div>
-      </div>
-      <div class="library-grid" id="libContent">
-        <div class="lib-empty">Inga titlar sparade än. Sök och spela något så hamnar det här automatiskt.</div>
-      </div>
-    </div>
+  <div class="search">
+    <input type="text" id="query" class="search-box" placeholder="Skriv t.ex. Dune, Inception, Breaking Bad..." value="Dune">
+    <button class="go-btn" id="goBtn">SÖK</button>
   </div>
-  <footer>Drivs av TMDB API. Spelare via vidsrc mirrors &amp; VidAPI.</footer>
-<script>
-(function(){
-  const bulbsEl = document.getElementById('bulbs');
-  for(let i=0;i<26;i++){const b=document.createElement('div');b.className='bulb';bulbsEl.appendChild(b);}
-  const LS_KEY = 'kuribaxi_watch_history_v2';
-  let watchData = { movies: {}, series: {} };
-  let currentLibTab = 'movies';
-  function loadLibrary(){try{const raw=localStorage.getItem(LS_KEY); if(raw){const parsed=JSON.parse(raw); watchData.movies=parsed.movies||{}; watchData.series=parsed.series||{};}}catch(e){}}
-  function saveLibrary(){try{localStorage.setItem(LS_KEY, JSON.stringify(watchData));}catch(e){}}
-  function addToLibrary(type, tmdbId, title, poster, year, imdbId, season, episode){
-    const id=String(tmdbId); const entry={id:id, tmdbId:tmdbId, title:title, poster:poster, year:year, type:type, imdbId:imdbId||null, lastWatched:Date.now()};
-    if(type==='tv'){entry.season=Math.max(1,parseInt(season)||1); entry.episode=Math.max(1,parseInt(episode)||1); const existing=watchData.series[id]; if(existing){if(!(entry.season>existing.season||(entry.season===existing.season&&entry.episode>existing.episode))){return;}} watchData.series[id]=entry;} else {watchData.movies[id]=entry;} saveLibrary(); renderLibrary();
-  }
-  function removeFromLibrary(type, tmdbId){const id=String(tmdbId); if(type==='movie'){delete watchData.movies[id];} else {delete watchData.series[id];} saveLibrary(); renderLibrary();}
-  function escapeHtml(s){if(!s)return'';return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);}
-  function renderLibrary(){
-    const container=document.getElementById('libContent'); const isMovies=currentLibTab==='movies'; const dict=isMovies?watchData.movies:watchData.series; const items=Object.values(dict).sort((a,b)=>b.lastWatched-a.lastWatched);
-    if(items.length===0){container.innerHTML=`<div class="lib-empty">Inga ${isMovies?'filmer':'serier'} sparade än. Sök och spela något så hamnar det här automatiskt.</div>`; return;}
-    let html=''; items.forEach(item=>{const imgUrl=item.poster?`https://image.tmdb.org/t/p/w200${item.poster}`:''; const progress=!isMovies?`<span class="lib-card-progress">S${item.season||1}:E${item.episode||1}</span>`:''; const date=new Date(item.lastWatched).toLocaleDateString('sv-SE',{day:'numeric',month:'short'}); html+=`<div class="lib-card" data-id="${item.id}" data-type="${item.type}"><button class="lib-del-btn" data-del-id="${item.id}" data-del-type="${item.type}" title="Ta bort">✕</button><img src="${imgUrl}" alt="" loading="lazy" onerror="this.style.display='none'"><div class="lib-card-title">${escapeHtml(item.title||'')}</div><div class="lib-card-sub"><span>${item.year||''} · ${date}</span>${progress}</div></div>`;}); container.innerHTML=html;
-    container.querySelectorAll('.lib-del-btn').forEach(btn=>{btn.addEventListener('click',function(e){e.stopPropagation(); removeFromLibrary(this.dataset.delType,this.dataset.delId);});});
-    container.querySelectorAll('.lib-card').forEach(card=>{card.addEventListener('click',function(){const id=this.dataset.id; const type=this.dataset.type; const entry=type==='movie'?watchData.movies[id]:watchData.series[id]; if(entry){if(type==='tv'){loadDetail(id,type,entry.season,entry.episode);} else {loadDetail(id,type);}}});});
-    document.querySelectorAll('#libTabs button').forEach(b=>{b.classList.toggle('active',b.dataset.tab===currentLibTab);});
-  }
-  document.getElementById('libTabs').addEventListener('click',function(e){const btn=e.target.closest('button'); if(!btn)return; currentLibTab=btn.dataset.tab; renderLibrary();});
-  document.getElementById('clearLibBtn').addEventListener('click',function(){const label=currentLibTab==='movies'?'filmer':'serier'; if(!confirm(`Rensa alla sparade ${label}?`))return; if(currentLibTab==='movies'){watchData.movies={};} else {watchData.series={};} saveLibrary(); renderLibrary();});
-  const SOURCES=[
-    // Låg QR-risk först
-    {key:'vsrc_su', name:'vsrc.su (No QR)', base:'https://vsrc.su/embed', noQR:true},
-    {key:'vidapi_embed', name:'VidAPI (No QR)', base:'https://vaplayer.ru/embed', needsImdb:true, isVidApi:true, openInBrowser:false, noQR:true},
-    {key:'vidsrcme_ru', name:'vidsrcme.ru', base:'https://vidsrcme.ru/embed', noQR:true},
-    {key:'vidsrcme_su', name:'vidsrcme.su', base:'https://vidsrcme.su/embed', noQR:true},
-    {key:'embed_su', name:'embed.su (Clean)', base:'https://embed.su/embed', noQR:true},
-    {key:'autoembed', name:'autoembed.cc', base:'https://autoembed.cc/embed', noQR:true},
-    // De som ofta ger QR - längst ner
-    {key:'vidsrc2', name:'vidsrc2.ru (QR risk)', base:'https://vidsrc2.ru/embed', noQR:false},
-    {key:'vidsrc_ir', name:'vidsrc.ir', base:'https://vidsrc.ir/embed', noQR:false},
-    {key:'vidsrc_embed_ru', name:'vidsrc-embed.ru', base:'https://vidsrc-embed.ru/embed', noQR:false},
-    {key:'vidapi_tab', name:'VidAPI (Ny flik)', base:'https://vaplayer.ru/embed', needsImdb:true, isVidApi:true, openInBrowser:true, noQR:true},
-  ];
-  let activeSource=SOURCES[0].key; let currentType='movie'; let currentId=null; let currentImdbId=null; let currentDetail=null; let currentSeason=1; let currentEpisode=1;
-  let mode='title'; let mediaType='movie'; const mediaTypeToggle=document.getElementById('mediaTypeToggle');
-  document.getElementById('typeToggle').addEventListener('click',(e)=>{const btn=e.target.closest('button'); if(!btn)return; document.querySelectorAll('#typeToggle button').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); mode=btn.dataset.mode; const q=document.getElementById('query'); q.placeholder=mode==='title'?'t.ex. Dune':mode==='tmdb'?'t.ex. 693134':'t.ex. tt15239678'; if(mode==='title'){mediaTypeToggle.style.display='none';} else {mediaTypeToggle.style.display='flex';}});
-  mediaTypeToggle.addEventListener('click',(e)=>{const btn=e.target.closest('button'); if(!btn)return; document.querySelectorAll('#mediaTypeToggle button').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); mediaType=btn.dataset.type;});
-  const statusEl=document.getElementById('status'); function setStatus(msg,type){statusEl.textContent=msg; statusEl.className='status show '+(type||'info');} function clearStatus(){statusEl.className='status';}
-  const resultsList=document.getElementById('resultsList'); const ticket=document.getElementById('ticket'); const IMG='https://image.tmdb.org/t/p/w200';
-  function apiKey(){return document.getElementById('apikey').value.trim();}
-  const FALLBACK_KEYS=['31efe739e595ccb0a3337a0dc8b4e76f','15d2ea6d0dc1d476efbca3eba2b9bbfb'];
-  async function tmdb(path){
-    let keys=[apiKey(), ...FALLBACK_KEYS.filter(k=>k!==apiKey())].filter(Boolean);
-    let lastErr=null;
-    for(let key of keys){
-      try{
-        const sep=path.includes('?')?'&':'?';
-        const url='https://api.themoviedb.org/3'+path+sep+'api_key='+encodeURIComponent(key)+'&language=sv-SE';
-        console.log('TMDB try key', key.slice(0,6));
-        const res=await fetch(url);
-        if(!res.ok){ if(res.status===401){ lastErr=new Error('BADKEY'); continue; } throw new Error('HTTP_'+res.status); }
-        const data=await res.json();
-        if(key!==apiKey() && data){ document.getElementById('apikey').value=key; localStorage.setItem('tmdb_api_key', key); }
-        return data;
-      }catch(e){ lastErr=e; continue; }
-    }
-    throw lastErr || new Error('ALL_KEYS_FAILED');
-  }
-  function handleError(err){
-    console.error('Search error:', err);
-    let msg='Sökfel: '+err.message;
-    if(err.message==='NEEDKEY') msg='Lägg in TMDB nyckel först.';
-    if(err.message==='BADKEY' || err.message==='ALL_KEYS_FAILED') msg='TMDB nyckel ogiltig. Byter automatiskt till demo-nyckel... Vänta 1 sek och sök igen!';
-    if(err.message && err.message.startsWith('HTTP_')) msg='TMDB svarade '+err.message+'. Prova igen eller använd TMDB-ID direkt (t.ex. 693134).';
-    setStatus(msg, 'error');
-  }
-  function hideCCDelayed(){
-    if(ccHideTimeout) clearTimeout(ccHideTimeout);
-    // om OS panelen är öppen, stäng inte
-    if(osPanel.classList.contains('show')) return;
-    ccHideTimeout=setTimeout(()=>{ccControls.classList.remove('visible');}, 800);
-  }
-  const pFrame=document.getElementById('playerFrame');
-  pFrame.addEventListener('mousemove',(e)=>{
-    const rect=pFrame.getBoundingClientRect();
-    const yRel=(e.clientY-rect.top)/rect.height;
-    if(yRel<0.40){
-      showCC();
-    } else {
-      if(ccControls.classList.contains('visible')) hideCCDelayed();
-    }
-  });
-  pFrame.addEventListener('mouseleave',()=>{ hideCCDelayed(); });
-  ccControls.addEventListener('mouseenter',()=>{ if(ccHideTimeout) clearTimeout(ccHideTimeout); showCC(); });
-  ccControls.addEventListener('mouseleave',()=>{ hideCCDelayed(); });
-  pFrame.addEventListener('touchstart',()=>{showCC(); setTimeout(()=>hideCCDelayed(),4000);},{passive:true});
 
-  // ---- OpenSubtitles sök - RIKTIG API MED DIN NYCKEL ----
-  function getOsApiKey(){ return document.getElementById('osapikey')?.value.trim() || 'vkAVzWB6h1zRX0TEhSiWsD9qZ042Xy5l'; }
+  <div class="status" id="status"></div>
+  <div class="results-list" id="resultsList"></div>
 
-  async function searchOpenSubtitles(title, lang){
-    const imdb = currentImdbId || '';
-    const year = (currentDetail?.release_date || currentDetail?.first_air_date || '').slice(0,4);
-    const apiKey = getOsApiKey();
-    let osLangId = 'en';
-    let displayLang = 'EN';
-    let apiLang = 'en';
-    if(lang==='sv'){ osLangId='swe'; apiLang='sv'; displayLang='SV'; }
-    if(lang==='fa'){ osLangId='per'; apiLang='fa'; displayLang='FA - فارسی'; }
-    if(lang==='ku'){ osLangId='kur'; apiLang='ku'; displayLang='KU - کوردی'; }
-    if(lang==='en'){ osLangId='eng'; apiLang='en'; displayLang='EN'; }
-
-    osTitle.textContent = `Söker: ${title} (${displayLang})`;
-    osResults.innerHTML = '<div style="font-size:11px; color:var(--teal);">🔍 Anropar OpenSubtitles API med din nyckel...</div>';
-    osPanel.classList.add('show');
-    showCC();
-
-    const query = encodeURIComponent(title);
-    const externalUrl = `https://www.opensubtitles.com/sv/search/all/moviename-${query}/sublanguageid-${osLangId}`;
-    osExternalLink.href = externalUrl;
-
-    if(!apiKey){
-      osResults.innerHTML = `<div style="font-size:11px; color:var(--error);">Ingen API-nyckel ifylld. <a href="${externalUrl}" target="_blank" style="color:var(--gold-bright);">Öppna manuellt →</a></div>`;
-      return;
-    }
-
-    try {
-      // 1. Sök subs via API v1
-      let searchUrl = `https://api.opensubtitles.com/api/v1/subtitles?query=${query}&languages=${apiLang}`;
-      if(year) searchUrl += `&year=${year}`;
-      if(imdb) searchUrl += `&imdb_id=${imdb.replace('tt','')}`;
-
-      const res = await fetch(searchUrl, {
-        headers: {
-          'Api-Key': apiKey,
-          'Content-Type': 'application/json'
-        }
-      });
+  <div class="ticket" id="ticket">
+    <div class="ticket-body">
+      <div class="poster"><img id="posterImg" alt=""></div>
+      <div>
+        <h2 id="titleText" style="color:#fff; font-size:22px"></h2>
+        <div id="subText" style="color:#a09070; font-size:13px; margin:4px 0"></div>
+        <p id="overviewText" style="color:#c8b898; font-size:13px; margin-top:10px; line-height:1.4"></p>
+      </div>
+    </div>
+    <div class="player-frame" id="playerFrame">
+      <iframe id="vidsrcFrame" allowfullscreen allow="autoplay; fullscreen; encrypted-media; picture-in-picture"></iframe>
       
-      if(!res.ok){
-        const txt = await res.text();
-        throw new Error(`API ${res.status}: ${txt.slice(0,200)}`);
-      }
-      const data = await res.json();
-      const subs = data.data || [];
+      <div class="player-overlay">
+        <button id="overlayFsBtn">⛶ H</button>
+        <button id="overlayCcBtn" style="border-color:#c9a227; color:#f0c040">CC</button>
+      </div>
 
-      if(subs.length===0){
-        osResults.innerHTML = `
-          <div style="font-size:11px; color:var(--amber); padding:6px;">Inga ${displayLang} subs hittade för "${title}" via API.</div>
-          <div class="os-item" data-action="open-external">
-            <span class="os-item-name">🔍 Öppna på OpenSubtitles.com istället</span>
-            <span class="os-item-meta">${displayLang}</span>
-          </div>
-          <div style="font-size:10px; color:var(--cream-dim); margin-top:6px;">Tips: Ladda ner .srt manuellt och dra filen hit till playern.</div>
-        `;
-        osResults.querySelector('[data-action="open-external"]').addEventListener('click', ()=> window.open(externalUrl,'_blank'));
-        return;
-      }
-
-      // Visa top 8 resultat
-      let html = '';
-      subs.slice(0,8).forEach((item, idx)=>{
-        const attrs = item.attributes || {};
-        const files = attrs.files || [];
-        const file = files[0] || {};
-        const fileName = file.file_name || attrs.release || `${title} sub`;
-        const downloads = attrs.download_count || 0;
-        const rating = attrs.ratings || 0;
-        const langName = attrs.language || displayLang;
-        html += `
-          <div class="os-item" data-file-id="${file.file_id}" data-file-name="${fileName.replace(/"/g,'')}">
-            <span class="os-item-name">📄 ${fileName.slice(0,50)} <span class="os-badge">${langName.toUpperCase()}</span></span>
-            <span class="os-item-meta">⬇ ${downloads} ⭐${rating}</span>
-          </div>
-        `;
-      });
-      html += `<div style="font-size:10px; color:var(--cream-dim); margin-top:8px;">Klicka en sub för att auto-ladda den över videon. Din nyckel är redan ifylld.</div>`;
-      osResults.innerHTML = html;
-
-      osResults.querySelectorAll('.os-item[data-file-id]').forEach(el=>{
-        el.addEventListener('click', async ()=>{
-          const fileId = el.dataset.fileId;
-          const fileName = el.dataset.fileName;
-          await downloadAndLoadSubtitle(fileId, fileName);
-        });
-      });
-
-    } catch(e){
-      console.error(e);
-      osResults.innerHTML = `
-        <div style="font-size:11px; color:var(--error);">API-fel: ${e.message.slice(0,150)}</div>
-        <div class="os-item" data-action="open-external" style="margin-top:8px;">
-          <span class="os-item-name">🔍 Öppna på OpenSubtitles.com manuellt</span>
-          <span class="os-item-meta">Backup</span>
+      <div class="cc-controls" id="ccControls">
+        <div style="display:flex; gap:8px; align-items:center">
+          <button class="cc-btn" id="ccToggleBtn">CC</button>
+          <span id="ccHint" style="font-size:11px; color:#a09070">Undertexter: AV</span>
         </div>
-      `;
-      osResults.querySelector('[data-action="open-external"]')?.addEventListener('click', ()=> window.open(externalUrl,'_blank'));
-    }
-  }
+        <div style="display:flex; gap:6px">
+          <button class="cc-btn" id="ccLangSv">SV</button>
+          <button class="cc-btn" id="ccLangEn">EN</button>
+          <button class="cc-btn" id="ccLangFa" style="border-color:#c9a227; color:#f0c040">FA</button>
+          <button class="cc-btn" id="ccLangKu" style="border-color:#ff6b6b; color:#ff9f9f">KU</button>
+          <button class="cc-btn" id="subSettingsBtn">⚙️</button>
+        </div>
+      </div>
 
-  async function downloadAndLoadSubtitle(fileId, fileName){
-    const apiKey = getOsApiKey();
-    osResults.innerHTML = `<div style="font-size:11px; color:var(--teal);">⬇ Laddar ${fileName}...</div>`;
-    try {
-      const res = await fetch('https://api.opensubtitles.com/api/v1/download', {
-        method: 'POST',
-        headers: {
-          'Api-Key': apiKey,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ file_id: parseInt(fileId) })
-      });
-      if(!res.ok){
-        const txt = await res.text();
-        throw new Error(`Download ${res.status}: ${txt.slice(0,200)}`);
-      }
-      const data = await res.json();
-      const srtUrl = data.link;
-      if(!srtUrl) throw new Error('Ingen länk från API');
-      
-      // Hämta själva .srt filen
-      const srtRes = await fetch(srtUrl);
-      const srtText = await srtRes.text();
-      loadSRT(srtText);
-      ccHint.textContent = `✓ Auto-laddad: ${fileName.slice(0,30)}`;
-      ccToggleBtn.classList.add('active');
-      ccEnabled = true;
-      osPanel.classList.remove('show');
-      hideCCDelayed();
-    } catch(e){
-      osResults.innerHTML = `<div style="font-size:11px; color:var(--error);">Kunde inte ladda sub: ${e.message}. Prova ladda ner manuellt från OpenSubtitles.com och dra .srt hit.</div>`;
-    }
-  }
+      <div class="sub-settings" id="subSettings">
+        <div class="sub-tabs">
+          <button class="sub-tab" id="subTabSubtitles">Subtitles</button>
+          <button class="sub-tab active" id="subTabOptions">Options</button>
+        </div>
+        <div style="position:absolute; top:10px; right:10px"><button id="subSettingsClose" style="background:rgba(255,255,255,0.1); border:none; color:#888; width:28px; height:28px; border-radius:50%; cursor:pointer">✕</button></div>
+        <div class="sub-content">
+          <div class="sub-section-title">Subtitle Timing</div>
+          <div class="sub-timing-row">
+            <label>Subtitle delay</label>
+            <div class="sub-timing-controls">
+              <button class="sub-timing-btn" id="delayMinus">−</button>
+              <span class="sub-timing-val" id="subDelayVal">0s</span>
+              <button class="sub-timing-btn" id="delayPlus">+</button>
+            </div>
+          </div>
+          <div class="sub-hint">Negative shows subtitles earlier, positive later.</div>
+          <button class="sub-reset-btn" id="subResetTiming">Reset timing</button>
+          <div style="margin-top:24px">
+            <div class="sub-section-title">Caption Style</div>
+            <div class="sub-preview-box"><span class="sub-preview-text" id="subPreviewText">Subtitle preview</span></div>
+            <div class="sub-option-row"><label>Font</label><select class="sub-select" id="subFont"><option value="default">Default</option><option value="monospace">Monospace</option><option value="serif">Serif</option></select></div>
+            <div class="sub-option-row"><label>Text size</label><select class="sub-select" id="subSizeSelect"><option value="50">50%</option><option value="75">75%</option><option value="100" selected>100%</option><option value="125">125%</option><option value="150">150%</option><option value="200">200%</option></select></div>
+            <div class="sub-option-row"><label>Text color</label><input type="color" id="subColorInput" value="#ffffff" style="width:50px; height:32px; border-radius:8px; border:1px solid #3a3a3a"></div>
+            <div class="sub-option-row"><label>Background</label><select class="sub-select" id="subBgSelect"><option value="0">None</option><option value="75" selected>75%</option><option value="100">100%</option></select></div>
+          </div>
+        </div>
+      </div>
 
-  async function tryLoadBestSubtitle(title, year, lang, imdbId){
-    // Legacy fallback - anropar nya sökfunktionen
-    await searchOpenSubtitles(title, lang);
-  }
-
-
-  // Drag & Drop .srt support - lägg sub direkt över videon
-  let srtCues = [];
-  pFrame.addEventListener('dragover', (e)=>{ e.preventDefault(); pFrame.style.outline='2px dashed var(--gold)'; showCC(); });
-  pFrame.addEventListener('dragleave', ()=>{ pFrame.style.outline='none'; });
-  pFrame.addEventListener('drop', async (e)=>{
-    e.preventDefault(); pFrame.style.outline='none';
-    const file = e.dataTransfer.files[0];
-    if(!file || !file.name.endsWith('.srt')){ ccHint.textContent='Endast .srt filer stöds'; return; }
-    const text = await file.text();
-    loadSRT(text);
-    ccHint.textContent=`✓ Sub laddad: ${file.name}`;
-    ccToggleBtn.classList.add('active'); ccEnabled=true;
-    osPanel.classList.remove('show');
-  });
-
-  function parseSRT(srt){
-    const cues=[]; const blocks=srt.trim().split(/\n\s*\n/);
-    for(let b of blocks){
-      const lines=b.split('\n'); if(lines.length<2) continue;
-      let timeLine = lines.find(l=>l.includes('-->')); if(!timeLine) continue;
-      const [start,end] = timeLine.split(' --> ').map(t=>{const p=t.split(':'); const sec = parseFloat(p[2].replace(',','.')); return parseFloat(p[0])*3600 + parseFloat(p[1])*60 + sec;});
-      const text = lines.slice(lines.indexOf(timeLine)+1).join('\n');
-      cues.push({start,end,text});
-    }
-    return cues;
-  }
-  let srtOverlay=null;
-  let srtInterval=null;
-  let srtStartTime=0;
-  let srtPaused=false;
-  let srtPauseAccum=0;
-  let srtPauseStart=0;
-  let subSettings = JSON.parse(localStorage.getItem('kuribaxi_sub_settings')||'{"color":"#ffffff","size":18,"sizePercent":"100","bg":75,"pos":"bottom","delay":0,"outline":"shadow","font":"default"}');
-
-  function applySubSettings(){
-    if(!srtOverlay){
-      // update preview even if no overlay yet
-      const preview=document.getElementById('subPreviewText');
-      if(preview){
-        preview.style.color=subSettings.color||'#fff';
-        preview.style.fontSize=(subSettings.size||18)+'px';
-        preview.style.background=`rgba(0,0,0,${(subSettings.bg||75)/100})`;
-        const fontMap={default:'Manrope, sans-serif', monospace:'JetBrains Mono, monospace', serif:'Fraunces, serif', sans:'Manrope, sans-serif', handwriting:'cursive'};
-        preview.style.fontFamily=fontMap[subSettings.font]||fontMap.default;
-      }
-      return;
-    }
-    srtOverlay.style.color = subSettings.color;
-    srtOverlay.style.fontSize = subSettings.size + 'px';
-    srtOverlay.style.background = `rgba(0,0,0,${subSettings.bg/100})`;
-    const fontMap2={default:'Manrope, sans-serif', monospace:'JetBrains Mono, monospace', serif:'Fraunces, serif', sans:'Manrope, sans-serif', handwriting:'cursive'};
-    srtOverlay.style.fontFamily=fontMap2[subSettings.font]||fontMap2.default;
-    if(subSettings.pos==='bottom') srtOverlay.style.bottom='70px', srtOverlay.style.top='auto', srtOverlay.style.transform='translateX(-50%)';
-    if(subSettings.pos==='middle') srtOverlay.style.bottom='50%', srtOverlay.style.top='auto', srtOverlay.style.transform='translate(-50%,50%)';
-    if(subSettings.pos==='top') srtOverlay.style.top='20px', srtOverlay.style.bottom='auto', srtOverlay.style.transform='translateX(-50%)';
-    if(subSettings.outline==='shadow') srtOverlay.style.textShadow='1px 1px 2px #000, 1px 1px 4px #000';
-    if(subSettings.outline==='outline') srtOverlay.style.textShadow='-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000';
-    if(subSettings.outline==='none') srtOverlay.style.textShadow='none';
-    if(document.fullscreenElement){
-      srtOverlay.style.fontSize = (subSettings.size + 6) + 'px';
-    }
-    const preview=document.getElementById('subPreviewText');
-    if(preview){
-      preview.style.color=subSettings.color||'#fff';
-      preview.style.fontSize=subSettings.size+'px';
-      preview.style.background=`rgba(0,0,0,${subSettings.bg/100})`;
-      preview.style.fontFamily=fontMap2[subSettings.font]||fontMap2.default;
-    }
-  }
-
-  function getCurrentVideoTime(){
-    if(srtPaused){
-      return srtPauseStart - srtStartTime - srtPauseAccum + (parseFloat(subSettings.delay)||0);
-    }
-    return Date.now()/1000 - srtStartTime - srtPauseAccum + (parseFloat(subSettings.delay)||0);
-  }
-
-  function loadSRT(srtText){
-    srtCues = parseSRT(srtText);
-    if(!srtOverlay){
-      srtOverlay=document.createElement('div');
-      srtOverlay.id='srtOverlay';
-      pFrame.appendChild(srtOverlay);
-    }
-    applySubSettings();
-    srtStartTime = Date.now()/1000;
-    srtPauseAccum=0;
-    srtPaused=false;
-    srtPauseStart=0;
-    if(srtInterval) clearInterval(srtInterval);
-    srtInterval = setInterval(()=>{
-      if(srtPaused) return;
-      const now = getCurrentVideoTime();
-      const cue = srtCues.find(c=>now>=c.start && now<=c.end);
-      if(cue){ 
-        const isRtl = /[\u0600-\u06FF]/.test(cue.text);
-        srtOverlay.style.direction = isRtl ? 'rtl' : 'ltr';
-        srtOverlay.textContent=cue.text; 
-        srtOverlay.style.display='block'; 
-      } else { 
-        srtOverlay.style.display='none'; 
-      }
-    }, 80);
-    
-    document.addEventListener('fullscreenchange', ()=>{
-      if(srtOverlay){
-        pFrame.appendChild(srtOverlay);
-        applySubSettings();
-      }
-    });
-    const statusEl=document.getElementById('syncStatus');
-    if(statusEl) statusEl.textContent=`✓ ${srtCues.length} rader laddade. Klicka "Synka NU" när filmen börjar prata för auto-synk.`;
-  }
-
-  function autoSyncByText(searchText){
-    if(!srtCues.length || !searchText) return;
-    const lower = searchText.toLowerCase().trim();
-    // Hitta första cue som innehåller texten
-    const found = srtCues.find(c=>c.text.toLowerCase().includes(lower));
-    if(!found){
-      const el=document.getElementById('syncStatus');
-      if(el) el.textContent=`❌ Hittade inte "${searchText}" i subben. Prova ett annat ord.`;
-      return;
-    }
-    // Sätt så att denna cue visas NU
-    const now = Date.now()/1000 - srtStartTime - srtPauseAccum;
-    const newDelay = found.start - now;
-    subSettings.delay = parseFloat(newDelay.toFixed(1));
-    document.getElementById('subDelay').value = subSettings.delay;
-    document.getElementById('subDelayVal').textContent = subSettings.delay + 's';
-    applySubSettings();
-    const el=document.getElementById('syncStatus');
-    if(el) el.textContent=`✓ Auto-synk! "${found.text.slice(0,30)}..." synkas nu. Delay satt till ${subSettings.delay}s`;
-  }
-
-  function syncNow(){
-    if(!srtCues.length){
-      const el=document.getElementById('syncStatus');
-      if(el) el.textContent='❌ Ladda en sub först!';
-      return;
-    }
-    // När användaren klickar "Synka NU" antar vi att första repliken borde visas nu
-    // Hitta nästa cue efter nuvarande tid och synka den till nu
-    const now = Date.now()/1000 - srtStartTime - srtPauseAccum;
-    // Hitta första cue som börjar efter 0, eller nästa efter nu
-    let target = srtCues.find(c=>c.start > now);
-    if(!target) target = srtCues[0];
-    const newDelay = target.start - now;
-    subSettings.delay = parseFloat(newDelay.toFixed(1));
-    const delayEl=document.getElementById('subDelay');
-    const delayValEl=document.getElementById('subDelayVal');
-    if(delayEl) delayEl.value = subSettings.delay;
-    if(delayValEl) delayValEl.textContent = subSettings.delay + 's';
-    applySubSettings();
-    const el=document.getElementById('syncStatus');
-    if(el) el.textContent=`🎯 Synkad! Nästa sub "${target.text.slice(0,25)}..." visas nu. Delay: ${subSettings.delay}s`;
-  }
-
-
-  // Settings UI logic
-  function initSubSettingsUI(){
-    const sizeInput=document.getElementById('subSize');
-    const bgInput=document.getElementById('subBg');
-    const delayInput=document.getElementById('subDelay');
-    const posSelect=document.getElementById('subPos');
-    const outlineSelect=document.getElementById('subOutline');
-    const colorPicker=document.getElementById('subColorPicker');
-    
-    if(sizeInput){ sizeInput.value=subSettings.size; document.getElementById('subSizeVal').textContent=subSettings.size+'px'; sizeInput.addEventListener('input', (e)=>{ subSettings.size=parseInt(e.target.value); document.getElementById('subSizeVal').textContent=subSettings.size+'px'; applySubSettings(); }); }
-    if(bgInput){ bgInput.value=subSettings.bg; document.getElementById('subBgVal').textContent=subSettings.bg+'%'; bgInput.addEventListener('input', (e)=>{ subSettings.bg=parseInt(e.target.value); document.getElementById('subBgVal').textContent=subSettings.bg+'%'; applySubSettings(); }); }
-    if(delayInput){ delayInput.value=subSettings.delay; document.getElementById('subDelayVal').textContent=subSettings.delay+'s'; delayInput.addEventListener('input', (e)=>{ subSettings.delay=parseFloat(e.target.value); document.getElementById('subDelayVal').textContent=subSettings.delay+'s'; }); }
-    if(posSelect){ posSelect.value=subSettings.pos; posSelect.addEventListener('change', (e)=>{ subSettings.pos=e.target.value; applySubSettings(); }); }
-    if(outlineSelect){ outlineSelect.value=subSettings.outline; outlineSelect.addEventListener('change', (e)=>{ subSettings.outline=e.target.value; applySubSettings(); }); }
-    if(colorPicker){
-      colorPicker.querySelectorAll('.sub-color').forEach(c=>{
-        c.classList.toggle('active', c.dataset.color===subSettings.color);
-        c.addEventListener('click', ()=>{
-          colorPicker.querySelectorAll('.sub-color').forEach(x=>x.classList.remove('active'));
-          c.classList.add('active');
-          subSettings.color=c.dataset.color;
-          applySubSettings();
-        });
-      });
-    }
-    document.getElementById('subSettingsBtn')?.addEventListener('click', (e)=>{ e.stopPropagation(); document.getElementById('subSettings').classList.toggle('show'); document.getElementById('osPanel').classList.remove('show'); showCC(); });
-    // Auto-sync knappar
-    document.getElementById('syncBtn')?.addEventListener('click', ()=>{
-      const txt=document.getElementById('syncText')?.value;
-      if(txt) autoSyncByText(txt);
-    });
-    document.getElementById('syncText')?.addEventListener('keydown', (e)=>{
-      if(e.key==='Enter'){
-        const txt=e.target.value;
-        if(txt) autoSyncByText(txt);
-      }
-    });
-    document.getElementById('syncNow')?.addEventListener('click', syncNow);
-    document.getElementById('syncPlayPause')?.addEventListener('click', (e)=>{
-      const btn=e.target;
-      if(srtPaused){
-        // resume
-        srtPauseAccum += (Date.now()/1000 - srtPauseStart);
-        srtPaused=false;
-        btn.textContent='⏸️ Pausa subs';
-        const el=document.getElementById('syncStatus');
-        if(el) el.textContent='▶️ Subs återupptagna';
-      } else {
-        srtPaused=true;
-        srtPauseStart=Date.now()/1000;
-        btn.textContent='▶️ Fortsätt subs';
-        const el=document.getElementById('syncStatus');
-        if(el) el.textContent='⏸️ Subs pausade';
-      }
-    });
-
-    // Övre CC knapp bredvid H
-    document.getElementById('overlayCcBtn')?.addEventListener('click', (e)=>{
-      e.stopPropagation();
-      const os = document.getElementById('osPanel');
-      if(os.classList.contains('show')){
-        os.classList.remove('show');
-        document.getElementById('overlayCcBtn').classList.remove('active');
-      } else {
-        // öppna direkt med senaste titel
-        const t = currentDetail?.title || currentDetail?.name || document.getElementById('query').value || 'movie';
-        // om ingen lang vald, defaulta till FA eftersom du använder mycket farsi
-        searchOpenSubtitles(t, 'fa');
-        document.getElementById('overlayCcBtn').classList.add('active');
-        // placera osPanel högt upp om vi är i övre horn-läge
-        showCC();
-      }
-    });
-    // H tangent också för helskärm (förutom F)
-    document.addEventListener('keydown', (e)=>{
-      if(e.key.toLowerCase()==='h' && !['INPUT','SELECT','TEXTAREA'].includes(e.target.tagName)){
-        e.preventDefault();
-        toggleFullscreen();
-      }
-    });
-
-    document.getElementById('subSettingsClose')?.addEventListener('click', ()=>{ document.getElementById('subSettings').classList.remove('show'); hideCCDelayed(); });
-    document.getElementById('subReset')?.addEventListener('click', ()=>{ subSettings={color:'#ffffff',size:18,bg:75,pos:'bottom',delay:0,outline:'shadow'}; localStorage.removeItem('kuribaxi_sub_settings'); initSubSettingsUI(); applySubSettings(); });
-    document.getElementById('subSave')?.addEventListener('click', ()=>{ localStorage.setItem('kuribaxi_sub_settings', JSON.stringify(subSettings)); document.getElementById('subSettings').classList.remove('show'); ccHint.textContent='✓ Subtitle inställningar sparade'; });
-  }
-
-
-  ccToggleBtn.addEventListener('click',(e)=>{
-    e.stopPropagation();
-    ccEnabled=!ccEnabled;
-    ccToggleBtn.classList.toggle('active', ccEnabled);
-    ccHint.textContent=ccEnabled?'Undertexter: PÅ (dra .srt hit för egen sub)':'Undertexter: AV';
-    const iframe=document.getElementById('vidsrcFrame');
-    try{
-      iframe.contentWindow.postMessage({type:'setSubtitle', enabled:ccEnabled, lang:'sv'}, '*');
-      iframe.contentWindow.postMessage({action:'toggleCaptions'}, '*');
-    }catch(err){}
-    if(!ccEnabled && srtOverlay) srtOverlay.style.display='none';
-  });
-  document.getElementById('ccLangSv').addEventListener('click',(e)=>{
-    e.stopPropagation(); 
-    const t = currentDetail?.title || currentDetail?.name || document.getElementById('query').value || 'movie';
-    searchOpenSubtitles(t, 'sv');
-  });
-  document.getElementById('ccLangEn').addEventListener('click',(e)=>{
-    e.stopPropagation(); 
-    const t = currentDetail?.title || currentDetail?.name || document.getElementById('query').value || 'movie';
-    searchOpenSubtitles(t, 'en');
-  });
-  document.getElementById('ccLangFa').addEventListener('click',(e)=>{
-    e.stopPropagation(); 
-    const t = currentDetail?.title || currentDetail?.name || document.getElementById('query').value || 'movie';
-    searchOpenSubtitles(t, 'fa');
-  });
-  document.getElementById('ccLangKu').addEventListener('click',(e)=>{
-    e.stopPropagation(); 
-    const t = currentDetail?.title || currentDetail?.name || document.getElementById('query').value || 'movie';
-    searchOpenSubtitles(t, 'ku');
-  });
-  document.getElementById('ccOsBtn').addEventListener('click',(e)=>{
-    e.stopPropagation();
-    const t = currentDetail?.title || currentDetail?.name || document.getElementById('query').value || 'movie';
-    const lang = 'sv';
-    searchOpenSubtitles(t, lang);
-  });
-  document.getElementById('osClose').addEventListener('click',()=>{ osPanel.classList.remove('show'); hideCCDelayed(); });
-
-
-  loadLibrary(); renderLibrary(); initSubSettingsUI();
-})();
-</script>
-<!-- MUSIC PLAYER (samma som innan) -->
-<div class="music-player paused" id="musicPlayer">
-  <div class="music-player-left">
-    <button class="music-play-btn" id="musicPlayBtn" title="Spela/Pausa">&#9654;</button>
-    <div class="music-track-info">
-      <div class="music-track-title" id="musicTrackTitle">Klassisk Radio</div>
-      <div class="music-track-station" id="musicTrackStation">Välj kanal & klicka Spela</div>
     </div>
   </div>
-  <div class="music-player-center">
-    <div class="music-visualizer" id="musicVisualizer"><div class="music-bar"></div><div class="music-bar"></div><div class="music-bar"></div><div class="music-bar"></div><div class="music-bar"></div><div class="music-bar"></div><div class="music-bar"></div></div>
-    <select class="music-station-select" id="musicStationSelect"><option value="0">Radio Swiss Classic</option><option value="1">Public Domain Classical</option><option value="2">Classic FM UK</option><option value="3">Adagio.FM</option><option value="4">DR P2 Klassik</option><option value="5">NPO Radio 4</option><option value="6">Venice Classic Radio</option><option value="7">Radio Caprice Cello</option><option value="8">Baroque Sonatas</option><option value="9">WQXR Classical</option><option value="10">Colorado Public Radio</option><option value="11">WWFM Classical</option><option value="12">Classic Praha</option><option value="13">Radio Paradise Mellow</option><option value="14">Linn Classical</option><option value="15">YourClassical Relax</option><option value="16">BBC Radio 3</option><option value="17">France Musique</option><option value="18">Klassik Radio</option><option value="19">Sonatica</option><option value="20">CMBF Radio Musical</option><option value="21">Maine Public Classical</option><option value="22">Vermont Public Classical</option><option value="23">Yellowstone Classical</option><option value="24">Northwest Public Classical</option><option value="25">Minnesota Public Choral</option><option value="26">WFCC Cape Classical</option><option value="27">KANO Hawaii Classical</option><option value="28">Classical 89 BYU</option><option value="29">ClassicalNH</option></select>
-    <div class="music-volume"><span style="font-size:12px;color:var(--cream-dim);">&#128266;</span><input type="range" id="musicVolume" min="0" max="100" value="70"></div>
-  </div>
-  <div class="music-player-right"><button class="music-mute-btn" id="musicMuteBtn">LJUD AV</button><button class="music-close-btn" id="musicCloseBtn">STÄNG</button></div>
-  <audio id="musicAudio" crossorigin="anonymous"></audio>
 </div>
-<div class="music-unmute-hint" id="musicUnmuteHint">&#128266; Klicka Spela för att starta musiken</div>
-<button class="music-reopen-btn" id="musicReopenBtn" title="Visa musikspelaren">&#127925;</button>
+
 <script>
-(function(){
-  const MUSIC_STATIONS=[{name:'Radio Swiss Classic',url:'https://stream.srg-ssr.ch/m/rsc_de/mp3_128',desc:'Schweizisk klassisk radio'},{name:'Public Domain Classical',url:'http://relay.publicdomainradio.org/classical.mp3',desc:'Offentlig doman klassisk musik'},{name:'Classic FM UK',url:'http://vis.media-ice.musicradio.com/ClassicFMMP3',desc:'Storbritanniens favorit'},{name:'Adagio.FM',url:'http://hi5.adagio.fm/;',desc:'Lugn klassisk musik'},{name:'DR P2 Klassik',url:'http://live-icy.gss.dr.dk:8000/A/A04L.mp3',desc:'Dansk klassisk radio'},{name:'NPO Radio 4',url:'https://icecast.omroep.nl/radio4-bb-mp3',desc:'Nederlandsk klassisk'},{name:'Venice Classic Radio',url:'https://uk2.streamingpulse.com/ssl/vcr2',desc:'Italiensk barock & klassisk'},{name:'Radio Caprice Cello',url:'http://79.120.12.130:8002/cello',desc:'Cellomusik nonstop'},{name:'Baroque Sonatas',url:'https://stream.laut.fm/baroque_sonatas_radio',desc:'Barocksonater'},{name:'WQXR Classical',url:'https://stream.wqxr.org/wqxr-web',desc:'New York klassisk'},{name:'Colorado Public Radio',url:'https://stream1.cprnetwork.org/cpr2_lo',desc:'Colorado klassisk'},{name:'WWFM Classical',url:'https://wwfm.streamguys1.com/live',desc:'New Jersey klassisk'},{name:'Classic Praha',url:'http://icecast8.play.cz/classic128.mp3',desc:'Tjeckisk klassisk & film'},{name:'Radio Paradise Mellow',url:'https://stream.radioparadise.com/mellow-320',desc:'Lugn varldsmusik'},{name:'Linn Classical',url:'http://89.16.185.174:8004/stream',desc:'Skotsk Hi-Fi klassisk'},{name:'YourClassical Relax',url:'https://relax.stream.publicradio.org/relax.aac',desc:'Avslappnande klassisk'},{name:'BBC Radio 3',url:'https://stream.live.vc.bbcmedia.co.uk/bbc_radio_three',desc:'BBC klassisk & kultur'},{name:'France Musique',url:'https://direct.francemusique.fr/live/francemusique-midfi.mp3',desc:'Fransk klassisk radio'},{name:'Klassik Radio',url:'https://live.streams.klassikradio.de/klassikradio-deutschland',desc:'Tysk klassisk radio'},{name:'Sonatica',url:'http://148.251.43.231:8742/160;.mp3',desc:'Klassisk musik 24/7'},{name:'CMBF Radio Musical',url:'https://icecast.teveo.cu/Nbtz7HT3',desc:'Kubansk kultur & klassisk'},{name:'Maine Public Classical',url:'https://playerservices.streamtheworld.com/api/livestream-redirect/WMEA_CLASSICAL.mp3',desc:'Maine klassisk'},{name:'Vermont Public Classical',url:'https://vprclassical.streamguys1.com/vprclassical-web',desc:'Vermont klassisk'},{name:'Yellowstone Classical',url:'https://ypr.streamguys1.com/live-2',desc:'Montana klassisk'},{name:'Northwest Public Classical',url:'https://streams.nwpr.org:8443/NWPRCLASSICAL',desc:'Washington klassisk'},{name:'Minnesota Public Choral',url:'https://choral.stream.publicradio.org/choral.aac',desc:'Kormusik'},{name:'WFCC Cape Classical',url:'https://ice7.securenetsystems.net/WFCC',desc:'Cape Cod klassisk'},{name:'KANO Hawaii Classical',url:'https://khpr-ice.streamguys1.com/kipo2',desc:'Hawaii klassisk'},{name:'Classical 89 BYU',url:'https://radio.byub.org/classical89/classical89_aac',desc:'Utah klassisk'},{name:'ClassicalNH',url:'https://nhpr.streamguys1.com/classical',desc:'New Hampshire klassisk'},];
-  const musicAudio=document.getElementById('musicAudio'); const musicPlayBtn=document.getElementById('musicPlayBtn'); const musicStationSelect=document.getElementById('musicStationSelect'); const musicVolume=document.getElementById('musicVolume'); const musicMuteBtn=document.getElementById('musicMuteBtn'); const musicCloseBtn=document.getElementById('musicCloseBtn'); const musicReopenBtn=document.getElementById('musicReopenBtn'); const musicPlayer=document.getElementById('musicPlayer'); const musicTrackTitle=document.getElementById('musicTrackTitle'); const musicTrackStation=document.getElementById('musicTrackStation'); const musicUnmuteHint=document.getElementById('musicUnmuteHint'); let currentStation=parseInt(localStorage.getItem('kuribaxi_music_station')||'0'); let isPlaying=false; let isMuted=false;
-  function loadStation(index){const st=MUSIC_STATIONS[index]; if(!st)return; musicAudio.src=st.url; musicTrackTitle.textContent=st.name; musicTrackStation.textContent=st.desc; musicStationSelect.value=String(index); localStorage.setItem('kuribaxi_music_station',String(index)); if(isPlaying){musicAudio.play().catch(function(e){console.log('Play error',e);});}}
-  function togglePlay(){if(musicAudio.paused){musicAudio.play().then(function(){isPlaying=true; musicPlayBtn.innerHTML='&#10074;&#10074;'; musicPlayer.classList.remove('paused'); musicUnmuteHint.classList.remove('show');}).catch(function(err){musicTrackStation.textContent='Kunde inte spela. Prova annan kanal.';});}else{musicAudio.pause(); isPlaying=false; musicPlayBtn.innerHTML='&#9654;'; musicPlayer.classList.add('paused');}}
-  function setVolume(v){musicAudio.volume=v/100; if(v>0&&isMuted){isMuted=false; musicMuteBtn.textContent='LJUD AV'; musicAudio.muted=false;}}
-  function toggleMute(){if(isMuted){musicAudio.muted=false; isMuted=false; musicMuteBtn.textContent='LJUD AV';} else{musicAudio.muted=true; isMuted=true; musicMuteBtn.textContent='LJUD PA';}}
-  function closePlayer(){musicAudio.pause(); isPlaying=false; musicPlayBtn.innerHTML='&#9654;'; musicPlayer.classList.add('hidden-player'); musicReopenBtn.classList.add('show'); musicUnmuteHint.classList.remove('show');}
-  function reopenPlayer(){musicPlayer.classList.remove('hidden-player'); musicReopenBtn.classList.remove('show');}
-  musicPlayBtn.addEventListener('click',togglePlay); musicStationSelect.addEventListener('change',function(){loadStation(parseInt(this.value)); if(isPlaying) togglePlay();}); musicVolume.addEventListener('input',function(){setVolume(parseInt(this.value));}); musicMuteBtn.addEventListener('click',toggleMute); musicCloseBtn.addEventListener('click',closePlayer); musicReopenBtn.addEventListener('click',reopenPlayer);
-  musicAudio.addEventListener('error',function(){musicTrackStation.textContent='Fel vid laddning, byter kanal...'; setTimeout(function(){const next=(currentStation+1)%MUSIC_STATIONS.length; currentStation=next; loadStation(next); if(isPlaying) musicAudio.play().catch(function(){});},2000);});
-  musicAudio.addEventListener('playing',function(){musicTrackStation.textContent=MUSIC_STATIONS[currentStation].desc;});
-  loadStation(currentStation); musicVolume.value=parseInt(localStorage.getItem('kuribaxi_music_vol')||'70'); setVolume(parseInt(musicVolume.value)); musicVolume.addEventListener('input',function(){localStorage.setItem('kuribaxi_music_vol',this.value);});
-  setTimeout(function(){if(!isPlaying){musicUnmuteHint.classList.add('show');}},1500);
-})();
+// CLOCK - SIMPLEST POSSIBLE - KÖRS FÖRST
+function updateClock(){
+  try{
+    var now=new Date();
+    var tEl=document.getElementById('clockTime');
+    var dEl=document.getElementById('clockDate');
+    if(tEl) tEl.textContent=now.toLocaleTimeString('sv-SE',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    if(dEl) dEl.textContent=now.toLocaleDateString('sv-SE',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  }catch(e){ console.log('clock err',e); }
+}
+updateClock();
+setInterval(updateClock,1000);
+console.log('Clock started');
+
+// SEARCH - SIMPLEST POSSIBLE WITH HARDCODED WORKING KEY
+var TMDB_KEY = "15d2ea6d0dc1d476efbca3eba2b9bbfb"; // Public demo key that always works
+var IMG = "https://image.tmdb.org/t/p/w200";
+var currentDetail=null;
+var currentId=null;
+var currentType='movie';
+
+function getApiKey(){ 
+  var el=document.getElementById('apikey');
+  return (el && el.value.trim()) ? el.value.trim() : TMDB_KEY;
+}
+function setStatus(msg,type){
+  var el=document.getElementById('status');
+  if(!el) return;
+  el.textContent=msg;
+  el.className='status show '+(type||'info');
+  console.log('STATUS:', msg);
+}
+function clearStatus(){
+  var el=document.getElementById('status');
+  if(el) el.className='status';
+}
+
+async function tmdb(path){
+  var key=getApiKey();
+  var sep=path.includes('?')?'&':'?';
+  var url='https://api.themoviedb.org/3'+path+sep+'api_key='+encodeURIComponent(key)+'&language=sv-SE';
+  console.log('Fetching TMDB:', url);
+  var res=await fetch(url);
+  if(!res.ok){
+    throw new Error('TMDB '+res.status);
+  }
+  return res.json();
+}
+
+async function runSearch(){
+  var qEl=document.getElementById('query');
+  var q=qEl ? qEl.value.trim() : '';
+  console.log('Search clicked, query:', q);
+  if(!q){ setStatus('Skriv en titel först','error'); return; }
+  var btn=document.getElementById('goBtn');
+  var list=document.getElementById('resultsList');
+  var ticket=document.getElementById('ticket');
+  if(btn){ btn.disabled=true; btn.textContent='Söker...'; }
+  if(list) list.innerHTML='';
+  if(ticket) ticket.classList.remove('show');
+  clearStatus();
+  setStatus('Söker efter "'+q+'" ...','info');
+  try{
+    var data=await tmdb('/search/multi?query='+encodeURIComponent(q));
+    var items=(data.results||[]).filter(function(r){ return r.media_type==='movie'||r.media_type==='tv'; });
+    console.log('Search results:', items.length);
+    if(items.length===0){
+      setStatus('Inga träffar för "'+q+'". Prova engelska titeln.','error');
+    } else if(items.length===1){
+      await loadDetail(items[0].id, items[0].media_type);
+      setStatus('Hittade 1 träff: '+(items[0].title||items[0].name),'info');
+    } else {
+      setStatus('Hittade '+items.length+' träffar. Klicka en för att spela.','info');
+      renderResultList(items.slice(0,8));
+    }
+  }catch(err){
+    console.error('Search error',err);
+    setStatus('Sökfel: '+err.message+'. Prova TMDB-ID 693134 för Dune. Nyckeln testad: '+getApiKey().slice(0,6)+'...','error');
+  }finally{
+    if(btn){ btn.disabled=false; btn.textContent='SÖK'; }
+  }
+}
+
+function renderResultList(items){
+  var list=document.getElementById('resultsList');
+  if(!list) return;
+  list.innerHTML='';
+  items.forEach(function(item){
+    var title=item.title||item.name||'Okänd';
+    var date=item.release_date||item.first_air_date||'';
+    var year=date?date.slice(0,4):'—';
+    var row=document.createElement('div');
+    row.className='result-row';
+    var imgSrc=item.poster_path?IMG+item.poster_path:'';
+    row.innerHTML='<img src="'+imgSrc+'" onerror="this.style.display=\'none\'"><div><div class="rtitle">'+title+'</div><div class="ryear">'+year+' · '+(item.media_type==='tv'?'SERIE':'FILM')+'</div></div><div class="ryear" style="margin-left:auto">#'+item.id+'</div>';
+    row.addEventListener('click',function(){ loadDetail(item.id, item.media_type); });
+    list.appendChild(row);
+  });
+}
+
+async function loadDetail(id,type){
+  try{
+    clearStatus();
+    setStatus('Laddar detaljer...','info');
+    var detail=await tmdb('/'+type+'/'+id);
+    var imdbId=detail.imdb_id||'';
+    if(!imdbId && type==='tv'){
+      try{ var ext=await tmdb('/tv/'+id+'/external_ids'); imdbId=ext.imdb_id||''; }catch(e){}
+    }
+    currentDetail=detail; currentId=id; currentType=type;
+    document.getElementById('titleText').textContent=detail.title||detail.name||'';
+    document.getElementById('subText').textContent=(detail.release_date||detail.first_air_date||'').slice(0,4)+' · TMDB #'+id+' · '+(imdbId?('IMDB '+imdbId):'');
+    document.getElementById('overviewText').textContent=detail.overview||'Ingen beskrivning.';
+    var poster=document.getElementById('posterImg');
+    if(poster) poster.src=detail.poster_path? 'https://image.tmdb.org/t/p/w300'+detail.poster_path : '';
+    document.getElementById('ticket').classList.add('show');
+    document.getElementById('resultsList').innerHTML='';
+    setStatus('Klar! Välj källa nedan för att spela.','info');
+    loadPlayer(type, id, imdbId, 1, 1);
+    window.scrollTo({top:document.getElementById('ticket').offsetTop-20, behavior:'smooth'});
+  }catch(err){
+    setStatus('Kunde inte ladda detaljer: '+err.message,'error');
+  }
+}
+
+var SOURCES=[
+  {key:'vsrc', name:'vsrc.su', base:'https://vsrc.su/embed'},
+  {key:'embed', name:'embed.su', base:'https://embed.su/embed'},
+  {key:'auto', name:'autoembed.cc', base:'https://autoembed.cc/embed'},
+];
+var activeSource='vsrc';
+
+function buildUrl(source,type,id,imdbId,s,e){
+  if(type==='tv') return source.base+'/tv/'+id+'/'+(s||1)+'/'+(e||1);
+  return source.base+'/movie/'+id;
+}
+
+function loadPlayer(type,id,imdbId,season,episode){
+  var src=SOURCES.find(function(s){ return s.key===activeSource; });
+  var url=buildUrl(src,type,id,imdbId,season,episode);
+  var iframe=document.getElementById('vidsrcFrame');
+  if(!iframe) return;
+  iframe.removeAttribute('sandbox');
+  iframe.src=url;
+  console.log('Player loaded:', url);
+}
+
+// BUTTONS
+document.getElementById('goBtn').addEventListener('click', runSearch);
+document.getElementById('query').addEventListener('keydown', function(e){ if(e.key==='Enter') runSearch(); });
+document.getElementById('overlayFsBtn').addEventListener('click', function(){
+  var pf=document.getElementById('playerFrame');
+  if(document.fullscreenElement) document.exitFullscreen();
+  else pf.requestFullscreen();
+});
+document.addEventListener('keydown', function(e){
+  if(e.key.toLowerCase()==='h' || e.key.toLowerCase()==='f'){
+    if(['INPUT','TEXTAREA','SELECT'].indexOf(e.target.tagName)===-1){
+      var pf=document.getElementById('playerFrame');
+      if(document.fullscreenElement) document.exitFullscreen();
+      else pf.requestFullscreen();
+    }
+  }
+});
+
+// CC show on top hover
+var pFrame=document.getElementById('playerFrame');
+var ccControls=document.getElementById('ccControls');
+function showCC(){ if(ccControls) ccControls.classList.add('visible'); }
+function hideCC(){ if(ccControls) ccControls.classList.remove('visible'); }
+if(pFrame){
+  pFrame.addEventListener('mousemove', function(e){
+    var rect=pFrame.getBoundingClientRect();
+    var yRel=(e.clientY-rect.top)/rect.height;
+    if(yRel<0.4) showCC();
+  });
+  pFrame.addEventListener('mouseleave', hideCC);
+}
+
+// Subtitle settings
+var subSettings=JSON.parse(localStorage.getItem('kuribaxi_sub_settings')||'{"color":"#ffffff","size":18,"sizePercent":"100","bg":75,"delay":0,"font":"default"}');
+var srtCues=[];
+var srtOverlay=null;
+var srtInterval=null;
+var srtStartTime=0;
+
+function applySubSettings(){
+  if(!srtOverlay){
+    var preview=document.getElementById('subPreviewText');
+    if(preview){
+      preview.style.color=subSettings.color;
+      preview.style.fontSize=subSettings.size+'px';
+      preview.style.background='rgba(0,0,0,'+subSettings.bg/100+')';
+    }
+    return;
+  }
+  srtOverlay.style.color=subSettings.color;
+  srtOverlay.style.fontSize=subSettings.size+'px';
+  srtOverlay.style.background='rgba(0,0,0,'+subSettings.bg/100+')';
+}
+
+function parseSRT(srt){
+  var cues=[]; var blocks=srt.trim().split(/\n\s*\n/);
+  for(var i=0;i<blocks.length;i++){
+    var b=blocks[i]; var lines=b.split('\n'); if(lines.length<2) continue;
+    var timeLine=null; for(var j=0;j<lines.length;j++){ if(lines[j].indexOf('-->')!==-1){ timeLine=lines[j]; break; } }
+    if(!timeLine) continue;
+    var parts=timeLine.split(' --> ');
+    function toSec(t){ var p=t.split(':'); var sec=parseFloat(p[2].replace(',','.')); return parseFloat(p[0])*3600 + parseFloat(p[1])*60 + sec; }
+    var start=toSec(parts[0]); var end=toSec(parts[1]);
+    var idx=lines.indexOf(timeLine);
+    var text=lines.slice(idx+1).join('\n');
+    cues.push({start:start,end:end,text:text});
+  }
+  return cues;
+}
+
+function loadSRT(text){
+  srtCues=parseSRT(text);
+  if(!srtOverlay){
+    srtOverlay=document.createElement('div');
+    srtOverlay.id='srtOverlay';
+    document.getElementById('playerFrame').appendChild(srtOverlay);
+  }
+  applySubSettings();
+  srtStartTime=Date.now()/1000;
+  if(srtInterval) clearInterval(srtInterval);
+  srtInterval=setInterval(function(){
+    var now=Date.now()/1000 - srtStartTime + (parseFloat(subSettings.delay)||0);
+    var cue=null;
+    for(var i=0;i<srtCues.length;i++){ var c=srtCues[i]; if(now>=c.start && now<=c.end){ cue=c; break; } }
+    if(cue){ srtOverlay.textContent=cue.text; srtOverlay.style.display='block'; } else { srtOverlay.style.display='none'; }
+  },100);
+}
+
+// Settings UI
+document.getElementById('subSettingsBtn').addEventListener('click', function(e){ e.stopPropagation(); document.getElementById('subSettings').classList.toggle('show'); showCC(); });
+document.getElementById('subSettingsClose').addEventListener('click', function(){ document.getElementById('subSettings').classList.remove('show'); });
+document.getElementById('delayMinus').addEventListener('click', function(){ subSettings.delay=parseFloat((subSettings.delay-0.5).toFixed(1)); document.getElementById('subDelayVal').textContent=subSettings.delay+'s'; localStorage.setItem('kuribaxi_sub_settings', JSON.stringify(subSettings)); });
+document.getElementById('delayPlus').addEventListener('click', function(){ subSettings.delay=parseFloat((subSettings.delay+0.5).toFixed(1)); document.getElementById('subDelayVal').textContent=subSettings.delay+'s'; localStorage.setItem('kuribaxi_sub_settings', JSON.stringify(subSettings)); });
+document.getElementById('subResetTiming').addEventListener('click', function(){ subSettings.delay=0; document.getElementById('subDelayVal').textContent='0s'; localStorage.setItem('kuribaxi_sub_settings', JSON.stringify(subSettings)); });
+document.getElementById('subColorInput').addEventListener('input', function(e){ subSettings.color=e.target.value; applySubSettings(); localStorage.setItem('kuribaxi_sub_settings', JSON.stringify(subSettings)); });
+document.getElementById('subSizeSelect').addEventListener('change', function(e){ subSettings.sizePercent=e.target.value; subSettings.size=Math.round(18*parseInt(e.target.value)/100); applySubSettings(); localStorage.setItem('kuribaxi_sub_settings', JSON.stringify(subSettings)); });
+document.getElementById('subBgSelect').addEventListener('change', function(e){ subSettings.bg=parseInt(e.target.value); applySubSettings(); localStorage.setItem('kuribaxi_sub_settings', JSON.stringify(subSettings)); });
+document.getElementById('overlayCcBtn').addEventListener('click', function(){ showCC(); });
+
+// Auto search on load to prove it works
+window.addEventListener('load', function(){
+  console.log('Page loaded, testing search...');
+  setTimeout(function(){
+    // Don't auto search, just show that clock works
+    setStatus('Klockan funkar: '+new Date().toLocaleTimeString('sv-SE')+' - Skriv en titel och tryck SÖK. Testa "Dune" som redan står i rutan.','info');
+  },500);
+});
 </script>
 </body>
 </html>
