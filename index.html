@@ -197,7 +197,7 @@
   .music-unmute-hint.show{display:block;} @keyframes hint-bounce{0%,100%{transform:translateX(-50%) translateY(0);}50%{transform:translateX(-50%) translateY(-4px);}}
   @media(max-width:700px){.music-player{flex-wrap:wrap;padding:8px 12px;gap:8px;} .music-track-title{max-width:120px;} .music-volume input[type=range]{width:50px;} .music-station-select{max-width:120px;} .library-grid{grid-template-columns:repeat(auto-fill,minmax(110px,1fr));}}
 
-  /* ===== PLAYER CONTROLS ===== */
+  /* ===== PLAYER CONTROLS + NY CC LOGIK ===== */
   .player-frame { position: relative; }
   .player-overlay {
     position: absolute;
@@ -216,7 +216,22 @@
   .player-frame:fullscreen iframe{width:100%; height:100%; position:static;}
   .player-frame:fullscreen .player-overlay{opacity:0;} .player-frame:fullscreen:hover .player-overlay{opacity:1;}
 
-  /* ===== CC CONTROLS (visas på nederdelen) ===== */
+  /* ===== OPENSUBTITLES INTEGRATION ===== */
+  .os-panel{
+    position:absolute; bottom:52px; left:12px; right:12px;
+    background:rgba(18,27,46,0.98); border:1px solid var(--gold); border-radius:10px;
+    padding:10px; max-height:200px; overflow-y:auto; z-index:20; display:none;
+    box-shadow:0 12px 30px rgba(0,0,0,0.6); backdrop-filter:blur(12px);
+  }
+  .os-panel.show{display:block;}
+  .os-panel h4{font-size:11px; color:var(--gold-bright); font-family:'JetBrains Mono',monospace; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;}
+  .os-item{display:flex; justify-content:space-between; align-items:center; padding:6px 8px; border-radius:6px; background:rgba(255,255,255,0.03); border:1px solid transparent; margin-bottom:6px; cursor:pointer; transition:all .15s;}
+  .os-item:hover{border-color:var(--gold); background:rgba(201,162,39,0.08);}
+  .os-item-name{font-size:11px; color:var(--cream); max-width:65%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .os-item-meta{font-size:10px; color:var(--cream-dim); font-family:'JetBrains Mono',monospace;}
+  .os-badge{font-size:9px; padding:2px 6px; border-radius:10px; background:var(--teal); color:#000; font-weight:700; margin-left:6px;}
+
+  /* NYA CC - VISAS BARA NÄR MUSEN ÄR PÅ NEDRE DELEN */
   .cc-controls{
     position:absolute; bottom:0; left:0; right:0;
     padding:44px 16px 14px;
@@ -228,7 +243,7 @@
     pointer-events:none;
   }
   .cc-controls.visible{opacity:1; transform:translateY(0); pointer-events:auto;}
-  .cc-left{display:flex; gap:10px; align-items:center; flex-wrap:wrap;}
+  .cc-left{display:flex; gap:10px; align-items:center;}
   .cc-btn{
     background:rgba(255,255,255,0.14); border:1px solid rgba(255,255,255,0.28); color:#fff;
     border-radius:8px; padding:7px 14px; font-size:12px; font-family:'JetBrains Mono',monospace; font-weight:700;
@@ -244,44 +259,6 @@
     pointer-events:none; z-index:11; opacity:0; transition:opacity .2s;
   }
   .player-frame:hover .cc-zone-hint{opacity:1;}
-  
-  /* ===== SUBTITLE OVERLAY ===== */
-  #srtOverlay {
-    position:absolute; bottom:90px; left:50%; transform:translateX(-50%);
-    max-width:85%; background:rgba(0,0,0,0.8); color:#fff;
-    padding:8px 18px; border-radius:8px; font-size:18px;
-    line-height:1.4; text-align:center; text-shadow:1px 1px 3px #000;
-    z-index:15; pointer-events:none; font-family:'Manrope',sans-serif;
-    display:none; border:1px solid rgba(255,255,255,0.1);
-  }
-  
-  /* ===== OPENSUBTITLES PANEL ===== */
-  .os-panel{
-    position:absolute; bottom:105px; left:12px; right:12px;
-    background:rgba(18,27,46,0.98); border:1px solid var(--gold); border-radius:10px;
-    padding:12px; max-height:250px; overflow-y:auto; z-index:20; display:none;
-    box-shadow:0 12px 30px rgba(0,0,0,0.6); backdrop-filter:blur(12px);
-  }
-  .os-panel.show{display:block;}
-  .os-panel h4{font-size:11px; color:var(--gold-bright); font-family:'JetBrains Mono',monospace; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;}
-  .os-panel .os-close{font-size:14px; cursor:pointer; padding:0 6px; color:var(--cream-dim);}
-  .os-panel .os-close:hover{color:var(--gold-bright);}
-  .os-item{display:flex; justify-content:space-between; align-items:center; padding:8px 10px; border-radius:6px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.06); margin-bottom:6px; cursor:pointer; transition:all .15s;}
-  .os-item:hover{border-color:var(--gold); background:rgba(201,162,39,0.1);}
-  .os-item-name{font-size:12px; color:var(--cream); max-width:60%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-  .os-item-meta{font-size:10px; color:var(--cream-dim); font-family:'JetBrains Mono',monospace; display:flex; align-items:center; gap:6px; flex-shrink:0;}
-  .os-badge{font-size:9px; padding:2px 8px; border-radius:10px; background:var(--teal); color:#000; font-weight:700;}
-  .os-badge.sv{background:#1a8a5a;}
-  .os-badge.en{background:#1a6a8a;}
-  .os-badge.fa{background:#8a6a1a;}
-  .os-badge.ku{background:#8a2a4a;}
-  .os-status{font-size:11px; color:var(--cream-dim); padding:8px; text-align:center;}
-  .os-status.loading{color:var(--teal);}
-  .os-status.error{color:var(--error);}
-  .os-status.success{color:var(--green-light);}
-  
-  .subtitle-status{font-size:10px; color:var(--teal); font-family:'JetBrains Mono',monospace; margin-top:4px; display:none;}
-  .subtitle-status.show{display:block;}
 </style>
 <base target="_blank">
 </head>
@@ -293,18 +270,18 @@
 <div class="marquee">
     <div class="bulbs" id="bulbs"></div>
     <h1>Var kan jag <span>se</span> den?</h1>
-    <p>Sök på titel, TMDB-id eller IMDb-id. Spelaren laddas direkt under biljetten.</p>
+    <p>Sok pa titel, TMDB-id eller IMDb-id. Spelaren laddas direkt under biljetten.</p>
   </div>
   <div class="wrap">
     <div class="config">
       <div class="config-row">
         <div class="field">
           <label for="apikey">TMDB API-nyckel (v3)</label>
-          <input type="password" id="apikey" placeholder="klistra in din nyckel här" value="31efe739e595ccb0a3337a0dc8b4e76f">
+          <input type="password" id="apikey" placeholder="klistra in din nyckel har" value="31efe739e595ccb0a3337a0dc8b4e76f">
         </div>
         <div class="field">
-          <label for="osApiKey">OpenSubtitles.com API-nyckel (valfri)</label>
-          <input type="password" id="osApiKey" placeholder="skaffa gratis på opensubtitles.com" value="">
+          <label for="osapikey">OpenSubtitles API-nyckel</label>
+          <input type="password" id="osapikey" placeholder="OpenSubtitles API key" value="vkAVzWB6h1zRX0TEhSiWsD9qZ042Xy5l">
         </div>
       </div>
     </div>
@@ -319,7 +296,7 @@
         <button data-type="tv">SERIE</button>
       </div>
       <input type="text" id="query" class="search-box" placeholder="t.ex. Dune, 693134, eller tt15239678">
-      <button class="go-btn" id="goBtn">Sök</button>
+      <button class="go-btn" id="goBtn">Sok</button>
     </div>
     <div style="margin-top:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
       <span style="font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--gold-bright);text-transform:uppercase;letter-spacing:0.06em;font-weight:700;">Tangentbord:</span>
@@ -372,27 +349,31 @@
           <div class="cc-controls" id="ccControls">
             <div class="cc-left">
               <button class="cc-btn" id="ccToggleBtn">CC</button>
-              <span class="cc-hint" id="ccHint">Hovra här nere = undertexter</span>
+              <span class="cc-hint" id="ccHint">Hovra här nere = subs</span>
             </div>
-            <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
-              <button class="cc-btn cc-lang-btn" data-lang="sv">SV</button>
-              <button class="cc-btn cc-lang-btn" data-lang="en">EN</button>
-              <button class="cc-btn cc-lang-btn" data-lang="fa" style="border-color:var(--gold-bright); color:var(--gold-bright);">FA</button>
-              <button class="cc-btn cc-lang-btn" data-lang="ku" style="border-color:#ff6b6b; color:#ff9f9f;">KU</button>
+            <div style="display:flex; gap:6px; align-items:center;">
+              <button class="cc-btn" id="ccLangSv">SV</button>
+              <button class="cc-btn" id="ccLangEn">EN</button>
+              <button class="cc-btn" id="ccLangFa" style="border-color:var(--gold-bright); color:var(--gold-bright);">FA</button>
+              <button class="cc-btn" id="ccLangKu" style="border-color:#ff6b6b; color:#ff9f9f;">KU</button>
               <button class="cc-btn" id="ccOsBtn" style="background:var(--teal); color:#000; border-color:var(--teal);">OS.com</button>
             </div>
           </div>
           <div class="os-panel" id="osPanel">
-            <h4><span id="osTitle">OpenSubtitles.com</span> <span class="os-close" id="osClose">✕</span></h4>
-            <div id="osResults"><div class="os-status loading">⏳ Söker undertexter...</div></div>
+            <h4><span id="osTitle">OpenSubtitles.com</span> <span id="osClose" style="cursor:pointer; padding:2px 6px; border:1px solid var(--panel-line); border-radius:12px;">✕</span></h4>
+            <div id="osResults" style="display:flex; flex-direction:column; gap:4px;">
+              <div style="font-size:11px; color:var(--cream-dim);">Söker...</div>
+            </div>
+            <div style="margin-top:8px; display:flex; gap:6px;">
+              <a id="osExternalLink" href="#" target="_blank" style="font-size:10px; color:var(--gold-bright); text-decoration:none; border-bottom:1px dotted var(--gold);">Öppna på OpenSubtitles.com →</a>
+              <span style="font-size:10px; color:var(--cream-dim);">| Laddar ner .srt och läggs över videon</span>
+            </div>
           </div>
           <div class="cc-zone-hint" id="ccZoneHint">↓ CC visas här</div>
-          <div id="srtOverlay"></div>
-          <div class="subtitle-status" id="subtitleStatus"></div>
         </div>
         <div class="browser-frame" id="browserFrame" style="display:none;">
           <div class="browser-icon">&#127760;</div>
-          <p id="browserFrameText">Den här källan öppnas i webbläsaren.<br><strong>Klicka knappen nedan för att spela upp.</strong></p>
+          <p id="browserFrameText">Den har kallan oppnas i webblasaren.<br><strong>Klicka knappen nedan for att spela upp.</strong></p>
           <a class="open-browser-btn" id="openBrowserBtn" href="#" target="_blank" rel="noopener">Spela upp i ny flik &#8594;</a>
         </div>
         <div class="player-meta" id="playerMeta"></div>
@@ -462,22 +443,21 @@
   const statusEl=document.getElementById('status'); function setStatus(msg,type){statusEl.textContent=msg; statusEl.className='status show '+(type||'info');} function clearStatus(){statusEl.className='status';}
   const resultsList=document.getElementById('resultsList'); const ticket=document.getElementById('ticket'); const IMG='https://image.tmdb.org/t/p/w200';
   function apiKey(){return document.getElementById('apikey').value.trim();}
-  function osApiKey(){return document.getElementById('osApiKey').value.trim();}
   async function tmdb(path){const key=apiKey(); if(!key){throw new Error('NEEDKEY');} const sep=path.includes('?')?'&':'?'; const res=await fetch('https://api.themoviedb.org/3'+path+sep+'api_key='+encodeURIComponent(key)+'&language=sv-SE'); if(!res.ok){if(res.status===401) throw new Error('BADKEY'); throw new Error('HTTP_'+res.status);} return res.json();}
   document.getElementById('goBtn').addEventListener('click',runSearch); document.getElementById('query').addEventListener('keydown',(e)=>{if(e.key==='Enter') runSearch();});
   async function runSearch(){
-    clearStatus(); resultsList.innerHTML=''; ticket.classList.remove('show'); const q=document.getElementById('query').value.trim(); if(!q){setStatus('Skriv in en titel eller ett id först.','error'); return;} if(!apiKey()){setStatus('Lägg in din TMDB API-nyckel ovan först.','error'); return;}
-    const btn=document.getElementById('goBtn'); btn.disabled=true; btn.textContent='Söker...';
+    clearStatus(); resultsList.innerHTML=''; ticket.classList.remove('show'); const q=document.getElementById('query').value.trim(); if(!q){setStatus('Skriv in en titel eller ett id forst.','error'); return;} if(!apiKey()){setStatus('Lagg in din TMDB API-nyckel ovan forst.','error'); return;}
+    const btn=document.getElementById('goBtn'); btn.disabled=true; btn.textContent='Soker...';
     try{
       if(mode==='title'){
         const data=await tmdb('/search/multi?query='+encodeURIComponent(q)); const items=(data.results||[]).filter(r=>r.media_type==='movie'||r.media_type==='tv');
-        if(items.length===0){setStatus('Inga träffar. Kolla stavningen eller prova på engelska.','error');} else if(items.length===1){await loadDetail(items[0].id,items[0].media_type);} else {renderResultList(items.slice(0,8));}
+        if(items.length===0){setStatus('Inga traffar. Kolla stavningen eller prova pa engelska.','error');} else if(items.length===1){await loadDetail(items[0].id,items[0].media_type);} else {renderResultList(items.slice(0,8));}
       } else if(mode==='tmdb'){
         let detail=null; let foundType=null; try{detail=await tmdb('/'+mediaType+'/'+encodeURIComponent(q)); foundType=mediaType;}catch(e){const otherType=mediaType==='movie'?'tv':'movie'; try{detail=await tmdb('/'+otherType+'/'+encodeURIComponent(q)); foundType=otherType;}catch(e2){}} if(!detail){setStatus('Hittade ingen titel med det TMDB-ID:t.','error');} else {await loadDetail(q,foundType);}
       } else {
-        const data=await tmdb('/find/'+encodeURIComponent(q)+'?external_source=imdb_id'); let results=mediaType==='movie'?data.movie_results:data.tv_results; let foundType=mediaType; if(!results||!results.length){const otherType=mediaType==='movie'?'tv':'movie'; results=otherType==='movie'?data.movie_results:data.tv_results; foundType=otherType;} if(results&&results.length){await loadDetail(results[0].id,foundType);} else {setStatus('Hittade ingen film eller serie för det IMDb-id:t.','error');}
+        const data=await tmdb('/find/'+encodeURIComponent(q)+'?external_source=imdb_id'); let results=mediaType==='movie'?data.movie_results:data.tv_results; let foundType=mediaType; if(!results||!results.length){const otherType=mediaType==='movie'?'tv':'movie'; results=otherType==='movie'?data.movie_results:data.tv_results; foundType=otherType;} if(results&&results.length){await loadDetail(results[0].id,foundType);} else {setStatus('Hittade ingen film eller serie for det IMDb-id:t.','error');}
       }
-    }catch(err){handleError(err);} finally {btn.disabled=false; btn.textContent='Sök';}
+    }catch(err){handleError(err);} finally {btn.disabled=false; btn.textContent='Sok';}
   }
   function renderResultList(items){
     resultsList.innerHTML=''; items.forEach(item=>{const title=item.title||item.name; const date=item.release_date||item.first_air_date||''; const year=date?date.slice(0,4):'&#8212;'; const row=document.createElement('div'); row.className='result-row'; row.innerHTML='<img src="'+(item.poster_path?IMG+item.poster_path:'')+'" alt=""><div class="rmeta"><div class="rtitle">'+escapeHtml(title)+'</div><div class="ryear">'+year+'</div></div><div class="ryear rid mono">TMDB #'+item.id+'</div><div class="rtype">'+(item.media_type==='tv'?'SERIE':'FILM')+'</div>'; row.addEventListener('click',()=>{loadDetail(item.id,item.media_type).catch(handleError);}); resultsList.appendChild(row);});
@@ -495,19 +475,19 @@
   function loadPlayer(type,id,imdbId,season,episode){
     const src=SOURCES.find(s=>s.key===activeSource); const url=buildUrl(src,type,id,imdbId,season,episode);
     const iframe=document.getElementById('vidsrcFrame'); const playerFrame=document.getElementById('playerFrame'); const browserFrame=document.getElementById('browserFrame'); const openBtn=document.getElementById('openBrowserBtn'); const browserFrameText=document.getElementById('browserFrameText');
-    if(src.openInBrowser){playerFrame.style.display='none'; browserFrame.style.display='flex'; openBtn.href=url; iframe.src=''; browserFrameText.innerHTML='Den här källan öppnas i webbläsaren.<br><strong>Klicka knappen nedan för att spela upp.</strong>'; openBtn.textContent='Spela upp i ny flik →';}
+    if(src.openInBrowser){playerFrame.style.display='none'; browserFrame.style.display='flex'; openBtn.href=url; iframe.src=''; browserFrameText.innerHTML='Den har kallan oppnas i webblasaren.<br><strong>Klicka knappen nedan for att spela upp.</strong>'; openBtn.textContent='Spela upp i ny flik →';}
     else {playerFrame.style.display='block'; browserFrame.style.display='none'; iframe.src=url;}
-    const meta=document.getElementById('playerMeta'); meta.innerHTML=''; const tag=document.createElement('span'); tag.className='tag active'; const displayId=(src.isVidApi&&type==='movie'&&imdbId)?imdbId:id; const epInfo=type==='tv'?` S${season}:E${episode}`:''; tag.textContent=src.name+' / '+type+' / '+displayId+epInfo; meta.appendChild(tag); const a=document.createElement('a'); a.href=url; a.target='_blank'; a.rel='noopener'; a.textContent='Öppna i eget fönster →'; meta.appendChild(a); document.getElementById('playerNotice').style.display='none';
+    const meta=document.getElementById('playerMeta'); meta.innerHTML=''; const tag=document.createElement('span'); tag.className='tag active'; const displayId=(src.isVidApi&&type==='movie'&&imdbId)?imdbId:id; const epInfo=type==='tv'?` S${season}:E${episode}`:''; tag.textContent=src.name+' / '+type+' / '+displayId+epInfo; meta.appendChild(tag); const a=document.createElement('a'); a.href=url; a.target='_blank'; a.rel='noopener'; a.textContent='Oppna i eget fonster →'; meta.appendChild(a); document.getElementById('playerNotice').style.display='none';
     if(currentDetail){const s=type==='tv'?(season||1):1; const e=type==='tv'?(episode||1):1; addToLibrary(type,id,currentDetail.title||currentDetail.name||'Unknown',currentDetail.poster_path||null,(currentDetail.release_date||currentDetail.first_air_date||'').slice(0,4),imdbId||null,s,e);}
   }
   function renderTicket(d,type,id,imdbId,season,episode){
     const title=d.title||d.name; const date=d.release_date||d.first_air_date||''; const year=date?date.slice(0,4):'&#8212;'; const runtime=d.runtime?d.runtime+' min':(d.episode_run_time&&d.episode_run_time[0]?d.episode_run_time[0]+' min/avsnitt':'');
-    document.getElementById('posterImg').src=d.poster_path?IMG+d.poster_path:''; document.getElementById('titleText').textContent=title; const epInfo=type==='tv'?` S${season||1}:E${episode||1}`:''; document.getElementById('subText').textContent=[type==='tv'?'SERIE':'FILM',year,runtime,'TMDB #'+d.id+epInfo].filter(Boolean).join('  ·  '); document.getElementById('overviewText').textContent=d.overview||'Ingen beskrivning tillgänglig.'; const genreBox=document.getElementById('genreTags'); genreBox.innerHTML=''; (d.genres||[]).forEach(g=>{const tag=document.createElement('span'); tag.className='genre-tag'; tag.textContent=g.name; genreBox.appendChild(tag);});
+    document.getElementById('posterImg').src=d.poster_path?IMG+d.poster_path:''; document.getElementById('titleText').textContent=title; const epInfo=type==='tv'?` S${season||1}:E${episode||1}`:''; document.getElementById('subText').textContent=[type==='tv'?'SERIE':'FILM',year,runtime,'TMDB #'+d.id+epInfo].filter(Boolean).join('  ·  '); document.getElementById('overviewText').textContent=d.overview||'Ingen beskrivning tillganglig.'; const genreBox=document.getElementById('genreTags'); genreBox.innerHTML=''; (d.genres||[]).forEach(g=>{const tag=document.createElement('span'); tag.className='genre-tag'; tag.textContent=g.name; genreBox.appendChild(tag);});
     let epControls=document.getElementById('epControls'); if(!epControls){epControls=document.createElement('div'); epControls.id='epControls'; epControls.style.cssText='display:flex; gap:10px; align-items:center; margin:10px 0 12px; flex-wrap:wrap;'; document.getElementById('playerBox').insertBefore(epControls,document.getElementById('sourcePicker'));}
     if(type==='tv'){epControls.style.display='flex'; epControls.innerHTML=`<span style="font-size:11px;color:var(--cream-dim);font-family:'JetBrains Mono',monospace;">Säsong</span><input type="number" id="seasonInput" value="${season||1}" min="1" max="99" style="width:55px;background:rgba(255,255,255,0.04);border:1px solid var(--panel-line);color:var(--cream);border-radius:6px;padding:5px 8px;font-size:13px;font-family:'JetBrains Mono',monospace;"><span style="font-size:11px;color:var(--cream-dim);font-family:'JetBrains Mono',monospace;">Avsnitt</span><input type="number" id="episodeInput" value="${episode||1}" min="1" max="99" style="width:55px;background:rgba(255,255,255,0.04);border:1px solid var(--panel-line);color:var(--cream);border-radius:6px;padding:5px 8px;font-size:13px;font-family:'JetBrains Mono',monospace;"><button id="epGoBtn" class="go-btn" style="padding:5px 16px;font-size:12px;">Uppdatera</button>`; document.getElementById('epGoBtn').addEventListener('click',function(){const s=parseInt(document.getElementById('seasonInput').value)||1; const e=parseInt(document.getElementById('episodeInput').value)||1; currentSeason=s; currentEpisode=e; renderTicket(currentDetail,currentType,currentId,currentImdbId,s,e); loadPlayer(currentType,currentId,currentImdbId,s,e);});} else {epControls.style.display='none';}
     renderSourcePicker(); loadPlayer(type,id,imdbId,season,episode); document.getElementById('playerHeading').textContent='Spelare — '+(type==='tv'?'Serie':'Film'); ticket.classList.add('show'); ticket.scrollIntoView({behavior:'smooth',block:'nearest'});
   }
-  function handleError(err){if(err.message==='NEEDKEY') setStatus('Lägg in din TMDB API-nyckel ovan först.','error'); else if(err.message==='BADKEY') setStatus('TMDB avvisade nyckeln. Dubbelkolla att du kopierat "API Key (v3 auth)" korrekt.','error'); else setStatus('Kunde inte hämta data just nu ('+err.message+'). Prova igen om en stund.','error');}
+  function handleError(err){if(err.message==='NEEDKEY') setStatus('Lagg in din TMDB API-nyckel ovan forst.','error'); else if(err.message==='BADKEY') setStatus('TMDB avvisade nyckeln. Dubbelkolla att du kopierat "API Key (v3 auth)" korrekt.','error'); else setStatus('Kunde inte hamta data just nu ('+err.message+'). Prova igen om en stund.','error');}
   function updateClock(){const now=new Date(); document.getElementById('clockTime').textContent=now.toLocaleTimeString('sv-SE',{hour:'2-digit',minute:'2-digit',second:'2-digit'}); document.getElementById('clockDate').textContent=now.toLocaleDateString('sv-SE',{weekday:'long',day:'numeric',month:'long'});} updateClock(); setInterval(updateClock,1000);
 
   // VKB
@@ -528,7 +508,7 @@
   document.getElementById('playerFrame').addEventListener('dblclick',function(e){if(e.target.closest('.player-overlay button')) return; toggleFullscreen();});
   document.addEventListener('keydown',function(e){if(!ticket.classList.contains('show')) return; if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT'||e.target.tagName==='TEXTAREA') return; if(e.key==='f'||e.key==='F'){e.preventDefault(); toggleFullscreen();} if(e.key==='Escape'&&document.fullscreenElement){document.exitFullscreen();}});
 
-  // ===== OPENSUBTITLES.COM INTEGRATION =====
+  // ===== CC LOGIK - VISAS BARA NÄR MUSEN ÄR PÅ NEDRE DELEN + OPENSUBTITLES.COM =====
   const ccControls=document.getElementById('ccControls');
   const ccToggleBtn=document.getElementById('ccToggleBtn');
   const ccHint=document.getElementById('ccHint');
@@ -536,12 +516,10 @@
   const osPanel=document.getElementById('osPanel');
   const osResults=document.getElementById('osResults');
   const osTitle=document.getElementById('osTitle');
-  const osClose=document.getElementById('osClose');
-  const subtitleStatus=document.getElementById('subtitleStatus');
-  const srtOverlay=document.getElementById('srtOverlay');
-  let ccHideTimeout=null; let ccEnabled=false; let activeSubtitles=[]; let srtTimer=null; let currentSrtCues=[];
+  const osExternalLink=document.getElementById('osExternalLink');
+  let ccHideTimeout=null; let ccEnabled=false;
+  let activeSrtUrl=null;
 
-  // CC controls visibility
   function showCC(){
     ccControls.classList.add('visible');
     if(ccZoneHint) ccZoneHint.style.opacity='0';
@@ -549,6 +527,7 @@
   }
   function hideCCDelayed(){
     if(ccHideTimeout) clearTimeout(ccHideTimeout);
+    // om OS panelen är öppen, stäng inte
     if(osPanel.classList.contains('show')) return;
     ccHideTimeout=setTimeout(()=>{ccControls.classList.remove('visible');}, 800);
   }
@@ -556,420 +535,246 @@
   pFrame.addEventListener('mousemove',(e)=>{
     const rect=pFrame.getBoundingClientRect();
     const yRel=(e.clientY-rect.top)/rect.height;
-    if(yRel>0.65){ showCC(); } else { if(ccControls.classList.contains('visible')) hideCCDelayed(); }
+    if(yRel>0.65){
+      showCC();
+    } else {
+      if(ccControls.classList.contains('visible')) hideCCDelayed();
+    }
   });
   pFrame.addEventListener('mouseleave',()=>{ hideCCDelayed(); });
   ccControls.addEventListener('mouseenter',()=>{ if(ccHideTimeout) clearTimeout(ccHideTimeout); showCC(); });
   ccControls.addEventListener('mouseleave',()=>{ hideCCDelayed(); });
   pFrame.addEventListener('touchstart',()=>{showCC(); setTimeout(()=>hideCCDelayed(),4000);},{passive:true});
 
-  // CC Toggle
+  // ---- OpenSubtitles sök - RIKTIG API MED DIN NYCKEL ----
+  function getOsApiKey(){ return document.getElementById('osapikey')?.value.trim() || 'vkAVzWB6h1zRX0TEhSiWsD9qZ042Xy5l'; }
+
+  async function searchOpenSubtitles(title, lang){
+    const imdb = currentImdbId || '';
+    const year = (currentDetail?.release_date || currentDetail?.first_air_date || '').slice(0,4);
+    const apiKey = getOsApiKey();
+    let osLangId = 'en';
+    let displayLang = 'EN';
+    let apiLang = 'en';
+    if(lang==='sv'){ osLangId='swe'; apiLang='sv'; displayLang='SV'; }
+    if(lang==='fa'){ osLangId='per'; apiLang='fa'; displayLang='FA - فارسی'; }
+    if(lang==='ku'){ osLangId='kur'; apiLang='ku'; displayLang='KU - کوردی'; }
+    if(lang==='en'){ osLangId='eng'; apiLang='en'; displayLang='EN'; }
+
+    osTitle.textContent = `Söker: ${title} (${displayLang})`;
+    osResults.innerHTML = '<div style="font-size:11px; color:var(--teal);">🔍 Anropar OpenSubtitles API med din nyckel...</div>';
+    osPanel.classList.add('show');
+    showCC();
+
+    const query = encodeURIComponent(title);
+    const externalUrl = `https://www.opensubtitles.com/sv/search/all/moviename-${query}/sublanguageid-${osLangId}`;
+    osExternalLink.href = externalUrl;
+
+    if(!apiKey){
+      osResults.innerHTML = `<div style="font-size:11px; color:var(--error);">Ingen API-nyckel ifylld. <a href="${externalUrl}" target="_blank" style="color:var(--gold-bright);">Öppna manuellt →</a></div>`;
+      return;
+    }
+
+    try {
+      // 1. Sök subs via API v1
+      let searchUrl = `https://api.opensubtitles.com/api/v1/subtitles?query=${query}&languages=${apiLang}`;
+      if(year) searchUrl += `&year=${year}`;
+      if(imdb) searchUrl += `&imdb_id=${imdb.replace('tt','')}`;
+
+      const res = await fetch(searchUrl, {
+        headers: {
+          'Api-Key': apiKey,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if(!res.ok){
+        const txt = await res.text();
+        throw new Error(`API ${res.status}: ${txt.slice(0,200)}`);
+      }
+      const data = await res.json();
+      const subs = data.data || [];
+
+      if(subs.length===0){
+        osResults.innerHTML = `
+          <div style="font-size:11px; color:var(--amber); padding:6px;">Inga ${displayLang} subs hittade för "${title}" via API.</div>
+          <div class="os-item" data-action="open-external">
+            <span class="os-item-name">🔍 Öppna på OpenSubtitles.com istället</span>
+            <span class="os-item-meta">${displayLang}</span>
+          </div>
+          <div style="font-size:10px; color:var(--cream-dim); margin-top:6px;">Tips: Ladda ner .srt manuellt och dra filen hit till playern.</div>
+        `;
+        osResults.querySelector('[data-action="open-external"]').addEventListener('click', ()=> window.open(externalUrl,'_blank'));
+        return;
+      }
+
+      // Visa top 8 resultat
+      let html = '';
+      subs.slice(0,8).forEach((item, idx)=>{
+        const attrs = item.attributes || {};
+        const files = attrs.files || [];
+        const file = files[0] || {};
+        const fileName = file.file_name || attrs.release || `${title} sub`;
+        const downloads = attrs.download_count || 0;
+        const rating = attrs.ratings || 0;
+        const langName = attrs.language || displayLang;
+        html += `
+          <div class="os-item" data-file-id="${file.file_id}" data-file-name="${fileName.replace(/"/g,'')}">
+            <span class="os-item-name">📄 ${fileName.slice(0,50)} <span class="os-badge">${langName.toUpperCase()}</span></span>
+            <span class="os-item-meta">⬇ ${downloads} ⭐${rating}</span>
+          </div>
+        `;
+      });
+      html += `<div style="font-size:10px; color:var(--cream-dim); margin-top:8px;">Klicka en sub för att auto-ladda den över videon. Din nyckel är redan ifylld.</div>`;
+      osResults.innerHTML = html;
+
+      osResults.querySelectorAll('.os-item[data-file-id]').forEach(el=>{
+        el.addEventListener('click', async ()=>{
+          const fileId = el.dataset.fileId;
+          const fileName = el.dataset.fileName;
+          await downloadAndLoadSubtitle(fileId, fileName);
+        });
+      });
+
+    } catch(e){
+      console.error(e);
+      osResults.innerHTML = `
+        <div style="font-size:11px; color:var(--error);">API-fel: ${e.message.slice(0,150)}</div>
+        <div class="os-item" data-action="open-external" style="margin-top:8px;">
+          <span class="os-item-name">🔍 Öppna på OpenSubtitles.com manuellt</span>
+          <span class="os-item-meta">Backup</span>
+        </div>
+      `;
+      osResults.querySelector('[data-action="open-external"]')?.addEventListener('click', ()=> window.open(externalUrl,'_blank'));
+    }
+  }
+
+  async function downloadAndLoadSubtitle(fileId, fileName){
+    const apiKey = getOsApiKey();
+    osResults.innerHTML = `<div style="font-size:11px; color:var(--teal);">⬇ Laddar ${fileName}...</div>`;
+    try {
+      const res = await fetch('https://api.opensubtitles.com/api/v1/download', {
+        method: 'POST',
+        headers: {
+          'Api-Key': apiKey,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ file_id: parseInt(fileId) })
+      });
+      if(!res.ok){
+        const txt = await res.text();
+        throw new Error(`Download ${res.status}: ${txt.slice(0,200)}`);
+      }
+      const data = await res.json();
+      const srtUrl = data.link;
+      if(!srtUrl) throw new Error('Ingen länk från API');
+      
+      // Hämta själva .srt filen
+      const srtRes = await fetch(srtUrl);
+      const srtText = await srtRes.text();
+      loadSRT(srtText);
+      ccHint.textContent = `✓ Auto-laddad: ${fileName.slice(0,30)}`;
+      ccToggleBtn.classList.add('active');
+      ccEnabled = true;
+      osPanel.classList.remove('show');
+      hideCCDelayed();
+    } catch(e){
+      osResults.innerHTML = `<div style="font-size:11px; color:var(--error);">Kunde inte ladda sub: ${e.message}. Prova ladda ner manuellt från OpenSubtitles.com och dra .srt hit.</div>`;
+    }
+  }
+
+  async function tryLoadBestSubtitle(title, year, lang, imdbId){
+    // Legacy fallback - anropar nya sökfunktionen
+    await searchOpenSubtitles(title, lang);
+  }
+
+
+  // Drag & Drop .srt support - lägg sub direkt över videon
+  let srtCues = [];
+  pFrame.addEventListener('dragover', (e)=>{ e.preventDefault(); pFrame.style.outline='2px dashed var(--gold)'; showCC(); });
+  pFrame.addEventListener('dragleave', ()=>{ pFrame.style.outline='none'; });
+  pFrame.addEventListener('drop', async (e)=>{
+    e.preventDefault(); pFrame.style.outline='none';
+    const file = e.dataTransfer.files[0];
+    if(!file || !file.name.endsWith('.srt')){ ccHint.textContent='Endast .srt filer stöds'; return; }
+    const text = await file.text();
+    loadSRT(text);
+    ccHint.textContent=`✓ Sub laddad: ${file.name}`;
+    ccToggleBtn.classList.add('active'); ccEnabled=true;
+    osPanel.classList.remove('show');
+  });
+
+  function parseSRT(srt){
+    const cues=[]; const blocks=srt.trim().split(/\n\s*\n/);
+    for(let b of blocks){
+      const lines=b.split('\n'); if(lines.length<2) continue;
+      let timeLine = lines.find(l=>l.includes('-->')); if(!timeLine) continue;
+      const [start,end] = timeLine.split(' --> ').map(t=>{const p=t.split(':'); const sec = parseFloat(p[2].replace(',','.')); return parseFloat(p[0])*3600 + parseFloat(p[1])*60 + sec;});
+      const text = lines.slice(lines.indexOf(timeLine)+1).join('\n');
+      cues.push({start,end,text});
+    }
+    return cues;
+  }
+  let srtOverlay=null;
+  function loadSRT(srtText){
+    srtCues = parseSRT(srtText);
+    if(!srtOverlay){
+      srtOverlay=document.createElement('div');
+      srtOverlay.id='srtOverlay';
+      srtOverlay.style.cssText='position:absolute; bottom:70px; left:50%; transform:translateX(-50%); max-width:80%; background:rgba(0,0,0,0.75); color:#fff; padding:6px 14px; border-radius:6px; font-size:16px; line-height:1.3; text-align:center; text-shadow:1px 1px 2px #000; z-index:15; pointer-events:none; font-family:Manrope,sans-serif; display:none;';
+      pFrame.appendChild(srtOverlay);
+    }
+    // enkel timer synkad med Date.now - inte perfekt men funkar för demo
+    let startTime = Date.now()/1000;
+    setInterval(()=>{
+      const now = Date.now()/1000 - startTime;
+      const cue = srtCues.find(c=>now>=c.start && now<=c.end);
+      if(cue){ srtOverlay.textContent=cue.text; srtOverlay.style.display='block'; } else { srtOverlay.style.display='none'; }
+    }, 100);
+  }
+
   ccToggleBtn.addEventListener('click',(e)=>{
     e.stopPropagation();
     ccEnabled=!ccEnabled;
     ccToggleBtn.classList.toggle('active', ccEnabled);
-    ccHint.textContent=ccEnabled?'Undertexter: PÅ (sök via språkknapparna)':'Undertexter: AV';
-    if(!ccEnabled){ srtOverlay.style.display='none'; if(srtTimer){clearInterval(srtTimer); srtTimer=null;}}
+    ccHint.textContent=ccEnabled?'Undertexter: PÅ (dra .srt hit för egen sub)':'Undertexter: AV';
+    const iframe=document.getElementById('vidsrcFrame');
+    try{
+      iframe.contentWindow.postMessage({type:'setSubtitle', enabled:ccEnabled, lang:'sv'}, '*');
+      iframe.contentWindow.postMessage({action:'toggleCaptions'}, '*');
+    }catch(err){}
+    if(!ccEnabled && srtOverlay) srtOverlay.style.display='none';
   });
-
-  // Språkknappar - sök undertexter via OpenSubtitles.com API
-  document.querySelectorAll('.cc-lang-btn').forEach(btn=>{
-    btn.addEventListener('click', async (e)=>{
-      e.stopPropagation();
-      const lang = btn.dataset.lang;
-      if(!currentDetail){ ccHint.textContent='Sök först efter en film/serie.'; return; }
-      await searchSubtitles(lang);
-    });
+  document.getElementById('ccLangSv').addEventListener('click',(e)=>{
+    e.stopPropagation(); 
+    const t = currentDetail?.title || currentDetail?.name || document.getElementById('query').value || 'movie';
+    searchOpenSubtitles(t, 'sv');
   });
-
-  document.getElementById('ccOsBtn').addEventListener('click', async (e)=>{
+  document.getElementById('ccLangEn').addEventListener('click',(e)=>{
+    e.stopPropagation(); 
+    const t = currentDetail?.title || currentDetail?.name || document.getElementById('query').value || 'movie';
+    searchOpenSubtitles(t, 'en');
+  });
+  document.getElementById('ccLangFa').addEventListener('click',(e)=>{
+    e.stopPropagation(); 
+    const t = currentDetail?.title || currentDetail?.name || document.getElementById('query').value || 'movie';
+    searchOpenSubtitles(t, 'fa');
+  });
+  document.getElementById('ccLangKu').addEventListener('click',(e)=>{
+    e.stopPropagation(); 
+    const t = currentDetail?.title || currentDetail?.name || document.getElementById('query').value || 'movie';
+    searchOpenSubtitles(t, 'ku');
+  });
+  document.getElementById('ccOsBtn').addEventListener('click',(e)=>{
     e.stopPropagation();
-    if(!currentDetail){ ccHint.textContent='Sök först efter en film/serie.'; return; }
-    await searchSubtitles('sv');
+    const t = currentDetail?.title || currentDetail?.name || document.getElementById('query').value || 'movie';
+    const lang = 'sv';
+    searchOpenSubtitles(t, lang);
   });
+  document.getElementById('osClose').addEventListener('click',()=>{ osPanel.classList.remove('show'); hideCCDelayed(); });
 
-  osClose.addEventListener('click', ()=>{ osPanel.classList.remove('show'); hideCCDelayed(); });
 
-  // Huvudfunktion för att söka undertexter
-  async function searchSubtitles(langCode) {
-    const title = currentDetail?.title || currentDetail?.name || '';
-    const imdbId = currentImdbId || '';
-    const year = (currentDetail?.release_date || currentDetail?.first_air_date || '').slice(0,4);
-    
-    // Språkkoder för OpenSubtitles.com
-    const langMap = {
-      'sv': { code: 'swe', label: 'Svenska' },
-      'en': { code: 'eng', label: 'Engelska' },
-      'fa': { code: 'per', label: 'Persiska' },
-      'ku': { code: 'kur', label: 'Kurdiska' }
-    };
-    const langInfo = langMap[langCode] || langMap['en'];
-    const osLangId = langInfo.code;
-    const displayLabel = langInfo.label;
-
-    osPanel.classList.add('show');
-    showCC();
-    osTitle.textContent = `🔍 Söker ${displayLabel} undertexter för "${title}"`;
-    osResults.innerHTML = `<div class="os-status loading">⏳ Söker på OpenSubtitles.com ...</div>`;
-    ccHint.textContent = `Söker ${displayLabel}...`;
-
-    try {
-      // Försök med OpenSubtitles.com API (gratis, kräver ingen nyckel för grundläggande sök)
-      // Använd deras publika API endpoint
-      let apiUrl = `https://rest.opensubtitles.org/search/imdbid-${imdbId.replace('tt','')}/sublanguageid-${osLangId}`;
-      
-      // Om vi inte har IMDb ID, försök med titel-sök
-      if (!imdbId || imdbId === '') {
-        apiUrl = `https://rest.opensubtitles.org/search/moviename-${encodeURIComponent(title)}/sublanguageid-${osLangId}`;
-      }
-
-      const response = await fetch(apiUrl, {
-        headers: {
-          'User-Agent': 'KuribaxiPlayer/1.0',
-          'Accept': 'application/json'
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-
-      const data = await response.json();
-      
-      if (!data || data.length === 0) {
-        osResults.innerHTML = `
-          <div class="os-status error">❌ Inga ${displayLabel} undertexter hittades för "${title}".</div>
-          <div style="margin-top:8px; font-size:11px; color:var(--cream-dim);">
-            <a href="https://www.opensubtitles.com/sv/search/all/moviename-${encodeURIComponent(title)}/sublanguageid-${osLangId}" 
-               target="_blank" style="color:var(--gold-bright); text-decoration:underline;">
-              🔗 Sök manuellt på OpenSubtitles.com →
-            </a>
-          </div>
-        `;
-        ccHint.textContent = `Inga ${displayLabel} subs hittades`;
-        return;
-      }
-
-      // Visa resultat
-      let html = `<div style="font-size:11px; color:var(--cream-dim); margin-bottom:6px;">Hittade ${data.length} undertexter:</div>`;
-      let hasDownloadable = false;
-      
-      // Filtrera bort dåliga resultat och sortera efter nedladdningsantal
-      const sorted = data
-        .filter(item => item.SubDownloadLink || item.sub_download_link)
-        .sort((a, b) => (b.download_count || 0) - (a.download_count || 0))
-        .slice(0, 15);
-
-      sorted.forEach(item => {
-        const downloadLink = item.SubDownloadLink || item.sub_download_link || '';
-        const fileName = item.SubFileName || item.sub_file_name || 'subtitle.srt';
-        const dlCount = item.download_count || 0;
-        const rating = item.SubRating || item.sub_rating || '?';
-        const hearingImpaired = item.SubHearingImpaired || item.sub_hearing_impaired || '';
-        const hiBadge = hearingImpaired ? ' 🧏' : '';
-        
-        html += `
-          <div class="os-item" data-url="${downloadLink}" data-filename="${fileName}">
-            <span class="os-item-name">${escapeHtml(fileName)}</span>
-            <span class="os-item-meta">
-              ⭐ ${rating} · 📥 ${dlCount}
-              <span class="os-badge ${langCode}">${langCode.toUpperCase()}${hiBadge}</span>
-              <button class="cc-btn" style="padding:2px 8px; font-size:10px;" data-dl-url="${downloadLink}">Ladda</button>
-            </span>
-          </div>
-        `;
-        hasDownloadable = true;
-      });
-
-      if (!hasDownloadable) {
-        html += `<div class="os-status warn">⚠️ Inga nedladdningsbara undertexter hittades.</div>`;
-      }
-
-      osResults.innerHTML = html;
-
-      // Event listeners för varje rad och knapp
-      osResults.querySelectorAll('.os-item').forEach(el => {
-        const downloadUrl = el.dataset.url;
-        const fileName = el.dataset.filename;
-        
-        el.addEventListener('click', async () => {
-          await downloadAndLoadSubtitle(downloadUrl, fileName);
-        });
-        
-        // Knapp i raden
-        const dlBtn = el.querySelector('[data-dl-url]');
-        if (dlBtn) {
-          dlBtn.addEventListener('click', async (e) => {
-            e.stopPropagation();
-            await downloadAndLoadSubtitle(dlBtn.dataset.dlUrl, fileName);
-          });
-        }
-      });
-
-      ccHint.textContent = `Hittade ${sorted.length} ${displayLabel} undertexter`;
-
-    } catch (error) {
-      console.error('OpenSubtitles error:', error);
-      osResults.innerHTML = `
-        <div class="os-status error">❌ Kunde inte nå OpenSubtitles.com: ${error.message}</div>
-        <div style="margin-top:8px; font-size:11px; color:var(--cream-dim);">
-          <a href="https://www.opensubtitles.com/sv/search/all/moviename-${encodeURIComponent(title)}/sublanguageid-${langMap[langCode]?.code || 'eng'}" 
-             target="_blank" style="color:var(--gold-bright); text-decoration:underline;">
-              🔗 Öppna OpenSubtitles.com manuellt →
-            </a>
-            <br><span style="font-size:10px;">Prova att ladda ner en .srt-fil och dra den till spelaren.</span>
-        </div>
-      `;
-      ccHint.textContent = `Kunde inte söka ${displayLabel} subs`;
-    }
-  }
-
-  // Ladda ner och visa undertext
-  async function downloadAndLoadSubtitle(url, fileName) {
-    try {
-      osResults.innerHTML = `<div class="os-status loading">⏳ Laddar ner ${fileName} ...</div>`;
-      ccHint.textContent = `Laddar ner undertext...`;
-      
-      // Hämta .srt-filen
-      const response = await fetch(url);
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      
-      const srtText = await response.text();
-      
-      // Kontrollera att det är en giltig SRT-fil
-      if (!srtText.includes('-->') || srtText.length < 50) {
-        throw new Error('Filen verkar inte vara en giltig undertext (.srt)');
-      }
-      
-      // Ladda in undertexten
-      loadSRT(srtText);
-      
-      // Uppdatera status
-      osResults.innerHTML = `
-        <div class="os-status success">✅ Undertext laddad: ${escapeHtml(fileName)}</div>
-        <div style="margin-top:6px; font-size:11px; color:var(--teal);">
-          🎬 Undertexten visas nu på videon. Tryck CC för att stänga av/på.
-        </div>
-      `;
-      ccHint.textContent = `✅ ${fileName} laddad`;
-      ccToggleBtn.classList.add('active');
-      ccEnabled = true;
-      
-      // Stäng panelen efter 3 sekunder
-      setTimeout(() => {
-        if (!osPanel.classList.contains('show')) return;
-        // Vi stänger inte automatiskt, användaren får stänga själv
-      }, 3000);
-      
-      // Uppdatera subtitle status
-      subtitleStatus.textContent = `✓ Undertext: ${fileName}`;
-      subtitleStatus.classList.add('show');
-      
-      // Spara i localStorage för senare användning
-      try {
-        const subs = JSON.parse(localStorage.getItem('kuribaxi_subtitles') || '{}');
-        const key = `${currentType}_${currentId}`;
-        subs[key] = { srt: srtText, fileName: fileName, lang: 'custom', timestamp: Date.now() };
-        localStorage.setItem('kuribaxi_subtitles', JSON.stringify(subs));
-      } catch(e) {}
-      
-    } catch (error) {
-      console.error('Download error:', error);
-      osResults.innerHTML = `
-        <div class="os-status error">❌ Kunde inte ladda undertext: ${error.message}</div>
-        <div style="margin-top:8px; font-size:11px; color:var(--cream-dim);">
-          Försök ladda ner .srt-filen manuellt och dra den till spelaren.
-        </div>
-      `;
-      ccHint.textContent = `Fel vid nedladdning av undertext`;
-    }
-  }
-
-  // Ladda SRT och visa på videon
-  function loadSRT(srtText) {
-    if (srtTimer) { clearInterval(srtTimer); srtTimer = null; }
-    
-    currentSrtCues = parseSRT(srtText);
-    
-    if (currentSrtCues.length === 0) {
-      ccHint.textContent = '⚠️ Kunde inte tolka SRT-filen';
-      return;
-    }
-    
-    // Starta timer för att visa undertexter
-    let startTime = Date.now() / 1000;
-    
-    srtTimer = setInterval(() => {
-      const now = Date.now() / 1000 - startTime;
-      // Hitta aktuell cue
-      let currentCue = null;
-      for (const cue of currentSrtCues) {
-        if (now >= cue.start && now <= cue.end) {
-          currentCue = cue;
-          break;
-        }
-      }
-      
-      if (currentCue && ccEnabled) {
-        srtOverlay.textContent = currentCue.text;
-        srtOverlay.style.display = 'block';
-      } else {
-        srtOverlay.style.display = 'none';
-      }
-    }, 100);
-    
-    // Visa första cue direkt om den börjar vid 0
-    setTimeout(() => {
-      if (currentSrtCues.length > 0 && currentSrtCues[0].start <= 0.5) {
-        srtOverlay.textContent = currentSrtCues[0].text;
-        srtOverlay.style.display = 'block';
-      }
-    }, 200);
-    
-    ccHint.textContent = `✓ ${currentSrtCues.length} undertexter laddade`;
-    subtitleStatus.textContent = `✓ ${currentSrtCues.length} undertexter aktiva`;
-    subtitleStatus.classList.add('show');
-  }
-
-  // Parser för SRT-filer
-  function parseSRT(srt) {
-    const cues = [];
-    const blocks = srt.trim().split(/\n\s*\n/);
-    
-    for (const block of blocks) {
-      const lines = block.split('\n');
-      if (lines.length < 2) continue;
-      
-      // Hitta tidsraden
-      let timeLineIndex = -1;
-      for (let i = 0; i < lines.length; i++) {
-        if (lines[i].includes('-->')) {
-          timeLineIndex = i;
-          break;
-        }
-      }
-      if (timeLineIndex === -1) continue;
-      
-      const timeLine = lines[timeLineIndex];
-      const timeParts = timeLine.split(' --> ');
-      if (timeParts.length !== 2) continue;
-      
-      const start = parseTime(timeParts[0].trim());
-      const end = parseTime(timeParts[1].trim());
-      
-      if (isNaN(start) || isNaN(end)) continue;
-      
-      // Text är raderna efter tidsraden
-      const textLines = lines.slice(timeLineIndex + 1);
-      const text = textLines.join('\n').trim();
-      
-      if (text) {
-        cues.push({ start, end, text });
-      }
-    }
-    
-    return cues;
-  }
-
-  function parseTime(timeStr) {
-    // Hantera format: HH:MM:SS,mmm eller HH:MM:SS.mmm
-    const clean = timeStr.replace(',', '.');
-    const parts = clean.split(':');
-    if (parts.length !== 3) return NaN;
-    
-    const hours = parseFloat(parts[0]);
-    const minutes = parseFloat(parts[1]);
-    const seconds = parseFloat(parts[2]);
-    
-    if (isNaN(hours) || isNaN(minutes) || isNaN(seconds)) return NaN;
-    
-    return hours * 3600 + minutes * 60 + seconds;
-  }
-
-  // Drag & Drop .srt support
-  pFrame.addEventListener('dragover', (e) => { 
-    e.preventDefault(); 
-    pFrame.style.outline = '2px dashed var(--gold)'; 
-    showCC(); 
-  });
-  pFrame.addEventListener('dragleave', () => { 
-    pFrame.style.outline = 'none'; 
-  });
-  pFrame.addEventListener('drop', async (e) => {
-    e.preventDefault(); 
-    pFrame.style.outline = 'none';
-    
-    const file = e.dataTransfer.files[0];
-    if (!file) return;
-    
-    if (!file.name.endsWith('.srt') && !file.name.endsWith('.ass') && !file.name.endsWith('.ssa')) {
-      ccHint.textContent = '⚠️ Endast .srt, .ass och .ssa filer stöds';
-      return;
-    }
-    
-    const text = await file.text();
-    loadSRT(text);
-    ccHint.textContent = `✓ Undertext laddad: ${file.name}`;
-    ccToggleBtn.classList.add('active');
-    ccEnabled = true;
-    osPanel.classList.remove('show');
-    
-    // Spara i localStorage
-    try {
-      const subs = JSON.parse(localStorage.getItem('kuribaxi_subtitles') || '{}');
-      const key = `${currentType}_${currentId}`;
-      subs[key] = { srt: text, fileName: file.name, lang: 'custom', timestamp: Date.now() };
-      localStorage.setItem('kuribaxi_subtitles', JSON.stringify(subs));
-    } catch(e) {}
-  });
-
-  // Försök ladda sparade undertexter när en film/serie laddas
-  function loadSavedSubtitles(type, id) {
-    try {
-      const subs = JSON.parse(localStorage.getItem('kuribaxi_subtitles') || '{}');
-      const key = `${type}_${id}`;
-      if (subs[key]) {
-        const data = subs[key];
-        loadSRT(data.srt);
-        ccToggleBtn.classList.add('active');
-        ccEnabled = true;
-        subtitleStatus.textContent = `✓ Sparad undertext: ${data.fileName}`;
-        subtitleStatus.classList.add('show');
-        ccHint.textContent = `✓ Laddade sparad undertext: ${data.fileName}`;
-        return true;
-      }
-    } catch(e) {}
-    return false;
-  }
-
-  // Patcha loadDetail för att ladda sparade undertexter
-  const originalLoadDetail = loadDetail;
-  loadDetail = async function(id, type, prefillSeason, prefillEpisode) {
-    await originalLoadDetail(id, type, prefillSeason, prefillEpisode);
-    // Efter att detaljerna är laddade, försök ladda sparad undertext
-    setTimeout(() => {
-      const loaded = loadSavedSubtitles(type, id);
-      if (!loaded) {
-        // Ingen sparad undertext, men vi kan försöka hitta automatisk
-        // Vi gör inget automatiskt här, användaren får söka själv
-        subtitleStatus.textContent = '💡 Klicka på SV/EN/FA/KU för att söka undertexter';
-        subtitleStatus.classList.add('show');
-      }
-    }, 1000);
-  };
-
-  // Spara nuvarande undertext när spelaren stängs
-  window.addEventListener('beforeunload', () => {
-    if (srtTimer) { clearInterval(srtTimer); srtTimer = null; }
-  });
-
-  // Initiera
-  loadLibrary(); 
-  renderLibrary();
-  
-  // Visa meddelande om undertexter
-  console.log('🔍 Undertexter: Klicka på SV/EN/FA/KU-knapparna för att söka från OpenSubtitles.com');
-  console.log('📁 Dra en .srt-fil till spelaren för att ladda manuellt');
+  loadLibrary(); renderLibrary();
 })();
 </script>
 <!-- MUSIC PLAYER (samma som innan) -->
