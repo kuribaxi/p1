@@ -204,10 +204,13 @@
     bottom:auto; top:0; left:0; right:0;
     padding:12px 14px 50px;
     background:linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 60%, transparent 100%);
-    display:flex; gap:10px; justify-content:flex-end; align-items:center;
-    opacity:0; transition:opacity 0.3s ease; pointer-events:none; z-index:10;
+    display:flex; gap:8px; justify-content:flex-start; align-items:center;
+    opacity:1; transition:opacity 0.3s ease; pointer-events:none; z-index:12;
   }
-  .player-frame:hover .player-overlay { opacity:1; }
+  .player-frame .player-overlay { opacity:0; }
+  .player-frame:hover .player-overlay, .player-frame:fullscreen .player-overlay { opacity:1; }
+  .player-overlay button.active{background:var(--gold) !important; color:#1a1305 !important; border-color:var(--gold) !important;}
+
   .player-overlay button {
     pointer-events:auto; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.25); color:#fff; border-radius:8px; padding:7px 14px; font-size:12px; cursor:pointer; backdrop-filter:blur(6px); transition:all .15s; font-family:'Manrope',sans-serif; font-weight:600; display:inline-flex; align-items:center; gap:6px;
   }
@@ -230,6 +233,46 @@
   .os-item-name{font-size:11px; color:var(--cream); max-width:65%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
   .os-item-meta{font-size:10px; color:var(--cream-dim); font-family:'JetBrains Mono',monospace;}
   .os-badge{font-size:9px; padding:2px 6px; border-radius:10px; background:var(--teal); color:#000; font-weight:700; margin-left:6px;}
+
+  /* SUBTITLE SETTINGS PANEL */
+  .sub-settings{
+    position:absolute; bottom:52px; right:12px; width:260px;
+    background:rgba(18,27,46,0.98); border:1px solid var(--gold); border-radius:12px;
+    padding:12px; z-index:21; display:none; box-shadow:0 12px 30px rgba(0,0,0,0.6);
+  }
+  .sub-settings.show{display:block;}
+  .sub-settings h4{font-size:11px; color:var(--gold-bright); font-family:'JetBrains Mono',monospace; margin-bottom:10px; display:flex; justify-content:space-between;}
+  .sub-row{display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;}
+  .sub-row label{font-size:11px; color:var(--cream-dim); font-family:'Manrope',sans-serif;}
+  .sub-row input[type=range]{width:100px; height:3px; accent-color:var(--gold);}
+  .sub-row select, .sub-row input[type=color]{background:#0b1220; border:1px solid var(--panel-line); color:var(--cream); border-radius:6px; padding:3px 6px; font-size:11px; font-family:'JetBrains Mono',monospace;}
+  .sub-colors{display:flex; gap:6px;}
+  .sub-color{width:22px; height:22px; border-radius:50%; cursor:pointer; border:2px solid transparent; transition:all .15s;}
+  .sub-color.active{border-color:var(--gold); transform:scale(1.2); box-shadow:0 0 8px var(--gold);}
+
+  /* FIX FULLSCREEN SUBTITLE */
+  .player-frame:fullscreen #srtOverlay,
+  .player-frame:fullscreen .cc-controls,
+  .player-frame:fullscreen .os-panel,
+  .player-frame:fullscreen .sub-settings{
+    z-index:2147483647 !important;
+  }
+  .player-frame:fullscreen{
+    background:#000;
+  }
+  #srtOverlay{
+    position:absolute; bottom:70px; left:50%; transform:translateX(-50%);
+    max-width:85%; background:rgba(0,0,0,0.75); color:#fff; padding:6px 14px; border-radius:6px;
+    font-size:18px; line-height:1.35; text-align:center; text-shadow:1px 1px 2px #000;
+    z-index:2147483646; pointer-events:none; font-family:Manrope,sans-serif; display:none;
+    white-space:pre-wrap; word-wrap:break-word;
+  }
+  .player-frame:fullscreen #srtOverlay{
+    bottom:90px;
+    font-size:24px !important;
+    max-width:80%;
+  }
+
 
   /* NYA CC - VISAS BARA NÄR MUSEN ÄR PÅ NEDRE DELEN */
   .cc-controls{
@@ -343,8 +386,9 @@
         <div class="source-picker" id="sourcePicker"></div>
         <div class="player-frame" id="playerFrame" style="position:relative;">
           <iframe id="vidsrcFrame" allowfullscreen referrerpolicy="origin"></iframe>
-          <div class="player-overlay" id="playerOverlay">
-            <button id="overlayFsBtn" title="Helskärm (F)">⛶ Helskärm</button>
+          <div class="player-overlay" id="playerOverlay" style="justify-content:flex-start; gap:8px;">
+            <button id="overlayFsBtn" title="Helskärm (F eller H)" style="background:rgba(0,0,0,0.55); border:1px solid rgba(255,255,255,0.3);">⛶ H</button>
+            <button id="overlayCcBtn" title="Undertexter (CC)" style="background:rgba(0,0,0,0.55); border:1px solid rgba(201,162,39,0.5); color:var(--gold-bright);">CC</button>
           </div>
           <div class="cc-controls" id="ccControls">
             <div class="cc-left">
@@ -368,6 +412,26 @@
               <a id="osExternalLink" href="#" target="_blank" style="font-size:10px; color:var(--gold-bright); text-decoration:none; border-bottom:1px dotted var(--gold);">Öppna på OpenSubtitles.com →</a>
               <span style="font-size:10px; color:var(--cream-dim);">| Laddar ner .srt och läggs över videon</span>
             </div>
+          </div>
+          <div class="sub-settings" id="subSettings">
+            <h4><span>⚙️ Subtitle Inställningar</span> <span id="subSettingsClose" style="cursor:pointer; padding:2px 6px; border:1px solid var(--panel-line); border-radius:12px;">✕</span></h4>
+            <div class="sub-row"><label>Färg</label><div class="sub-colors" id="subColorPicker">
+              <div class="sub-color active" data-color="#ffffff" style="background:#fff;"></div>
+              <div class="sub-color" data-color="#ffff00" style="background:#ffff00;"></div>
+              <div class="sub-color" data-color="#00ffff" style="background:#00ffff;"></div>
+              <div class="sub-color" data-color="#ff6b6b" style="background:#ff6b6b;"></div>
+              <div class="sub-color" data-color="#4ec9b0" style="background:#4ec9b0;"></div>
+            </div></div>
+            <div class="sub-row"><label>Storlek</label><input type="range" id="subSize" min="12" max="36" value="18"><span id="subSizeVal" style="font-size:11px; font-family:'JetBrains Mono',monospace; color:var(--gold-bright);">18px</span></div>
+            <div class="sub-row"><label>Bakgrund</label><input type="range" id="subBg" min="0" max="100" value="75"><span id="subBgVal" style="font-size:11px; font-family:'JetBrains Mono',monospace; color:var(--gold-bright);">75%</span></div>
+            <div class="sub-row"><label>Position</label><select id="subPos"><option value="bottom">Nere</option><option value="middle">Mitten</option><option value="top">Uppe</option></select></div>
+            <div class="sub-row"><label>Delay (sek)</label><input type="range" id="subDelay" min="-5" max="5" step="0.5" value="0"><span id="subDelayVal" style="font-size:11px; font-family:'JetBrains Mono',monospace; color:var(--gold-bright);">0s</span></div>
+            <div class="sub-row"><label>Kant (outline)</label><select id="subOutline"><option value="shadow">Skugga</option><option value="outline">Outline</option><option value="none">Ingen</option></select></div>
+            <div style="margin-top:10px; display:flex; gap:6px;">
+              <button class="cc-btn" id="subReset" style="flex:1; justify-content:center;">Återställ</button>
+              <button class="cc-btn" id="subSave" style="flex:1; justify-content:center; background:var(--gold); color:#000; border-color:var(--gold);">Spara</button>
+            </div>
+            <div style="margin-top:8px; font-size:10px; color:var(--cream-dim); line-height:1.3;">Fungerar även i helskärm. Delay justerar synk om sub är före/efter.</div>
           </div>
           <div class="cc-zone-hint" id="ccZoneHint">↓ CC visas här</div>
         </div>
@@ -716,22 +780,118 @@
     return cues;
   }
   let srtOverlay=null;
+  let srtInterval=null;
+  let srtStartTime=0;
+  let subSettings = JSON.parse(localStorage.getItem('kuribaxi_sub_settings')||'{"color":"#ffffff","size":18,"bg":75,"pos":"bottom","delay":0,"outline":"shadow"}');
+
+  function applySubSettings(){
+    if(!srtOverlay) return;
+    srtOverlay.style.color = subSettings.color;
+    srtOverlay.style.fontSize = subSettings.size + 'px';
+    srtOverlay.style.background = `rgba(0,0,0,${subSettings.bg/100})`;
+    if(subSettings.pos==='bottom') srtOverlay.style.bottom='70px', srtOverlay.style.top='auto', srtOverlay.style.transform='translateX(-50%)';
+    if(subSettings.pos==='middle') srtOverlay.style.bottom='50%', srtOverlay.style.top='auto', srtOverlay.style.transform='translate(-50%,50%)';
+    if(subSettings.pos==='top') srtOverlay.style.top='20px', srtOverlay.style.bottom='auto', srtOverlay.style.transform='translateX(-50%)';
+    if(subSettings.outline==='shadow') srtOverlay.style.textShadow='1px 1px 2px #000, 1px 1px 4px #000';
+    if(subSettings.outline==='outline') srtOverlay.style.textShadow='-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000';
+    if(subSettings.outline==='none') srtOverlay.style.textShadow='none';
+    // fullscreen size boost
+    if(document.fullscreenElement){
+      srtOverlay.style.fontSize = (subSettings.size + 6) + 'px';
+    }
+  }
+
   function loadSRT(srtText){
     srtCues = parseSRT(srtText);
     if(!srtOverlay){
       srtOverlay=document.createElement('div');
       srtOverlay.id='srtOverlay';
-      srtOverlay.style.cssText='position:absolute; bottom:70px; left:50%; transform:translateX(-50%); max-width:80%; background:rgba(0,0,0,0.75); color:#fff; padding:6px 14px; border-radius:6px; font-size:16px; line-height:1.3; text-align:center; text-shadow:1px 1px 2px #000; z-index:15; pointer-events:none; font-family:Manrope,sans-serif; display:none;';
+      // viktigt: lägg INUTI playerFrame som går i fullscreen
       pFrame.appendChild(srtOverlay);
     }
-    // enkel timer synkad med Date.now - inte perfekt men funkar för demo
-    let startTime = Date.now()/1000;
-    setInterval(()=>{
-      const now = Date.now()/1000 - startTime;
+    applySubSettings();
+    srtStartTime = Date.now()/1000;
+    if(srtInterval) clearInterval(srtInterval);
+    srtInterval = setInterval(()=>{
+      const delay = parseFloat(subSettings.delay) || 0;
+      const now = Date.now()/1000 - srtStartTime + delay;
       const cue = srtCues.find(c=>now>=c.start && now<=c.end);
-      if(cue){ srtOverlay.textContent=cue.text; srtOverlay.style.display='block'; } else { srtOverlay.style.display='none'; }
-    }, 100);
+      if(cue){ 
+        // Stöd för RTL (farsi/kurdiska)
+        const isRtl = /[\u0600-\u06FF]/.test(cue.text);
+        srtOverlay.style.direction = isRtl ? 'rtl' : 'ltr';
+        srtOverlay.textContent=cue.text; 
+        srtOverlay.style.display='block'; 
+      } else { 
+        srtOverlay.style.display='none'; 
+      }
+    }, 80);
+    
+    // Se till att den syns i fullscreen också
+    document.addEventListener('fullscreenchange', ()=>{
+      if(srtOverlay){
+        pFrame.appendChild(srtOverlay); // re-append för att säkerställa den är kvar i fullscreen elementet
+        applySubSettings();
+      }
+    });
   }
+
+  // Settings UI logic
+  function initSubSettingsUI(){
+    const sizeInput=document.getElementById('subSize');
+    const bgInput=document.getElementById('subBg');
+    const delayInput=document.getElementById('subDelay');
+    const posSelect=document.getElementById('subPos');
+    const outlineSelect=document.getElementById('subOutline');
+    const colorPicker=document.getElementById('subColorPicker');
+    
+    if(sizeInput){ sizeInput.value=subSettings.size; document.getElementById('subSizeVal').textContent=subSettings.size+'px'; sizeInput.addEventListener('input', (e)=>{ subSettings.size=parseInt(e.target.value); document.getElementById('subSizeVal').textContent=subSettings.size+'px'; applySubSettings(); }); }
+    if(bgInput){ bgInput.value=subSettings.bg; document.getElementById('subBgVal').textContent=subSettings.bg+'%'; bgInput.addEventListener('input', (e)=>{ subSettings.bg=parseInt(e.target.value); document.getElementById('subBgVal').textContent=subSettings.bg+'%'; applySubSettings(); }); }
+    if(delayInput){ delayInput.value=subSettings.delay; document.getElementById('subDelayVal').textContent=subSettings.delay+'s'; delayInput.addEventListener('input', (e)=>{ subSettings.delay=parseFloat(e.target.value); document.getElementById('subDelayVal').textContent=subSettings.delay+'s'; }); }
+    if(posSelect){ posSelect.value=subSettings.pos; posSelect.addEventListener('change', (e)=>{ subSettings.pos=e.target.value; applySubSettings(); }); }
+    if(outlineSelect){ outlineSelect.value=subSettings.outline; outlineSelect.addEventListener('change', (e)=>{ subSettings.outline=e.target.value; applySubSettings(); }); }
+    if(colorPicker){
+      colorPicker.querySelectorAll('.sub-color').forEach(c=>{
+        c.classList.toggle('active', c.dataset.color===subSettings.color);
+        c.addEventListener('click', ()=>{
+          colorPicker.querySelectorAll('.sub-color').forEach(x=>x.classList.remove('active'));
+          c.classList.add('active');
+          subSettings.color=c.dataset.color;
+          applySubSettings();
+        });
+      });
+    }
+    document.getElementById('subSettingsBtn')?.addEventListener('click', (e)=>{ e.stopPropagation(); document.getElementById('subSettings').classList.toggle('show'); document.getElementById('osPanel').classList.remove('show'); showCC(); });
+    // Övre CC knapp bredvid H
+    document.getElementById('overlayCcBtn')?.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      const os = document.getElementById('osPanel');
+      if(os.classList.contains('show')){
+        os.classList.remove('show');
+        document.getElementById('overlayCcBtn').classList.remove('active');
+      } else {
+        // öppna direkt med senaste titel
+        const t = currentDetail?.title || currentDetail?.name || document.getElementById('query').value || 'movie';
+        // om ingen lang vald, defaulta till FA eftersom du använder mycket farsi
+        searchOpenSubtitles(t, 'fa');
+        document.getElementById('overlayCcBtn').classList.add('active');
+        // placera osPanel högt upp om vi är i övre horn-läge
+        showCC();
+      }
+    });
+    // H tangent också för helskärm (förutom F)
+    document.addEventListener('keydown', (e)=>{
+      if(e.key.toLowerCase()==='h' && !['INPUT','SELECT','TEXTAREA'].includes(e.target.tagName)){
+        e.preventDefault();
+        toggleFullscreen();
+      }
+    });
+
+    document.getElementById('subSettingsClose')?.addEventListener('click', ()=>{ document.getElementById('subSettings').classList.remove('show'); hideCCDelayed(); });
+    document.getElementById('subReset')?.addEventListener('click', ()=>{ subSettings={color:'#ffffff',size:18,bg:75,pos:'bottom',delay:0,outline:'shadow'}; localStorage.removeItem('kuribaxi_sub_settings'); initSubSettingsUI(); applySubSettings(); });
+    document.getElementById('subSave')?.addEventListener('click', ()=>{ localStorage.setItem('kuribaxi_sub_settings', JSON.stringify(subSettings)); document.getElementById('subSettings').classList.remove('show'); ccHint.textContent='✓ Subtitle inställningar sparade'; });
+  }
+
 
   ccToggleBtn.addEventListener('click',(e)=>{
     e.stopPropagation();
@@ -774,7 +934,7 @@
   document.getElementById('osClose').addEventListener('click',()=>{ osPanel.classList.remove('show'); hideCCDelayed(); });
 
 
-  loadLibrary(); renderLibrary();
+  loadLibrary(); renderLibrary(); initSubSettingsUI();
 })();
 </script>
 <!-- MUSIC PLAYER (samma som innan) -->
