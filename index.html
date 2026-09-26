@@ -366,7 +366,6 @@
     }
     .tafsir-translate-bar button:not(.active):active{background:var(--primary-soft);color:var(--primary)}
 
-    /* Tafsir-verktygsrad: font & storlek */
     .tafsir-tools-bar{
       display:flex;gap:8px;flex-wrap:wrap;align-items:center;
       padding:10px 24px;
@@ -418,7 +417,6 @@
     .tafsir-tools-bar .gt-btn:hover{background:var(--emerald);color:#fff}
     .tafsir-tools-bar .gt-btn:active{transform:scale(.95)}
 
-    /* Google Translate-panel */
     .gt-panel{
       display:none;
       padding:12px 24px;
@@ -475,7 +473,7 @@
     }
 
     /* ============================================================
-       GRÖN FÄRG FÖR ARABISKA AYOR I TAFSIR (alla språk)
+       GRÖN FÄRG FÖR ARABISKA AYOR I TAFSIR (alla språk inkl. persiska)
        ============================================================ */
     .tafsir-body .arabic,
     .tafsir-body .arabic-small,
@@ -486,12 +484,12 @@
     .tafsir-body .arabic-text,
     .tafsir-body .aya,
     .tafsir-body .ayah,
+    .tafsir-body .tafsir-aya-green,
     .tafsir-body span[lang="ar"],
     .tafsir-body div[lang="ar"],
     .tafsir-body em.arabic,
     .tafsir-body i.arabic,
     .tafsir-body b.arabic,
-    .tafsir-body .tafsir-aya-green,
     .tafsir-body [dir="rtl"][lang="ar"] {
       background: none !important;
       color: var(--emerald) !important;
@@ -505,7 +503,24 @@
       direction: rtl;
       text-align: right;
       font-weight: 700;
+      display: inline;
+    }
+
+    /* Särskilt för persisk tafsir (quranenc): arabiska aya inbäddade i persiska stycken */
+    .tafsir-body.tafsir-fa .tafsir-aya-green,
+    .tafsir-body.tafsir-fa .arabic,
+    .tafsir-body.tafsir-fa .quran-text,
+    .tafsir-body.tafsir-fa .arabic-text,
+    .tafsir-body.tafsir-fa [lang="ar"] {
+      color: var(--emerald) !important;
+      font-family: var(--quran-font) !important;
+      font-size: 1.2em !important;
+      font-weight: 700 !important;
+      background: none !important;
+      padding: 0 !important;
+      margin: 0 0 4px 0 !important;
       display: inline-block;
+      line-height: 2.1 !important;
     }
 
     /* ===== AYA-VÄLJAR-MODAL ===== */
@@ -2178,23 +2193,31 @@ function escapeHtml(str){
 }
 
 /* ============================================================
-   HIGHLIGHT ARABISKA CITAT I TAFSIR
+   HIGHLIGHT ARABISKA AYOR I TAFSIR (alla språk inkl. persiska)
    ============================================================ */
+function decodeHtmlEntities(str){
+  if(!str) return '';
+  const txt = document.createElement('textarea');
+  txt.innerHTML = str;
+  return txt.value;
+}
+
 function highlightArabicInTafsir(container){
   if(!container) return;
-  // Undvik dubbel-bearbetning
   if(container.dataset.arabicHighlighted === '1') return;
   try{
+    const arabicRegex = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
+    // Dela upp arabiska vs icke-arabiska tecken. Arabiska tecken + mellanslag + arabisk interpunktion
+    const splitRegex = /([\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF\u0660-\u0669\u06F0-\u06F9\u060C\u061B\u061F\u0640\u064B-\u065F\u0670\u06D6-\u06ED\uFD3E\uFD3F\u0600-\u0605\u06DD\u06DE\s]+)/;
+
     const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, {
       acceptNode: function(node){
         if(!node.nodeValue || !node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
         const parent = node.parentElement;
         if(!parent) return NodeFilter.FILTER_REJECT;
-        // Hoppa över om förälder redan är grönmarkerad eller en rubrik
         if(parent.classList.contains('tafsir-aya-green')) return NodeFilter.FILTER_REJECT;
         if(parent.tagName === 'H2' || parent.tagName === 'H1' || parent.tagName === 'H3') return NodeFilter.FILTER_REJECT;
-        // Endast om texten innehåller arabiska tecken
-        const arabicRegex = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
+        if(parent.tagName === 'SCRIPT' || parent.tagName === 'STYLE') return NodeFilter.FILTER_REJECT;
         if(!arabicRegex.test(node.nodeValue)) return NodeFilter.FILTER_REJECT;
         return NodeFilter.FILTER_ACCEPT;
       }
@@ -2203,16 +2226,18 @@ function highlightArabicInTafsir(container){
     while(walker.nextNode()) textNodes.push(walker.currentNode);
     textNodes.forEach(node => {
       const text = node.nodeValue;
-      // Dela upp i arabiska segment och icke-arabiska
-      const parts = text.split(/([\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF\s،؛؟!.:]+)/);
+      const parts = text.split(splitRegex);
       if(parts.length <= 1) return;
       const frag = document.createDocumentFragment();
       parts.forEach(part => {
         if(!part) return;
-        const isArabic = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/.test(part);
-        if(isArabic && part.trim().length >= 2){
+        const arabicChars = (part.match(/[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/g) || []).length;
+        // Om minst 3 arabiska tecken i följd → markera som grön aya
+        if(arabicChars >= 3 && arabicChars / part.length > 0.5){
           const span = document.createElement('span');
           span.className = 'tafsir-aya-green';
+          span.setAttribute('dir', 'rtl');
+          span.setAttribute('lang', 'ar');
           span.textContent = part;
           frag.appendChild(span);
         } else {
@@ -2227,7 +2252,6 @@ function highlightArabicInTafsir(container){
 function resetArabicHighlight(container){
   if(!container) return;
   container.dataset.arabicHighlighted = '0';
-  // Ta bort gamla grönmarkeringar
   container.querySelectorAll('.tafsir-aya-green').forEach(span => {
     const parent = span.parentNode;
     if(parent){
@@ -3442,10 +3466,16 @@ function applyTafsirFontStyles(bodyEl){
   bodyEl.style.setProperty('font-family', tafsirFontFamily, 'important');
   bodyEl.style.setProperty('font-size', tafsirFontSize + 'px', 'important');
 }
-/* Applicera grön färg på arabiska segment + font */
-function applyTafsirContentStyles(bodyEl){
+function applyTafsirContentStyles(bodyEl, lang){
   if(!bodyEl) return;
   applyTafsirFontStyles(bodyEl);
+  // Sätt klass för språkspecifik styling
+  bodyEl.classList.remove('tafsir-fa', 'tafsir-ku', 'tafsir-ar', 'tafsir-en');
+  if(lang === 'fa') bodyEl.classList.add('tafsir-fa');
+  else if(lang === 'ku') bodyEl.classList.add('tafsir-ku');
+  else if(lang === 'ar') bodyEl.classList.add('tafsir-ar');
+  else bodyEl.classList.add('tafsir-en');
+  // Markera arabiska aya grönt
   resetArabicHighlight(bodyEl);
   highlightArabicInTafsir(bodyEl);
   applyTafsirFontStyles(bodyEl);
@@ -3536,7 +3566,7 @@ async function runGoogleTranslate(){
   const paragraphs = translated.split(/\n{2,}/).filter(p => p.trim()).map(p => `<p>${escapeHtml(p.trim())}</p>`).join('');
   body.innerHTML = paragraphs || '<p>Ingen översättning tillgänglig.</p>';
   source.textContent = 'Google Translate (MyMemory) · ' + (targetLang === 'fa' ? 'Persiska' : 'Sorani');
-  applyTafsirContentStyles(body);
+  applyTafsirContentStyles(body, targetLang);
   body.classList.add('rtl');
   toast('✅ Översättning klar');
 }
@@ -3675,14 +3705,14 @@ async function openTafsirAyah(surah, ayah, label){
     body.innerHTML = '<p>Kunde inte hämta tafsir för denna vers just nu. Kontrollera internetanslutningen och försök igen.</p>';
     tafsirState.originalBody = body.innerHTML;
     tafsirState.originalSource = 'Tafsir ej tillgänglig';
-    applyTafsirContentStyles(body);
+    applyTafsirContentStyles(body, 'en');
     return;
   }
   tafsirState.originalSource = result.source;
   tafsirState.originalBody = result.body;
   source.textContent = result.source;
   body.innerHTML = result.body;
-  applyTafsirContentStyles(body);
+  applyTafsirContentStyles(body, 'en');
 }
 
 async function openTafsirChapter(surah, chapterName){
@@ -3713,7 +3743,7 @@ async function openTafsirChapter(surah, chapterName){
     body.innerHTML = '<p>Kunde inte hämta tafsir för denna sura just nu. Prova igen senare.</p>';
     tafsirState.originalBody = body.innerHTML;
     tafsirState.originalSource = 'Tafsir ej tillgänglig';
-    applyTafsirContentStyles(body);
+    applyTafsirContentStyles(body, 'en');
     return;
   }
 
@@ -3737,7 +3767,7 @@ async function openTafsirChapter(surah, chapterName){
   tafsirState.originalBody = html;
   source.textContent = tafsirState.originalSource;
   body.innerHTML = html;
-  applyTafsirContentStyles(body);
+  applyTafsirContentStyles(body, 'en');
 }
 
 async function openTafsirDaily(){
@@ -3795,7 +3825,7 @@ async function translateTafsirTo(lang){
     source.textContent = tafsirState.originalSource;
     body.classList.remove('rtl');
     body.classList.add('original');
-    applyTafsirContentStyles(body);
+    applyTafsirContentStyles(body, 'en');
     return;
   }
 
@@ -3805,7 +3835,7 @@ async function translateTafsirTo(lang){
       body.innerHTML = tafsirState.nativeCache[lang].body;
       source.textContent = tafsirState.nativeCache[lang].source;
       body.classList.add('rtl');
-      applyTafsirContentStyles(body);
+      applyTafsirContentStyles(body, lang);
       return;
     }
 
@@ -3845,12 +3875,12 @@ async function translateTafsirTo(lang){
       body.innerHTML = resultBody;
       source.textContent = resultSource;
       body.classList.add('rtl');
-      applyTafsirContentStyles(body);
+      applyTafsirContentStyles(body, lang);
     } else {
       body.innerHTML = '<p>Tafsir är inte tillgänglig på detta språk just nu. Kontrollera internetanslutningen eller försök igen senare.</p>';
       source.textContent = 'Ej tillgänglig';
       body.classList.remove('rtl');
-      applyTafsirContentStyles(body);
+      applyTafsirContentStyles(body, lang);
     }
     return;
   }
