@@ -473,8 +473,9 @@
     }
 
     /* ============================================================
-       GRÖN FÄRG FÖR ARABISKA AYOR I TAFSIR (alla språk inkl. persiska)
+       GRÖN FÄRG FÖR ARABISKA AYOR I TAFSIR (alla språk)
        ============================================================ */
+    .tafsir-body .tafsir-aya-green,
     .tafsir-body .arabic,
     .tafsir-body .arabic-small,
     .tafsir-body .tafsir-aya-arabic,
@@ -484,7 +485,6 @@
     .tafsir-body .arabic-text,
     .tafsir-body .aya,
     .tafsir-body .ayah,
-    .tafsir-body .tafsir-aya-green,
     .tafsir-body span[lang="ar"],
     .tafsir-body div[lang="ar"],
     .tafsir-body em.arabic,
@@ -504,23 +504,6 @@
       text-align: right;
       font-weight: 700;
       display: inline;
-    }
-
-    /* Särskilt för persisk tafsir (quranenc): arabiska aya inbäddade i persiska stycken */
-    .tafsir-body.tafsir-fa .tafsir-aya-green,
-    .tafsir-body.tafsir-fa .arabic,
-    .tafsir-body.tafsir-fa .quran-text,
-    .tafsir-body.tafsir-fa .arabic-text,
-    .tafsir-body.tafsir-fa [lang="ar"] {
-      color: var(--emerald) !important;
-      font-family: var(--quran-font) !important;
-      font-size: 1.2em !important;
-      font-weight: 700 !important;
-      background: none !important;
-      padding: 0 !important;
-      margin: 0 0 4px 0 !important;
-      display: inline-block;
-      line-height: 2.1 !important;
     }
 
     /* ===== AYA-VÄLJAR-MODAL ===== */
@@ -2193,65 +2176,82 @@ function escapeHtml(str){
 }
 
 /* ============================================================
-   HIGHLIGHT ARABISKA AYOR I TAFSIR (alla språk inkl. persiska)
+   HIGHLIGHT ARABISKA AYOR I TAFSIR
    ============================================================ */
-function decodeHtmlEntities(str){
-  if(!str) return '';
-  const txt = document.createElement('textarea');
-  txt.innerHTML = str;
-  return txt.value;
-}
-
 function highlightArabicInTafsir(container){
   if(!container) return;
-  if(container.dataset.arabicHighlighted === '1') return;
   try{
     const arabicRegex = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
-    // Dela upp arabiska vs icke-arabiska tecken. Arabiska tecken + mellanslag + arabisk interpunktion
-    const splitRegex = /([\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF\u0660-\u0669\u06F0-\u06F9\u060C\u061B\u061F\u0640\u064B-\u065F\u0670\u06D6-\u06ED\uFD3E\uFD3F\u0600-\u0605\u06DD\u06DE\s]+)/;
+    // Regex som matchar hela arabiska sekvenser (inkl. mellanslag, interpunktion och diakritiska tecken)
+    const arabicSeq = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF\u0660-\u0669\u06F0-\u06F9\u060C\u061B\u061F\u0640\u064B-\u065F\u0670\u06D6-\u06ED\uFD3E\uFD3F\u0600-\u0605\u06DD\u06DE\u200C\u200D\u200E\u200F\u0640]+/g;
 
+    // Bearbeta varje textnod som innehåller arabiska
     const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, {
       acceptNode: function(node){
-        if(!node.nodeValue || !node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+        if(!node.nodeValue) return NodeFilter.FILTER_REJECT;
         const parent = node.parentElement;
         if(!parent) return NodeFilter.FILTER_REJECT;
-        if(parent.classList.contains('tafsir-aya-green')) return NodeFilter.FILTER_REJECT;
-        if(parent.tagName === 'H2' || parent.tagName === 'H1' || parent.tagName === 'H3') return NodeFilter.FILTER_REJECT;
+        // Skippa redan markerade
+        if(parent.classList && parent.classList.contains('tafsir-aya-green')) return NodeFilter.FILTER_REJECT;
         if(parent.tagName === 'SCRIPT' || parent.tagName === 'STYLE') return NodeFilter.FILTER_REJECT;
+        if(parent.tagName === 'H1' || parent.tagName === 'H2' || parent.tagName === 'H3') return NodeFilter.FILTER_REJECT;
+        // Måste innehålla minst en arabisk bokstav
         if(!arabicRegex.test(node.nodeValue)) return NodeFilter.FILTER_REJECT;
         return NodeFilter.FILTER_ACCEPT;
       }
     });
+
     const textNodes = [];
-    while(walker.nextNode()) textNodes.push(walker.currentNode);
+    let n;
+    while((n = walker.nextNode())) textNodes.push(n);
+
     textNodes.forEach(node => {
       const text = node.nodeValue;
-      const parts = text.split(splitRegex);
-      if(parts.length <= 1) return;
+      let lastIndex = 0;
       const frag = document.createDocumentFragment();
-      parts.forEach(part => {
-        if(!part) return;
-        const arabicChars = (part.match(/[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/g) || []).length;
-        // Om minst 3 arabiska tecken i följd → markera som grön aya
-        if(arabicChars >= 3 && arabicChars / part.length > 0.5){
-          const span = document.createElement('span');
-          span.className = 'tafsir-aya-green';
-          span.setAttribute('dir', 'rtl');
-          span.setAttribute('lang', 'ar');
-          span.textContent = part;
-          frag.appendChild(span);
-        } else {
-          frag.appendChild(document.createTextNode(part));
+      let m;
+      arabicSeq.lastIndex = 0;
+      while((m = arabicSeq.exec(text)) !== null){
+        const match = m[0];
+        // Endast markera om det är en riktig arabisk fras (minst 4 arabiska bokstäver)
+        const arabicLetters = (match.match(/[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/g) || []).length;
+        if(match.trim().length === 0 || arabicLetters < 4){
+          // Hoppa över - behåll som vanlig text
+          if(m.index > lastIndex){
+            frag.appendChild(document.createTextNode(text.slice(lastIndex, m.index)));
+          }
+          frag.appendChild(document.createTextNode(match));
+          lastIndex = m.index + match.length;
+          continue;
         }
-      });
-      if(node.parentNode) node.parentNode.replaceChild(frag, node);
+        // Lägg till text före match
+        if(m.index > lastIndex){
+          frag.appendChild(document.createTextNode(text.slice(lastIndex, m.index)));
+        }
+        // Skapa grön span för arabisk fras
+        const span = document.createElement('span');
+        span.className = 'tafsir-aya-green';
+        span.setAttribute('dir', 'rtl');
+        span.setAttribute('lang', 'ar');
+        span.textContent = match;
+        frag.appendChild(span);
+        lastIndex = m.index + match.length;
+      }
+      // Resten
+      if(lastIndex < text.length){
+        frag.appendChild(document.createTextNode(text.slice(lastIndex)));
+      }
+      // Ersätt endast om vi hittade arabiska fraser
+      if(frag.childNodes.length > 0 && lastIndex > 0){
+        try{
+          node.parentNode.replaceChild(frag, node);
+        }catch(e){}
+      }
     });
-    container.dataset.arabicHighlighted = '1';
   }catch(e){ console.warn('highlightArabicInTafsir error:', e); }
 }
 function resetArabicHighlight(container){
   if(!container) return;
-  container.dataset.arabicHighlighted = '0';
   container.querySelectorAll('.tafsir-aya-green').forEach(span => {
     const parent = span.parentNode;
     if(parent){
@@ -3469,15 +3469,17 @@ function applyTafsirFontStyles(bodyEl){
 function applyTafsirContentStyles(bodyEl, lang){
   if(!bodyEl) return;
   applyTafsirFontStyles(bodyEl);
-  // Sätt klass för språkspecifik styling
   bodyEl.classList.remove('tafsir-fa', 'tafsir-ku', 'tafsir-ar', 'tafsir-en');
   if(lang === 'fa') bodyEl.classList.add('tafsir-fa');
   else if(lang === 'ku') bodyEl.classList.add('tafsir-ku');
   else if(lang === 'ar') bodyEl.classList.add('tafsir-ar');
   else bodyEl.classList.add('tafsir-en');
-  // Markera arabiska aya grönt
+  // Kör två gånger med delay för att säkerställa att DOM hunnit uppdateras
   resetArabicHighlight(bodyEl);
   highlightArabicInTafsir(bodyEl);
+  setTimeout(() => {
+    highlightArabicInTafsir(bodyEl);
+  }, 50);
   applyTafsirFontStyles(bodyEl);
 }
 
