@@ -1,45 +1,85 @@
-<!-- ============================================================
-     SNIPPET v3 – Markera text → sök-popup
-     Klistra in ALLT nedan precis före </body> i din HTML-fil.
+// =========================================================================
+// SÖK-POPUP: Markera text → popup med Google/YouTube/IMDb/Wikipedia
+//
+// VIKTIGT – NY PLATS ATT KLISTRA IN:
+// Leta upp den ALLRA SISTA raden i filens stora <script type="module">-
+// block. Den ser ut så här:
+//
+//   Bd.createRoot(document.getElementById("root")).render(h(Jd.default.StrictMode,{children:h(zs,{})}));
+//
+// Klistra in ALLT nedan DIREKT EFTER den raden (innan </script>).
+// Då körs koden som en del av appen och kan inte strippas av verktyget.
+// =========================================================================
 
-     TEST: När sidan laddas visas en gul bricka "✓ SÖKMODUL AKTIV"
-     nere till vänster i 5 sekunder. Syns den inte har skriptet inte
-     laddats alls (då är det pasting/cacheproblem, inte logiken).
-     ============================================================ -->
-
-<script>
 (function () {
-  // ---- START-TEST: syns alltid om skriptet körs ----
+  // ---------- START-TEST: gul bricka i 5 sekunder vid lyckad start ----------
   var testTag = document.createElement('div');
   testTag.textContent = '✓ SÖKMODUL AKTIV';
   testTag.style.cssText = 'position:fixed;bottom:70px;left:12px;z-index:2147483647;' +
     'background:#c9a227;color:#1a1305;font:bold 12px Manrope,sans-serif;' +
     'padding:6px 12px;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.4);';
   document.body.appendChild(testTag);
-  setTimeout(function () { testTag.remove(); }, 5000);
-})();
-</script>
+  setTimeout(function () { if (testTag.parentNode) testTag.remove(); }, 5000);
 
-<div id="selectionSearchBox" style="display:none; position:fixed; z-index:2147483647;
-     background:#121b2e; border:1px solid rgba(212,175,55,.32); border-radius:10px;
-     padding:8px; box-shadow:0 10px 30px rgba(0,0,0,.5); font-family:Manrope,sans-serif;">
-  <div id="selectionSearchText" style="font-size:11px; color:#e8c766; font-weight:700;
-       margin:2px 6px 6px; max-width:260px; white-space:nowrap; overflow:hidden;
-       text-overflow:ellipsis;"></div>
-  <div style="display:flex; gap:6px; flex-wrap:wrap;">
-    <button data-engine="https://www.google.com/search?q="        style="all:unset; cursor:pointer; background:#c9a227; color:#1a1305; font-size:11px; font-weight:700; padding:5px 10px; border-radius:6px;">🔎 Google</button>
-    <button data-engine="https://www.youtube.com/results?search_query=" style="all:unset; cursor:pointer; background:rgba(201,162,39,.14); color:#e8c766; font-size:11px; font-weight:700; padding:5px 10px; border-radius:6px; border:1px solid rgba(212,175,55,.32);">▶ YouTube</button>
-    <button data-engine="https://www.imdb.com/find/?q="           style="all:unset; cursor:pointer; background:rgba(201,162,39,.14); color:#e8c766; font-size:11px; font-weight:700; padding:5px 10px; border-radius:6px; border:1px solid rgba(212,175,55,.32);">🎬 IMDb</button>
-    <button data-engine="https://sv.wikipedia.org/w/index.php?search=" style="all:unset; cursor:pointer; background:rgba(201,162,39,.14); color:#e8c766; font-size:11px; font-weight:700; padding:5px 10px; border-radius:6px; border:1px solid rgba(212,175,55,.32);">📚 Wikipedia</button>
-    <button id="selectionCopyBtn" style="all:unset; cursor:pointer; background:transparent; color:#a9a290; font-size:11px; font-weight:700; padding:5px 10px; border-radius:6px; border:1px solid rgba(169,162,144,.4);">📋 Kopiera</button>
-    <button id="selectionCloseBtn" style="all:unset; cursor:pointer; background:transparent; color:#f0938a; font-size:11px; font-weight:700; padding:5px 8px; border-radius:6px;">✕</button>
-  </div>
-</div>
+  // ---------- Popup-rutan byggs med DOM (inga extra HTML-taggar behövs) ----------
+  var box = document.createElement('div');
+  box.style.cssText = 'display:none;position:fixed;z-index:2147483647;' +
+    'background:#121b2e;border:1px solid rgba(212,175,55,.32);border-radius:10px;' +
+    'padding:8px;box-shadow:0 10px 30px rgba(0,0,0,.5);font-family:Manrope,sans-serif;';
+  var label = document.createElement('div');
+  label.style.cssText = 'font-size:11px;color:#e8c766;font-weight:700;margin:2px 6px 6px;' +
+    'max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
+  var row = document.createElement('div');
+  row.style.cssText = 'display:flex;gap:6px;flex-wrap:wrap;';
+  box.appendChild(label); box.appendChild(row);
+  document.body.appendChild(box);
 
-<script>
-(function () {
-  var box = document.getElementById('selectionSearchBox');
-  var label = document.getElementById('selectionSearchText');
+  var engines = [
+    ['🔎 Google',   'https://www.google.com/search?q=',                 '#c9a227', '#1a1305'],
+    ['▶ YouTube',   'https://www.youtube.com/results?search_query=',   'rgba(201,162,39,.14)', '#e8c766'],
+    ['🎬 IMDb',     'https://www.imdb.com/find/?q=',                   'rgba(201,162,39,.14)', '#e8c766'],
+    ['📚 Wikipedia', 'https://sv.wikipedia.org/w/index.php?search=',    'rgba(201,162,39,.14)', '#e8c766']
+  ];
+  engines.forEach(function (eng) {
+    var b = document.createElement('button');
+    b.textContent = eng[0];
+    b.style.cssText = 'all:unset;cursor:pointer;background:' + eng[2] + ';color:' + eng[3] +
+      ';font-size:11px;font-weight:700;padding:5px 10px;border-radius:6px;' +
+      'border:1px solid rgba(212,175,55,.32);';
+    b.addEventListener('click', function () {
+      if (!currentText) return;
+      window.open(eng[1] + encodeURIComponent(currentText), '_blank', 'noopener');
+      hideBox();
+    });
+    row.appendChild(b);
+  });
+
+  var copyBtn = document.createElement('button');
+  copyBtn.textContent = '📋 Kopiera';
+  copyBtn.style.cssText = 'all:unset;cursor:pointer;background:transparent;color:#a9a290;' +
+    'font-size:11px;font-weight:700;padding:5px 10px;border-radius:6px;' +
+    'border:1px solid rgba(169,162,144,.4);';
+  copyBtn.addEventListener('click', function () {
+    if (!currentText) return;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(currentText);
+    } else {
+      var ta = document.createElement('textarea');
+      ta.value = currentText; document.body.appendChild(ta);
+      ta.select(); document.execCommand('copy'); ta.remove();
+    }
+    hideBox();
+  });
+  row.appendChild(copyBtn);
+
+  var closeBtn = document.createElement('button');
+  closeBtn.textContent = '✕';
+  closeBtn.style.cssText = 'all:unset;cursor:pointer;background:transparent;color:#f0938a;' +
+    'font-size:11px;font-weight:700;padding:5px 8px;border-radius:6px;';
+  closeBtn.addEventListener('click', hideBox);
+  row.appendChild(closeBtn);
+
+  // ---------- Logik ----------
   var currentText = '';
   var mouseX = 100, mouseY = 100;
 
@@ -58,7 +98,6 @@
     if (top + h > window.innerHeight - 8) top = Math.max(8, y - h - 14);
     box.style.left = left + 'px';
     box.style.top = top + 'px';
-    console.log('[sökmodul] popup visas för:', currentText);
   }
 
   function getSelectedText() {
@@ -107,32 +146,6 @@
     }, 200);
   });
 
-  Array.prototype.forEach.call(
-    box.querySelectorAll('button[data-engine]'),
-    function (btn) {
-      btn.addEventListener('click', function () {
-        if (!currentText) return;
-        window.open(btn.getAttribute('data-engine') +
-          encodeURIComponent(currentText), '_blank', 'noopener');
-        hideBox();
-      });
-    }
-  );
-
-  document.getElementById('selectionCopyBtn').addEventListener('click', function () {
-    if (!currentText) return;
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(currentText);
-    } else {
-      var ta = document.createElement('textarea');
-      ta.value = currentText; document.body.appendChild(ta);
-      ta.select(); document.execCommand('copy'); ta.remove();
-    }
-    hideBox();
-  });
-
-  document.getElementById('selectionCloseBtn').addEventListener('click', hideBox);
-
   window.addEventListener('scroll', hideBox, true);
   window.addEventListener('resize', hideBox);
   document.addEventListener('keydown', function (e) {
@@ -142,4 +155,3 @@
     if (!box.contains(e.target)) hideBox();
   }, true);
 })();
-</script>
