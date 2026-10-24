@@ -1,13 +1,24 @@
 <!-- ============================================================
-     SNIPPET v2: Markera text → sök-popup visas direkt
+     SNIPPET v3 – Markera text → sök-popup
      Klistra in ALLT nedan precis före </body> i din HTML-fil.
 
-     v2-fixar:
-     - Fungerar även i textfält (input/textarea), inte bara vanlig text
-     - Lyssnar på "selectionchange" (triggas alltid, alla webbläsare)
-     - Mäter popupens storrik NÄR den syns (korrekt positionering)
-     - Hamnar alltid inom fönstret
+     TEST: När sidan laddas visas en gul bricka "✓ SÖKMODUL AKTIV"
+     nere till vänster i 5 sekunder. Syns den inte har skriptet inte
+     laddats alls (då är det pasting/cacheproblem, inte logiken).
      ============================================================ -->
+
+<script>
+(function () {
+  // ---- START-TEST: syns alltid om skriptet körs ----
+  var testTag = document.createElement('div');
+  testTag.textContent = '✓ SÖKMODUL AKTIV';
+  testTag.style.cssText = 'position:fixed;bottom:70px;left:12px;z-index:2147483647;' +
+    'background:#c9a227;color:#1a1305;font:bold 12px Manrope,sans-serif;' +
+    'padding:6px 12px;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.4);';
+  document.body.appendChild(testTag);
+  setTimeout(function () { testTag.remove(); }, 5000);
+})();
+</script>
 
 <div id="selectionSearchBox" style="display:none; position:fixed; z-index:2147483647;
      background:#121b2e; border:1px solid rgba(212,175,55,.32); border-radius:10px;
@@ -32,7 +43,6 @@
   var currentText = '';
   var mouseX = 100, mouseY = 100;
 
-  // Följ musen hela tiden så vi vet var popupen ska visas
   document.addEventListener('mousemove', function (e) {
     mouseX = e.clientX; mouseY = e.clientY;
   }, true);
@@ -40,72 +50,63 @@
   function hideBox() { box.style.display = 'none'; }
 
   function showBox(x, y) {
-    box.style.display = 'block';          // gör synlig FÖRST
+    box.style.display = 'block';
     var w = box.offsetWidth || 280;
-    var h = box.offsetHeight || 80;       // mät när den syns
+    var h = box.offsetHeight || 80;
     var left = Math.min(Math.max(8, x), window.innerWidth - w - 8);
     var top = y + 14;
     if (top + h > window.innerHeight - 8) top = Math.max(8, y - h - 14);
     box.style.left = left + 'px';
     box.style.top = top + 'px';
+    console.log('[sökmodul] popup visas för:', currentText);
   }
 
-  function getTextFromTarget(t) {
-    // Hämta markerad text även ur input/textarea-fält
-    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA') &&
-        t.selectionStart !== undefined && t.selectionEnd > t.selectionStart) {
-      return t.value.slice(t.selectionStart, t.selectionEnd);
+  function getSelectedText() {
+    var active = document.activeElement;
+    if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA') &&
+        active.selectionStart !== undefined &&
+        active.selectionEnd > active.selectionStart) {
+      return active.value.slice(active.selectionStart, active.selectionEnd);
     }
     var sel = window.getSelection ? window.getSelection() : null;
     return sel ? String(sel) : '';
   }
 
-  function checkSelection(clickX, clickY) {
-    var active = document.activeElement;
-    var text = getTextFromTarget(active).trim();
+  function checkSelection(x, y) {
+    var text = getSelectedText().trim();
     if (text && text.length >= 2 && text.length <= 200) {
       currentText = text;
       label.textContent = '"' + text + '"';
-      // Försök få position från markeringens rektangel,
-      // annars använd senaste musposition
-      var x = clickX, y = clickY;
-      try {
-        var sel = window.getSelection();
-        if (sel && sel.rangeCount > 0) {
-          var r = sel.getRangeAt(0).getBoundingClientRect();
-          if (r && (r.width > 0 || r.height > 0)) { x = r.left; y = r.bottom; }
-        }
-      } catch (err) {}
-      if (x === undefined || (x === 0 && y === 0)) { x = mouseX; y = mouseY; }
+      if (x === undefined || x === null) {
+        x = mouseX; y = mouseY;
+        try {
+          var sel = window.getSelection();
+          if (sel && sel.rangeCount > 0) {
+            var r = sel.getRangeAt(0).getBoundingClientRect();
+            if (r && (r.width > 0 || r.height > 0)) { x = r.left; y = r.bottom; }
+          }
+        } catch (err) {}
+      }
       showBox(x, y);
-      return true;
+    } else {
+      currentText = '';
+      hideBox();
     }
-    currentText = '';
-    hideBox();
-    return false;
   }
 
-  // Huvudtrigger: körs när som helst markeringen ändras
-  document.addEventListener('selectionchange', function () {
-    // Liten fördröjning så markeringen hinner bli klar vid drag
-    if (hideBox) clearTimeout(hideBox);
-    setTimeout(function () { checkSelection(undefined, undefined); }, 80);
-  });
-
-  // Mus: kolla vid mouseup (markering klar efter drag)
   document.addEventListener('mouseup', function (e) {
     if (box.contains(e.target)) return;
     setTimeout(function () { checkSelection(e.clientX, e.clientY); }, 10);
   });
 
-  // Touch/mobil
   document.addEventListener('touchend', function (e) {
     if (box.contains(e.target)) return;
     var t = e.changedTouches && e.changedTouches[0];
-    setTimeout(function () { checkSelection(t ? t.clientX : mouseX, t ? t.clientY : mouseY); }, 200);
+    setTimeout(function () {
+      checkSelection(t ? t.clientX : mouseX, t ? t.clientY : mouseY);
+    }, 200);
   });
 
-  // Sök-knapparna
   Array.prototype.forEach.call(
     box.querySelectorAll('button[data-engine]'),
     function (btn) {
@@ -118,7 +119,6 @@
     }
   );
 
-  // Kopiera
   document.getElementById('selectionCopyBtn').addEventListener('click', function () {
     if (!currentText) return;
     if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -133,7 +133,6 @@
 
   document.getElementById('selectionCloseBtn').addEventListener('click', hideBox);
 
-  // Dölj vid scroll, klick utanför, Escape och fönsterändring
   window.addEventListener('scroll', hideBox, true);
   window.addEventListener('resize', hideBox);
   document.addEventListener('keydown', function (e) {
