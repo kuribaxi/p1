@@ -1,12 +1,15 @@
 <!-- ============================================================
-     SNIPPET: Markera text → sök-popup visas direkt
-     Klistra in ALLT nedan precis före </body> i din HTML-fil
-     (allra sist, efter de andra <script>-taggarna).
-     Fungerar med mus-drag, dubbelklick och mobil-markering.
-     Sökmotorer: Google, YouTube, IMDb, Wikipedia + Kopiera.
+     SNIPPET v2: Markera text → sök-popup visas direkt
+     Klistra in ALLT nedan precis före </body> i din HTML-fil.
+
+     v2-fixar:
+     - Fungerar även i textfält (input/textarea), inte bara vanlig text
+     - Lyssnar på "selectionchange" (triggas alltid, alla webbläsare)
+     - Mäter popupens storrik NÄR den syns (korrekt positionering)
+     - Hamnar alltid inom fönstret
      ============================================================ -->
 
-<div id="selectionSearchBox" style="display:none; position:fixed; z-index:10002;
+<div id="selectionSearchBox" style="display:none; position:fixed; z-index:2147483647;
      background:#121b2e; border:1px solid rgba(212,175,55,.32); border-radius:10px;
      padding:8px; box-shadow:0 10px 30px rgba(0,0,0,.5); font-family:Manrope,sans-serif;">
   <div id="selectionSearchText" style="font-size:11px; color:#e8c766; font-weight:700;
@@ -27,70 +30,100 @@
   var box = document.getElementById('selectionSearchBox');
   var label = document.getElementById('selectionSearchText');
   var currentText = '';
-  var hideTimer = null;
+  var mouseX = 100, mouseY = 100;
 
-  function showBox(x, y) {
-    // Positionera nära markeringen, håll inom fönstret
-    var w = box.offsetWidth || 240, h = box.offsetHeight || 70;
-    var left = Math.min(Math.max(8, x), window.innerWidth - w - 8);
-    var top = y + 12;
-    if (top + h > window.innerHeight - 8) top = y - h - 12;
-    box.style.left = left + 'px';
-    box.style.top = top + 'px';
-    box.style.display = 'block';
-  }
+  // Följ musen hela tiden så vi vet var popupen ska visas
+  document.addEventListener('mousemove', function (e) {
+    mouseX = e.clientX; mouseY = e.clientY;
+  }, true);
 
   function hideBox() { box.style.display = 'none'; }
 
-  function onMouseUp(e) {
-    if (box.contains(e.target)) return; // klick inuti rutan
-    // Låt markeringen hinna uppdateras
-    setTimeout(function () {
-      var sel = window.getSelection ? window.getSelection() : null;
-      var text = sel ? String(sel).trim() : '';
-      if (text && text.length >= 2 && text.length <= 200) {
-        currentText = text;
-        label.textContent = '"' + text + '"';
-        var r = sel.getRangeAt(0).getBoundingClientRect();
-        showBox(r.left, r.bottom);
-      } else {
-        currentText = '';
-        hideBox();
-      }
-    }, 10);
+  function showBox(x, y) {
+    box.style.display = 'block';          // gör synlig FÖRST
+    var w = box.offsetWidth || 280;
+    var h = box.offsetHeight || 80;       // mät när den syns
+    var left = Math.min(Math.max(8, x), window.innerWidth - w - 8);
+    var top = y + 14;
+    if (top + h > window.innerHeight - 8) top = Math.max(8, y - h - 14);
+    box.style.left = left + 'px';
+    box.style.top = top + 'px';
   }
 
-  // Mobil/pekskärm
-  function onTouchEnd(e) {
-    if (box.contains(e.target)) return;
-    setTimeout(function () {
-      var sel = window.getSelection ? window.getSelection() : null;
-      var text = sel ? String(sel).trim() : '';
-      if (text && text.length >= 2) {
-        currentText = text;
-        label.textContent = '"' + text + '"';
-        var r;
-        try { r = sel.getRangeAt(0).getBoundingClientRect(); } catch (err) { hideBox(); return; }
-        showBox(r.left, r.bottom);
-      }
-    }, 150);
+  function getTextFromTarget(t) {
+    // Hämta markerad text även ur input/textarea-fält
+    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA') &&
+        t.selectionStart !== undefined && t.selectionEnd > t.selectionStart) {
+      return t.value.slice(t.selectionStart, t.selectionEnd);
+    }
+    var sel = window.getSelection ? window.getSelection() : null;
+    return sel ? String(sel) : '';
   }
+
+  function checkSelection(clickX, clickY) {
+    var active = document.activeElement;
+    var text = getTextFromTarget(active).trim();
+    if (text && text.length >= 2 && text.length <= 200) {
+      currentText = text;
+      label.textContent = '"' + text + '"';
+      // Försök få position från markeringens rektangel,
+      // annars använd senaste musposition
+      var x = clickX, y = clickY;
+      try {
+        var sel = window.getSelection();
+        if (sel && sel.rangeCount > 0) {
+          var r = sel.getRangeAt(0).getBoundingClientRect();
+          if (r && (r.width > 0 || r.height > 0)) { x = r.left; y = r.bottom; }
+        }
+      } catch (err) {}
+      if (x === undefined || (x === 0 && y === 0)) { x = mouseX; y = mouseY; }
+      showBox(x, y);
+      return true;
+    }
+    currentText = '';
+    hideBox();
+    return false;
+  }
+
+  // Huvudtrigger: körs när som helst markeringen ändras
+  document.addEventListener('selectionchange', function () {
+    // Liten fördröjning så markeringen hinner bli klar vid drag
+    if (hideBox) clearTimeout(hideBox);
+    setTimeout(function () { checkSelection(undefined, undefined); }, 80);
+  });
+
+  // Mus: kolla vid mouseup (markering klar efter drag)
+  document.addEventListener('mouseup', function (e) {
+    if (box.contains(e.target)) return;
+    setTimeout(function () { checkSelection(e.clientX, e.clientY); }, 10);
+  });
+
+  // Touch/mobil
+  document.addEventListener('touchend', function (e) {
+    if (box.contains(e.target)) return;
+    var t = e.changedTouches && e.changedTouches[0];
+    setTimeout(function () { checkSelection(t ? t.clientX : mouseX, t ? t.clientY : mouseY); }, 200);
+  });
 
   // Sök-knapparna
-  box.querySelectorAll('button[data-engine]').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      if (!currentText) return;
-      window.open(btn.getAttribute('data-engine') +
-        encodeURIComponent(currentText), '_blank', 'noopener');
-      hideBox();
-    });
-  });
+  Array.prototype.forEach.call(
+    box.querySelectorAll('button[data-engine]'),
+    function (btn) {
+      btn.addEventListener('click', function () {
+        if (!currentText) return;
+        window.open(btn.getAttribute('data-engine') +
+          encodeURIComponent(currentText), '_blank', 'noopener');
+        hideBox();
+      });
+    }
+  );
 
   // Kopiera
   document.getElementById('selectionCopyBtn').addEventListener('click', function () {
     if (!currentText) return;
-    if (navigator.clipboard) navigator.clipboard.writeText(currentText);
-    else {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(currentText);
+    } else {
       var ta = document.createElement('textarea');
       ta.value = currentText; document.body.appendChild(ta);
       ta.select(); document.execCommand('copy'); ta.remove();
@@ -100,14 +133,14 @@
 
   document.getElementById('selectionCloseBtn').addEventListener('click', hideBox);
 
-  // Dölj vid scroll, klick utanför eller Escape
+  // Dölj vid scroll, klick utanför, Escape och fönsterändring
   window.addEventListener('scroll', hideBox, true);
+  window.addEventListener('resize', hideBox);
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') hideBox();
   });
-
-  document.addEventListener('mouseup', onMouseUp);
-  document.addEventListener('touchend', onTouchEnd);
-  window.addEventListener('resize', hideBox);
+  document.addEventListener('mousedown', function (e) {
+    if (!box.contains(e.target)) hideBox();
+  }, true);
 })();
 </script>
